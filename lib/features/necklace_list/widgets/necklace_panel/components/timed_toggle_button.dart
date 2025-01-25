@@ -20,8 +20,8 @@ class TimedToggleButton extends StatelessWidget {
 
   const TimedToggleButton({
     Key? key,
-    this.activeColor,
-    this.inactiveColor = Colors.grey,
+    this.activeColor = const Color(0xFF1E88E5),
+    this.inactiveColor = const Color(0xFFBBDEFB),
     required this.iconData,
     this.iconColor = Colors.white,
     this.buttonSize = 48.0,
@@ -62,6 +62,8 @@ class TimedToggleButton extends StatelessWidget {
 class _TimedToggleButtonView extends StatelessWidget {
   final Color? activeColor;
   final Color? inactiveColor;
+  final Color defaultActiveColor = Colors.blue[600]!;
+  final Color defaultInactiveColor = Colors.blue[100]!;
   final IconData iconData;
   final Color? iconColor;
   final double buttonSize;
@@ -73,7 +75,7 @@ class _TimedToggleButtonView extends StatelessWidget {
   final bool isConnected;
   final VoidCallback onToggle;
 
-  const _TimedToggleButtonView({
+  _TimedToggleButtonView({
     Key? key,
     this.activeColor,
     this.inactiveColor,
@@ -98,9 +100,12 @@ class _TimedToggleButtonView extends StatelessWidget {
       },
       child: BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
         builder: (context, state) {
-          final buttonColor = activeColor ?? Colors.grey[300];
           bool isLightOn = state is LightOnState;
+          final currentActiveColor = activeColor ?? defaultActiveColor;
+          final currentInactiveColor = inactiveColor ?? defaultInactiveColor;
+          final buttonColor = isConnected ? (isLightOn ? currentActiveColor : currentInactiveColor) : Colors.grey[300];
 
+          // Set button color based on connection and light state
           return Stack(
             children: [
               Container(
@@ -108,7 +113,7 @@ class _TimedToggleButtonView extends StatelessWidget {
                 height: buttonSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: isConnected ? (isLightOn ? buttonColor : inactiveColor) : Colors.grey.shade300,
+                  color: buttonColor,
                 ),
                 child: Center(
                   child: Icon(

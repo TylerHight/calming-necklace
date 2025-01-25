@@ -56,8 +56,8 @@ class _NecklacePanelState extends State<NecklacePanel> {
                 _buildActionButton(Icons.note_add, 'Add Note', () {
                   // Add a note
                 }),
-                _buildTimedToggleButton(Icons.spa, 1), // Release 1
-                _buildTimedToggleButton(Icons.spa, 2), // Release 2
+                _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Release 1
+                _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Release 2
               ],
             ),
           ],
@@ -99,17 +99,19 @@ class _NecklacePanelState extends State<NecklacePanel> {
     );
   }
 
-  Widget _buildTimedToggleButton(IconData icon, int buttonIndex) {
+  Widget _buildTimedToggleButton(IconData icon, int buttonIndex, Color activeColor, Color inactiveColor) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: TimedToggleButton(
-          autoTurnOffDuration: const Duration(seconds: 5), // Example duration
-          periodicEmissionTimerDuration: const Duration(seconds: 10), // Example duration
+          autoTurnOffDuration: const Duration(seconds: 5),
+          periodicEmissionTimerDuration: const Duration(seconds: 10),
           isConnected: widget.isConnected,
           necklace: widget.necklace,
           bleConnectionBloc: widget.bleConnectionBloc,
           iconData: icon,
+          activeColor: activeColor,
+          inactiveColor: inactiveColor,
           onToggle: () {
             setState(() {
               if (buttonIndex == 1) {
