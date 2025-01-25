@@ -1,0 +1,53 @@
+class BleConstants {
+  // Device Information
+  static const String DEVICE_NAME = "QUE Device";
+  static const String DEVICE_NAME_PREFIX = "QUE";
+
+  // Connection settings
+  static const Duration CONNECTION_TIMEOUT = Duration(seconds: 180);
+  static const Duration KEEP_ALIVE_INTERVAL = Duration(seconds: 60);
+  static const Duration KEEP_ALIVE_TIMEOUT = Duration(seconds: 120);
+  static const Duration RECONNECT_DELAY = Duration(seconds: 2);
+  static const int MAX_CONNECTION_RETRIES = 3;
+  static const int MIN_RSSI_THRESHOLD = -80;
+
+  // Service UUIDs
+  static const String LED_SERVICE_UUID = "180A";
+  static const String SETTINGS_SERVICE_UUID = "180F";
+  static const String HEARTRATE_SERVICE_UUID = "180D";
+
+  // Characteristic UUIDs
+  static const String SWITCH_CHARACTERISTIC_UUID = "2A57";
+  static const String KEEPALIVE_CHARACTERISTIC_UUID = "2A3B";
+  static const String EMISSION1_CHARACTERISTIC_UUID = "2A19";
+  static const String EMISSION2_CHARACTERISTIC_UUID = "2A1A";
+  static const String INTERVAL1_CHARACTERISTIC_UUID = "2A1B";
+  static const String INTERVAL2_CHARACTERISTIC_UUID = "2A1C";
+  static const String PERIODIC1_CHARACTERISTIC_UUID = "2A1D";
+  static const String PERIODIC2_CHARACTERISTIC_UUID = "2A1E";
+  static const String HEARTRATE_CHARACTERISTIC_UUID = "2A1F";
+
+  // MTU Settings
+  static const int DEFAULT_MTU = 23;
+  static const int PREFERRED_MTU = 512;
+
+  // Error Messages
+  static const String ERR_DEVICE_NOT_FOUND = "QUE device not found";
+  static const String ERR_CONNECTION_FAILED = "Failed to connect to device";
+  static const String ERR_SERVICE_NOT_FOUND = "Required BLE service not found";
+  static const String ERR_CHARACTERISTIC_NOT_FOUND = "Required characteristic not found";
+  static const String ERR_DEVICE_DISCONNECTED = "Device disconnected unexpectedly";
+  static const String ERR_BLUETOOTH_DISABLED = "Bluetooth is disabled";
+  static const String ERR_TIMEOUT = "Connection timeout";
+  static const String ERR_KEEPALIVE_FAILED = "Keep-alive check failed";
+  static const String ERR_INVALID_COMMAND = "Invalid command value";
+  static const String ERR_CHARACTERISTIC_WRITE = "Failed to write to characteristic";
+  static const String ERR_CHARACTERISTIC_READ = "Failed to read characteristic";
+  static const String ERR_DISCOVERY = "Service discovery failed";
+
+  // Status Messages
+  static const String MSG_CONNECTING = "Connecting to device...";
+  static const String MSG_CONNECTED = "Connected successfully";
+  static const String MSG_DISCONNECTED = "Device disconnected";
+  static const String MSG_SCANNING = "Scanning for devices...";
+}
