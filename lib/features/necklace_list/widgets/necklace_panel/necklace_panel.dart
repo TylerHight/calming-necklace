@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:developer' as developer;
 
 import '../../../../core/blocs/ble_connection/ble_connection_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import 'components/timed_toggle_button.dart';
+import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
@@ -30,37 +33,43 @@ class _NecklacePanelState extends State<NecklacePanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(widget.name, style: Theme.of(context).textTheme.titleLarge),
-                _buildConnectionStatus(),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildActionButton(Icons.settings, 'Settings', () {
-                  // Navigate to settings
-                }),
-                _buildActionButton(Icons.note_add, 'Add Note', () {
-                  // Add a note
-                }),
-                _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Release 1
-                _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Release 2
-              ],
-            ),
-          ],
+    return BlocProvider(
+      create: (context) => TimedToggleButtonBloc(
+        bleConnectionBloc: widget.bleConnectionBloc,
+        necklace: widget.necklace,
+      ),
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(widget.name, style: Theme.of(context).textTheme.titleLarge),
+                  _buildConnectionStatus(),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildActionButton(Icons.settings, 'Settings', () {
+                    // Navigate to settings
+                  }),
+                  _buildActionButton(Icons.note_add, 'Add Note', () {
+                    // Add a note
+                  }),
+                  _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
+                  _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

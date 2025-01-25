@@ -101,11 +101,9 @@ class _TimedToggleButtonView extends StatelessWidget {
       child: BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
         builder: (context, state) {
           bool isLightOn = state is LightOnState;
-          final currentActiveColor = activeColor ?? defaultActiveColor;
-          final currentInactiveColor = inactiveColor ?? defaultInactiveColor;
-          final buttonColor = isConnected ? (isLightOn ? currentActiveColor : currentInactiveColor) : Colors.grey[300];
+          String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
+          final buttonColor = isLightOn ? activeColor : inactiveColor;
 
-          // Set button color based on connection and light state
           return Stack(
             children: [
               Container(
@@ -134,7 +132,7 @@ class _TimedToggleButtonView extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.all(4),
                     child: Text(
-                      _formatTime(state.secondsLeft),
+                      timeLeft,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white,
@@ -153,7 +151,7 @@ class _TimedToggleButtonView extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.all(4),
                     child: Text(
-                      _formatTime(state.secondsLeft),
+                      timeLeft,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white,

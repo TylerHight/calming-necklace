@@ -20,13 +20,8 @@ class LightOnState extends TimedToggleButtonState {
   List<Object> get props => [secondsLeft];
 }
 
-class AutoTurnOffState extends TimedToggleButtonState {
-  final int secondsLeft;
-
-  const AutoTurnOffState(this.secondsLeft);
-
-  @override
-  List<Object> get props => [secondsLeft];
+class AutoTurnOffState extends LightOnState {
+  const AutoTurnOffState(int secondsLeft) : super(secondsLeft);
 }
 
 class PeriodicEmissionState extends TimedToggleButtonState {
