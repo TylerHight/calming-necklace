@@ -188,12 +188,14 @@ class _NecklacePanelState extends State<NecklacePanel> {
   Widget _buildControls() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
-          child: _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
+          child: _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!),
         ),
+        SizedBox(width: UIConstants.timedToggleButtonSpacing),
         Expanded(
-          child: _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
+          child: _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!),
         ),
       ],
     );
@@ -212,6 +214,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
         activeColor: activeColor,
         inactiveColor: inactiveColor,
         label: 'Emission $buttonIndex',
+        buttonWidth: UIConstants.timedToggleButtonWidth,
         onToggle: () {
           setState(() {
             if (buttonIndex == 1) {

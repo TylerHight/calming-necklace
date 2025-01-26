@@ -14,6 +14,7 @@ class TimedToggleButton extends StatelessWidget {
   final Color? iconColor;
   final double buttonSize;
   final double iconSize;
+  final double buttonWidth;
   final Duration autoTurnOffDuration;
   final Duration periodicEmissionTimerDuration;
   final bool isConnected;
@@ -30,6 +31,7 @@ class TimedToggleButton extends StatelessWidget {
     this.iconColor = Colors.white,
     this.buttonSize = 60.0,
     this.iconSize = 28.0,
+    required this.buttonWidth,
     required this.autoTurnOffDuration,
     required this.periodicEmissionTimerDuration,
     required this.isConnected,
@@ -53,6 +55,7 @@ class TimedToggleButton extends StatelessWidget {
         iconColor: iconColor,
         buttonSize: buttonSize,
         iconSize: iconSize,
+        buttonWidth: buttonWidth,
         autoTurnOffDuration: autoTurnOffDuration,
         autoTurnOffEnabled: necklace.autoTurnOffEnabled,
         periodicEmissionTimerDuration: periodicEmissionTimerDuration,
@@ -72,6 +75,7 @@ class _TimedToggleButtonView extends StatelessWidget {
   final Color? iconColor;
   final double buttonSize;
   final double iconSize;
+  final double buttonWidth;
   final Duration autoTurnOffDuration;
   final bool autoTurnOffEnabled;
   final Duration periodicEmissionTimerDuration;
@@ -88,6 +92,7 @@ class _TimedToggleButtonView extends StatelessWidget {
     required this.iconColor,
     required this.buttonSize,
     required this.iconSize,
+    required this.buttonWidth,
     required this.autoTurnOffDuration,
     required this.autoTurnOffEnabled,
     required this.periodicEmissionTimerDuration,
@@ -135,8 +140,8 @@ class _TimedToggleButtonView extends StatelessWidget {
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             child: Container(
+              width: UIConstants.timedToggleButtonWidth,
               height: UIConstants.timedToggleButtonSize,
-              width: UIConstants.timedToggleButtonSize,
               padding: const EdgeInsets.all(0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -158,14 +163,14 @@ class _TimedToggleButtonView extends StatelessWidget {
               ),
 
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Centering horizontally
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     iconData,
                     color: iconColor,
                     size: UIConstants.timedToggleButtonIconSize,
                   ),
-                  const SizedBox(width: 4), // Space between icon and timer
+                  const SizedBox(width: 4),
                   if (isLightOn && timeLeft.isNotEmpty)
                     Text(
                       timeLeft,
