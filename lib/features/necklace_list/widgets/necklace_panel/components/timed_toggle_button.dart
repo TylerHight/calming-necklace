@@ -134,52 +134,45 @@ class _TimedToggleButtonView extends StatelessWidget {
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             child: Container(
-              height: 80,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              height: 60, // Adjusted height for circular button
+              width: 60, // Added width for circular button
+              padding: const EdgeInsets.all(0), // Adjusted padding for circular button
               decoration: BoxDecoration(
-                color: isLightOn ? activeColor : inactiveColor,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    isLightOn ? activeColor!.withOpacity(0.9) : inactiveColor!.withOpacity(0.9),
+                    isLightOn ? activeColor! : inactiveColor!,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(30), // Changed to 30 for circular shape
                 boxShadow: isLightOn ? [
                   BoxShadow(
                     color: activeColor!.withOpacity(0.4),
                     blurRadius: 8,
-                    spreadRadius: 2,
+                    offset: Offset(0, 2),
                   ),
                 ] : null,
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center, // Centering vertically
                 children: [
+                  Icon(
+                    iconData,
+                    color: iconColor,
+                    size: iconSize,
+                  ),
+                  const SizedBox(height: 4),
                   if (isLightOn && timeLeft.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(
-                        timeLeft,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+                    Text(
+                      timeLeft,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        iconData,
-                        color: iconColor,
-                        size: iconSize,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        label,
-                        style: TextStyle(
-                          color: iconColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

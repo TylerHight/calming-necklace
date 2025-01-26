@@ -26,8 +26,23 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Calming Necklace',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
+          ),
           useMaterial3: true,
+          cardTheme: CardTheme(
+            elevation: 4,
+            shadowColor: Colors.black.withOpacity(0.2),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          scaffoldBackgroundColor: Colors.grey[50],
+          appBarTheme: AppBarTheme(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+          ),
         ),
         home: const MainScreen(),
         debugShowCheckedModeBanner: false,

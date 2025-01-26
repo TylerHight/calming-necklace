@@ -1,5 +1,3 @@
-// lib/features/necklace_list/widgets/necklace_panel/components/emission_buttons.dart
-
 import 'package:flutter/material.dart';
 import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'timed_toggle_button.dart';
@@ -22,9 +20,8 @@ class EmissionControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 80,
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.grey[200]!,
@@ -32,30 +29,21 @@ class EmissionControls extends StatelessWidget {
         ),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Expanded(
-            child: _buildEmissionButton(
-              duration: necklace.emission1Duration,
-              interval: necklace.releaseInterval1,
-              color: Colors.pink[400]!,
-              inactiveColor: Colors.pink[100]!,
-              label: 'Emission 1',
-              isLeftButton: true,
-            ),
+          _buildEmissionButton(
+            duration: necklace.emission1Duration,
+            interval: necklace.releaseInterval1,
+            color: Colors.pink[400]!,
+            inactiveColor: Colors.pink[100]!,
+            isLeftButton: true,
           ),
-          Container(
-            width: 1,
-            color: Colors.grey[200],
-          ),
-          Expanded(
-            child: _buildEmissionButton(
-              duration: necklace.emission2Duration,
-              interval: necklace.releaseInterval2,
-              color: Colors.green[400]!,
-              inactiveColor: Colors.green[100]!,
-              label: 'Emission 2',
-              isLeftButton: false,
-            ),
+          _buildEmissionButton(
+            duration: necklace.emission2Duration,
+            interval: necklace.releaseInterval2,
+            color: Colors.green[400]!,
+            inactiveColor: Colors.green[100]!,
+            isLeftButton: false,
           ),
         ],
       ),
@@ -67,15 +55,26 @@ class EmissionControls extends StatelessWidget {
     required Duration interval,
     required Color color,
     required Color inactiveColor,
-    required String label,
     required bool isLeftButton,
   }) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.horizontal(
-          left: isLeftButton ? const Radius.circular(16) : Radius.zero,
-          right: !isLeftButton ? const Radius.circular(16) : Radius.zero,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            color.withOpacity(0.9),
+            color,
+          ],
         ),
+        borderRadius: BorderRadius.circular(30), // Changed to 30 for circular shape
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: TimedToggleButton(
         autoTurnOffDuration: duration,
@@ -87,9 +86,9 @@ class EmissionControls extends StatelessWidget {
         activeColor: color,
         inactiveColor: inactiveColor,
         iconColor: Colors.white,
-        buttonSize: double.infinity,
+        buttonSize: 60.0, // Set a fixed size for circular buttons
         iconSize: 24.0,
-        label: label,
+        label: '',
         onToggle: () {
           onCommand(isLeftButton ? 1 : 2);
         },

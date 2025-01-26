@@ -88,11 +88,18 @@ class _NecklacePanelState extends State<NecklacePanel> {
         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         elevation: 2,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(20),
         ),
         color: Colors.white,
-        child: Padding(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Colors.grey.shade50],
+            ),
+          ),
           padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,36 +179,38 @@ class _NecklacePanelState extends State<NecklacePanel> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
-        _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
+        Expanded(
+          child: _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
+        ),
+        Expanded(
+          child: _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
+        ),
       ],
     );
   }
 
   Widget _buildTimedToggleButton(IconData icon, int buttonIndex, Color activeColor, Color inactiveColor) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: TimedToggleButton(
-          autoTurnOffDuration: const Duration(seconds: 5),
-          periodicEmissionTimerDuration: const Duration(seconds: 10),
-          isConnected: widget.isConnected,
-          necklace: widget.necklace,
-          bleConnectionBloc: widget.bleConnectionBloc,
-          iconData: icon,
-          activeColor: activeColor,
-          inactiveColor: inactiveColor,
-          label: 'Emission $buttonIndex',
-          onToggle: () {
-            setState(() {
-              if (buttonIndex == 1) {
-                isRelease1Active = !isRelease1Active;
-              } else if (buttonIndex == 2) {
-                isRelease2Active = !isRelease2Active;
-              }
-            });
-          },
-        ),
+    return Container(
+      margin: EdgeInsets.zero, // Remove any margin
+      child: TimedToggleButton(
+        autoTurnOffDuration: const Duration(seconds: 5),
+        periodicEmissionTimerDuration: const Duration(seconds: 10),
+        isConnected: widget.isConnected,
+        necklace: widget.necklace,
+        bleConnectionBloc: widget.bleConnectionBloc,
+        iconData: icon,
+        activeColor: activeColor,
+        inactiveColor: inactiveColor,
+        label: 'Emission $buttonIndex',
+        onToggle: () {
+          setState(() {
+            if (buttonIndex == 1) {
+              isRelease1Active = !isRelease1Active;
+            } else if (buttonIndex == 2) {
+              isRelease2Active = !isRelease2Active;
+            }
+          });
+        },
       ),
     );
   }
