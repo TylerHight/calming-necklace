@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'features/necklace_list/presentation/necklaces_screen.dart';
 import 'app_bloc_observer.dart';
+import 'features/necklace_list/repositories/necklace_repository.dart';
+import 'core/services/logging_service.dart';
 
 void main() {
   Bloc.observer = AppBlocObserver();
+
   runApp(const MyApp());
 }
 
@@ -13,14 +17,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        Provider<NecklaceRepository>(
+          create: (context) => NecklaceRepositoryImpl(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Calming Necklace',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MainScreen(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: const MainScreen(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -47,6 +58,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final logger = LoggingService();
+    logger.logDebug('MainScreen: Created NecklaceRepositoryImpl:');
+
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(

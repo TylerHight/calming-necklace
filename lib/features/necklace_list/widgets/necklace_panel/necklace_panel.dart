@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:developer' as developer;
-
 import '../../../../core/blocs/ble_connection/ble_connection_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import 'components/timed_toggle_button.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
+import '../../repositories/necklace_repository.dart';
+import '../../../../core/services/logging_service.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
   final String name;
   final bool isConnected;
   final Necklace necklace;
+  final NecklaceRepository repository;
   final BleConnectionBloc bleConnectionBloc;
 
   const NecklacePanel({
@@ -20,6 +21,7 @@ class NecklacePanel extends StatefulWidget {
     required this.name,
     required this.isConnected,
     required this.necklace,
+    required this.repository,
     required this.bleConnectionBloc,
   }) : super(key: key);
 
@@ -33,9 +35,13 @@ class _NecklacePanelState extends State<NecklacePanel> {
 
   @override
   Widget build(BuildContext context) {
+    final logger = LoggingService();
+    logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
+    final repository = widget.repository;
+    
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(
-        bleConnectionBloc: widget.bleConnectionBloc,
+        repository: repository,
         necklace: widget.necklace,
       ),
       child: Card(

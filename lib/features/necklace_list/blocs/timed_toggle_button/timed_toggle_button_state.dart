@@ -9,6 +9,17 @@ abstract class TimedToggleButtonState extends Equatable {
 
 class TimedToggleButtonInitial extends TimedToggleButtonState {}
 
+class TimedToggleButtonLoading extends TimedToggleButtonState {}
+
+class TimedToggleButtonError extends TimedToggleButtonState {
+  final String message;
+
+  const TimedToggleButtonError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
 class LightOffState extends TimedToggleButtonState {}
 
 class LightOnState extends TimedToggleButtonState {

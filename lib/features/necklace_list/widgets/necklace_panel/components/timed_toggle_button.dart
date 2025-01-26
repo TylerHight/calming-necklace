@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
 import 'package:calming_necklace/features/necklace_list/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../../core/data/models/necklace.dart';
+import '../../../../../core/services/logging_service.dart';
+import '../../../repositories/necklace_repository.dart';
 
 class TimedToggleButton extends StatelessWidget {
   final Color? activeColor;
@@ -36,9 +38,13 @@ class TimedToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final repository = context.read<NecklaceRepository>();
+    final logger = LoggingService();
+    logger.logDebug('TimedToggleButton: Accessed NecklaceRepository: $repository');
+    
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(
-        bleConnectionBloc: bleConnectionBloc,
+        repository: repository,
         necklace: necklace,
       ),
       child: _TimedToggleButtonView(
@@ -93,20 +99,47 @@ class _TimedToggleButtonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        onToggle();
-        context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+    return BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
+      buildWhen: (previous, current) {
+        // Rebuild only when necessary
+        if (previous.runtimeType != current.runtimeType) return true;
+        if (previous is LightOnState && current is LightOnState) {
+          return previous.secondsLeft != current.secondsLeft;
+        }
+        return true;
       },
-      child: BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
-        builder: (context, state) {
-          bool isLightOn = state is LightOnState;
-          String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
-          final buttonColor = isLightOn ? activeColor : inactiveColor;
+      
+      builder: (context, state) {
+        if (state is TimedToggleButtonLoading) {
+          return const CircularProgressIndicator();
+        }
+        
+        if (state is TimedToggleButtonError) {
+          return Tooltip(
+            message: state.message,
+            child: Icon(Icons.error, color: Colors.red),
+          );
+        }
 
-          return Stack(
-            children: [
-              Container(
+        bool isLightOn = state is LightOnState;
+        String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
+        final buttonColor = isLightOn ? activeColor : inactiveColor;
+        
+        void handlePress() {
+          if (!isConnected) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Device not connected')),
+            );
+            return;
+          }
+          context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+        }
+
+        return Stack(
+          children: [
+            GestureDetector(
+              onTap: handlePress,
+              child: Container(
                 width: buttonSize,
                 height: buttonSize,
                 decoration: BoxDecoration(
@@ -121,60 +154,82 @@ class _TimedToggleButtonView extends StatelessWidget {
                   ),
                 ),
               ),
-              if (autoTurnOffEnabled && isLightOn && state is AutoTurnOffState)
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
+            ),
+            if (isLightOn)
+              Positioned(
+                bottom: buttonSize + 4, // Positioned above the button
+                left: 0,
+                right: 0,
+                child: Container(
+                  width: buttonSize * 1.5, // Adjust width relative to the button size
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    timeLeft,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: Colors.white,
                     ),
-                    padding: const EdgeInsets.all(4),
-                    child: Text(
-                      timeLeft,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            if (autoTurnOffEnabled && isLightOn && state is AutoTurnOffState)
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Text(
+                    timeLeft,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              if (periodicEmissionEnabled && !isLightOn && state is PeriodicEmissionState)
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Text(
-                      timeLeft,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.white,
-                      ),
+              ),
+            if (periodicEmissionEnabled && !isLightOn && state is PeriodicEmissionState)
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(4),
+                  child: Text(
+                    timeLeft,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-            ],
-          );
-        },
-      ),
+              ),
+          ],
+        );
+      },
     );
   }
 
   String _formatTime(int seconds) {
     if (seconds >= 3600) {
       int hours = seconds ~/ 3600;
-      return '$hours' 'h';
+      return '${hours}h';
     } else if (seconds >= 60) {
       int minutes = seconds ~/ 60;
-      return '$minutes' 'm';
+      return '${minutes}m';
     } else {
-      return '$seconds' 's';
+      return '${seconds}s';
     }
   }
 }

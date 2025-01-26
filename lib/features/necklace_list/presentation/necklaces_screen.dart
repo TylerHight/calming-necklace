@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../repositories/necklace_repository.dart';
 
 class NecklacesScreen extends StatefulWidget {
   const NecklacesScreen({super.key});
@@ -149,11 +151,13 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       padding: const EdgeInsets.all(16.0),
       itemCount: _necklaces.length,
       itemBuilder: (context, index) {
+        final repository = context.read<NecklaceRepository>();
         final necklace = _necklaces[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: NecklacePanel(
             index: index,
+            repository: repository,
             name: necklace.name,
             isConnected: true,
             necklace: necklace,

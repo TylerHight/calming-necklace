@@ -1,43 +1,52 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'ticker.dart';
-import 'package:calming_necklace/core/data/models/necklace.dart';
-import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
 import 'dart:async';
 import 'package:calming_necklace/core/services/logging_service.dart';
+import '../../../../core/data/models/necklace.dart';
+import '../../repositories/necklace_repository.dart';
+import 'ticker.dart';
 
 part 'timed_toggle_button_event.dart';
 part 'timed_toggle_button_state.dart';
 
 class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButtonState> {
-  final BleConnectionBloc bleConnectionBloc;
+  final NecklaceRepository _repository;
   final Necklace necklace;
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
+  bool _isActive = false;
   final LoggingService _logger = LoggingService();
 
   TimedToggleButtonBloc({
-    required this.bleConnectionBloc, 
+    required NecklaceRepository repository,
     required this.necklace,
-  }) : _ticker = const Ticker(),
+  }) : _repository = repository,
+       _ticker = const Ticker(),
        super(TimedToggleButtonInitial()) {
     on<ToggleLightEvent>(_onToggleLight);
     on<_TimerTicked>(_onTimerTicked);
     _logger.logInfo('TimedToggleButtonBloc initialized');
   }
 
-  void _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) {
-    _logger.logDebug('ToggleLightEvent received');
-    if (state is LightOffState || state is TimedToggleButtonInitial) {
-      emit(LightOnState(necklace.emission1Duration.inSeconds));
-      _tickerSubscription?.cancel();
-      _tickerSubscription = _ticker
-          .tick(ticks: necklace.emission1Duration.inSeconds)
-          .listen(
-            (duration) => add(_TimerTicked(duration: duration)),
-          );
-    } else {
-      _stopTimer(emit);
+  Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
+    try {
+      emit(TimedToggleButtonLoading());
+      _logger.logDebug('Toggle light event received. Current state: ${state.runtimeType}');
+      
+      _isActive = !_isActive;
+      if (_isActive) {
+        await _repository.toggleLight(necklace, true);
+        emit(const LightOnState(5)); // Start with 5 seconds
+        _startTimer(necklace.emission1Duration.inSeconds);
+        _logger.logDebug('Light turned on, timer started');
+      } else {
+        await _repository.toggleLight(necklace, false);
+        _stopTimer(emit);
+      }
+      _logger.logDebug('Toggle light completed successfully');
+    } catch (e) {
+      _logger.logError('Error in _onToggleLight: $e');
+      emit(TimedToggleButtonError(e.toString()));
     }
   }
 
@@ -47,6 +56,13 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
           ? LightOnState(event.duration)
           : LightOffState(),
     );
+  }
+
+  void _startTimer(int duration) {
+    _tickerSubscription?.cancel();
+    _tickerSubscription = _ticker
+        .tick(ticks: duration)
+        .listen((duration) => add(_TimerTicked(duration: duration)));
   }
 
   void _stopTimer(Emitter<TimedToggleButtonState> emit) {
