@@ -12,7 +12,7 @@ class TimedToggleButton extends StatelessWidget {
   final Color? inactiveColor;
   final IconData iconData;
   final Color? iconColor;
-  final double buttonSize;
+  final double buttonHeight;
   final double iconSize;
   final double buttonWidth;
   final Duration autoTurnOffDuration;
@@ -29,7 +29,7 @@ class TimedToggleButton extends StatelessWidget {
     this.inactiveColor = const Color(0xFFBBDEFB),
     required this.iconData,
     this.iconColor = Colors.white,
-    this.buttonSize = 60.0,
+    this.buttonHeight = 60.0,
     this.iconSize = 28.0,
     required this.buttonWidth,
     required this.autoTurnOffDuration,
@@ -53,7 +53,7 @@ class TimedToggleButton extends StatelessWidget {
         inactiveColor: inactiveColor,
         iconData: iconData,
         iconColor: iconColor,
-        buttonSize: buttonSize,
+        buttonSize: buttonHeight,
         iconSize: iconSize,
         buttonWidth: buttonWidth,
         autoTurnOffDuration: autoTurnOffDuration,
@@ -141,7 +141,7 @@ class _TimedToggleButtonView extends StatelessWidget {
             },
             child: Container(
               width: UIConstants.timedToggleButtonWidth,
-              height: UIConstants.timedToggleButtonSize,
+              height: UIConstants.timedToggleButtonHeight,
               padding: const EdgeInsets.all(0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(

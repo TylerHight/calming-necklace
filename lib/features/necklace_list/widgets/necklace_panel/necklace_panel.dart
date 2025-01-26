@@ -215,6 +215,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
         inactiveColor: inactiveColor,
         label: 'Emission $buttonIndex',
         buttonWidth: UIConstants.timedToggleButtonWidth,
+        buttonHeight: UIConstants.timedToggleButtonHeight,
         onToggle: () {
           setState(() {
             if (buttonIndex == 1) {
