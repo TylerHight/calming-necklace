@@ -90,6 +90,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
+
         color: Colors.white,
         child: Container(
           decoration: BoxDecoration(
@@ -97,15 +98,22 @@ class _NecklacePanelState extends State<NecklacePanel> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.white, Colors.grey.shade50],
+              colors: [Colors.white, Colors.grey.shade200], // Lighter gradient for a softer look
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: Offset(0, 4),
+              ),
+            ],
           ),
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(16.0), // Reduced padding for a tighter layout
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16), // Reduced space for a more compact design
               _buildControls(),
             ],
           ),

@@ -155,15 +155,16 @@ class _TimedToggleButtonView extends StatelessWidget {
                   ),
                 ] : null,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // Centering vertically
+
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Centering horizontally
                 children: [
                   Icon(
                     iconData,
                     color: iconColor,
                     size: iconSize,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(width: 4), // Space between icon and timer
                   if (isLightOn && timeLeft.isNotEmpty)
                     Text(
                       timeLeft,
