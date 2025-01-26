@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/blocs/ble_connection/ble_connection_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import 'components/timed_toggle_button.dart';
+import 'components/connection_status.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../repositories/necklace_repository.dart';
 import '../../../../core/services/logging_service.dart';
@@ -33,6 +34,45 @@ class _NecklacePanelState extends State<NecklacePanel> {
   bool isRelease1Active = false;
   bool isRelease2Active = false;
 
+  void _showOptions(BuildContext context, Offset tapPosition) {
+    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(tapPosition, tapPosition),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'settings',
+          child: Row(
+            children: [
+              Icon(Icons.settings),
+              SizedBox(width: 8),
+              Text('Settings'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'add_note',
+          child: Row(
+            children: [
+              Icon(Icons.note_add),
+              SizedBox(width: 8),
+              Text('Add Note'),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value == 'settings') {
+        // Navigate to settings
+      } else if (value == 'add_note') {
+        // Add a note
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final logger = LoggingService();
@@ -45,35 +85,21 @@ class _NecklacePanelState extends State<NecklacePanel> {
         necklace: widget.necklace,
       ),
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+        ),
+        color: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(widget.name, style: Theme.of(context).textTheme.titleLarge),
-                  _buildConnectionStatus(),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildActionButton(Icons.settings, 'Settings', () {
-                    // Navigate to settings
-                  }),
-                  _buildActionButton(Icons.note_add, 'Add Note', () {
-                    // Add a note
-                  }),
-                  _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
-                  _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
-                ],
-              ),
+              _buildHeader(context),
+              const SizedBox(height: 20),
+              _buildControls(),
             ],
           ),
         ),
@@ -81,36 +107,74 @@ class _NecklacePanelState extends State<NecklacePanel> {
     );
   }
 
-  Widget _buildConnectionStatus() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: widget.isConnected ? Colors.green : Colors.red,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        widget.isConnected ? 'Connected' : 'Disconnected',
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.name,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              _buildConnectionStatus(),
+            ],
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'settings') {
+                // Navigate to settings
+              } else if (value == 'add_note') {
+                // Add a note
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings, color: Colors.grey[700]),
+                    const SizedBox(width: 8),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'add_note',
+                child: Row(
+                  children: [
+                    Icon(Icons.note_add, color: Colors.grey[700]),
+                    const SizedBox(width: 8),
+                    Text('Add Note'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, VoidCallback onPressed) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: ElevatedButton.icon(
-          onPressed: onPressed,
-          icon: Icon(icon, size: 18),
-          label: Text(label, style: const TextStyle(fontSize: 12)),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-      ),
+  Widget _buildConnectionStatus() {
+    return ConnectionStatus(isConnected: widget.isConnected);
+  }
+
+  Widget _buildControls() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!), // Emission 1
+        _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!), // Emission 2
+      ],
     );
   }
 

@@ -21,51 +21,92 @@ class EmissionControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 52,
-          height: 52,
-          child: TimedToggleButton(
-            autoTurnOffDuration: necklace.emission1Duration,
-            periodicEmissionTimerDuration: necklace.releaseInterval1,
+    return Container(
+      height: 80,
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.grey[200]!,
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildEmissionButton(
+              duration: necklace.emission1Duration,
+              interval: necklace.releaseInterval1,
+              color: Colors.pink[400]!,
+              inactiveColor: Colors.pink[100]!,
+              label: 'Emission 1',
+              isLeftButton: true,
+            ),
+          ),
+          Container(
+            width: 1,
+            color: Colors.grey[200],
+          ),
+          Expanded(
+            child: _buildEmissionButton(
+              duration: necklace.emission2Duration,
+              interval: necklace.releaseInterval2,
+              color: Colors.green[400]!,
+              inactiveColor: Colors.green[100]!,
+              label: 'Emission 2',
+              isLeftButton: false,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmissionButton({
+    required Duration duration,
+    required Duration interval,
+    required Color color,
+    required Color inactiveColor,
+    required String label,
+    required bool isLeftButton,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.horizontal(
+          left: isLeftButton ? Radius.circular(16) : Radius.zero,
+          right: !isLeftButton ? Radius.circular(16) : Radius.zero,
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TimedToggleButton(
+            autoTurnOffDuration: duration,
+            periodicEmissionTimerDuration: interval,
             isConnected: isConnected,
             necklace: necklace,
             bleConnectionBloc: bleConnectionBloc,
             iconData: Icons.air,
-            activeColor: Colors.blue[600]!,
-            inactiveColor: Colors.blue[100]!,
+            activeColor: color,
+            inactiveColor: inactiveColor,
             iconColor: Colors.white,
-            buttonSize: 52.0,
-            iconSize: 28.0,
+            buttonSize: 48.0,
+            iconSize: 24.0,
             onToggle: () {
-              // Implement the toggle logic here
+              onCommand(isLeftButton ? 1 : 2);
             },
           ),
-        ),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 52,
-          height: 52,
-          child: TimedToggleButton(
-            autoTurnOffDuration: necklace.emission2Duration,
-            periodicEmissionTimerDuration: necklace.releaseInterval2,
-            isConnected: isConnected,
-            necklace: necklace,
-            bleConnectionBloc: bleConnectionBloc,
-            iconData: Icons.air,
-            activeColor: Colors.green[600]!,
-            inactiveColor: Colors.green[100]!,
-            iconColor: Colors.white,
-            buttonSize: 52.0,
-            iconSize: 28.0,
-            onToggle: () {
-              // Implement the toggle logic here
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

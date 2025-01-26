@@ -1,42 +1,46 @@
-// lib/features/device_control/widgets/action_button.dart
-
 import 'package:flutter/material.dart';
 
 class ActionButton extends StatelessWidget {
-  final IconData icon;
   final String label;
+  final IconData icon;
   final VoidCallback onPressed;
 
   const ActionButton({
-    super.key,
-    required this.icon,
+    Key? key,
     required this.label,
+    required this.icon,
     required this.onPressed,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(8),
-        onTap: onPressed,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, size: 20, color: Colors.grey[700]),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                  fontSize: 13,
+    return Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onPressed,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.withOpacity(0.2)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 20, color: Colors.grey[800]),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    color: Colors.grey[800],
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

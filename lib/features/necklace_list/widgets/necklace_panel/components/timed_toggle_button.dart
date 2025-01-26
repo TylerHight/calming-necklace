@@ -26,8 +26,8 @@ class TimedToggleButton extends StatelessWidget {
     this.inactiveColor = const Color(0xFFBBDEFB),
     required this.iconData,
     this.iconColor = Colors.white,
-    this.buttonSize = 48.0,
-    this.iconSize = 24.0,
+    this.buttonSize = 60.0,
+    this.iconSize = 28.0,
     required this.autoTurnOffDuration,
     required this.periodicEmissionTimerDuration,
     required this.isConnected,
@@ -40,7 +40,6 @@ class TimedToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final repository = context.read<NecklaceRepository>();
     final logger = LoggingService();
-    logger.logDebug('TimedToggleButton: Accessed NecklaceRepository: $repository');
     
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(
@@ -68,8 +67,6 @@ class TimedToggleButton extends StatelessWidget {
 class _TimedToggleButtonView extends StatelessWidget {
   final Color? activeColor;
   final Color? inactiveColor;
-  final Color defaultActiveColor = Colors.blue[600]!;
-  final Color defaultInactiveColor = Colors.blue[100]!;
   final IconData iconData;
   final Color? iconColor;
   final double buttonSize;
@@ -81,14 +78,14 @@ class _TimedToggleButtonView extends StatelessWidget {
   final bool isConnected;
   final VoidCallback onToggle;
 
-  _TimedToggleButtonView({
+  const _TimedToggleButtonView({
     Key? key,
-    this.activeColor,
-    this.inactiveColor,
+    required this.activeColor,
+    required this.inactiveColor,
     required this.iconData,
-    this.iconColor,
-    this.buttonSize = 48.0,
-    this.iconSize = 24.0,
+    required this.iconColor,
+    required this.buttonSize,
+    required this.iconSize,
     required this.autoTurnOffDuration,
     required this.autoTurnOffEnabled,
     required this.periodicEmissionTimerDuration,
@@ -101,14 +98,12 @@ class _TimedToggleButtonView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
       buildWhen: (previous, current) {
-        // Rebuild only when necessary
         if (previous.runtimeType != current.runtimeType) return true;
         if (previous is LightOnState && current is LightOnState) {
           return previous.secondsLeft != current.secondsLeft;
         }
         return true;
       },
-      
       builder: (context, state) {
         if (state is TimedToggleButtonLoading) {
           return const CircularProgressIndicator();
@@ -123,95 +118,66 @@ class _TimedToggleButtonView extends StatelessWidget {
 
         bool isLightOn = state is LightOnState;
         String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
-        final buttonColor = isLightOn ? activeColor : inactiveColor;
         
-        void handlePress() {
-          if (!isConnected) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Device not connected')),
-            );
-            return;
-          }
-          context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
-        }
-
         return Stack(
+          clipBehavior: Clip.none,
           children: [
-            GestureDetector(
-              onTap: handlePress,
-              child: Container(
-                width: buttonSize,
-                height: buttonSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: buttonColor,
-                ),
-                child: Center(
-                  child: Icon(
-                    iconData,
-                    color: iconColor,
-                    size: iconSize,
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(buttonSize / 2),
+                onTap: () {
+                  if (!isConnected) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Device not connected')),
+                    );
+                    return;
+                  }
+                  context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+                },
+                child: Container(
+                  width: buttonSize,
+                  height: buttonSize,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isLightOn ? activeColor : inactiveColor,
+                    boxShadow: isLightOn ? [
+                      BoxShadow(
+                        color: activeColor!.withOpacity(0.4),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ] : null,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      iconData,
+                      color: iconColor,
+                      size: iconSize,
+                    ),
                   ),
                 ),
               ),
             ),
             if (isLightOn)
               Positioned(
-                bottom: buttonSize + 4, // Positioned above the button
+                top: -24,
                 left: 0,
                 right: 0,
                 child: Container(
-                  width: buttonSize * 1.5, // Adjust width relative to the button size
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     timeLeft,
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 12,
                       color: Colors.white,
+                      fontWeight: FontWeight.w500,
                     ),
                     textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            if (autoTurnOffEnabled && isLightOn && state is AutoTurnOffState)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Text(
-                    timeLeft,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            if (periodicEmissionEnabled && !isLightOn && state is PeriodicEmissionState)
-              Positioned(
-                bottom: 0,
-                right: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Text(
-                    timeLeft,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
                   ),
                 ),
               ),

@@ -24,6 +24,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       releaseInterval1: Duration(seconds: 20),
       emission2Duration: Duration(seconds: 8),
       releaseInterval2: Duration(seconds: 30),
+      description: 'This is the first necklace description.',
     ),
     Necklace(
       id: '2',
@@ -35,6 +36,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       releaseInterval1: Duration(seconds: 10),
       emission2Duration: Duration(seconds: 8),
       releaseInterval2: Duration(seconds: 20),
+      description: 'This is the second necklace description.',
     ),
     Necklace(
       id: '3',
@@ -46,6 +48,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       releaseInterval1: Duration(minutes: 40),
       emission2Duration: Duration(minutes: 25),
       releaseInterval2: Duration(minutes: 50),
+      description: 'This is the third necklace description.',
     ),
   ];
 

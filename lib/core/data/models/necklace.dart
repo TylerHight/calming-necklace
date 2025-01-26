@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class Necklace extends Equatable {
   final String id;
   final String name;
+  final String description;
   final String color;
   final bool autoTurnOffEnabled;
   final bool periodicEmissionEnabled;
@@ -16,6 +17,7 @@ class Necklace extends Equatable {
   Necklace({
     required this.id,
     required this.name,
+    required this.description,
     required this.color,
     this.autoTurnOffEnabled = false,
     this.periodicEmissionEnabled = false,
