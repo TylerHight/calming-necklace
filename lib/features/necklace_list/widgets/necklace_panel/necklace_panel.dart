@@ -7,6 +7,7 @@ import 'components/connection_status.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../repositories/necklace_repository.dart';
 import '../../../../core/services/logging_service.dart';
+import '../../../../core/ui/ui_constants.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:calming_necklace/core/data/models/necklace.dart';
+import '../../../../../core/ui/ui_constants.dart';
 import 'timed_toggle_button.dart';
 import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
 
@@ -87,7 +88,7 @@ class EmissionControls extends StatelessWidget {
         inactiveColor: inactiveColor,
         iconColor: Colors.white,
         buttonSize: 60.0, // Set a fixed size for circular buttons
-        iconSize: 24.0,
+        iconSize: UIConstants.timedToggleButtonIconSize,
         label: '',
         onToggle: () {
           onCommand(isLeftButton ? 1 : 2);

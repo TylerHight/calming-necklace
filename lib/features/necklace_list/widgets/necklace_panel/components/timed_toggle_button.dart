@@ -5,6 +5,7 @@ import 'package:calming_necklace/features/necklace_list/blocs/timed_toggle_butto
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/services/logging_service.dart';
 import '../../../repositories/necklace_repository.dart';
+import '../../../../../core/ui/ui_constants.dart';
 
 class TimedToggleButton extends StatelessWidget {
   final Color? activeColor;
@@ -134,9 +135,9 @@ class _TimedToggleButtonView extends StatelessWidget {
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             child: Container(
-              height: 60, // Adjusted height for circular button
-              width: 60, // Added width for circular button
-              padding: const EdgeInsets.all(0), // Adjusted padding for circular button
+              height: UIConstants.timedToggleButtonSize,
+              width: UIConstants.timedToggleButtonSize,
+              padding: const EdgeInsets.all(0),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -146,12 +147,12 @@ class _TimedToggleButtonView extends StatelessWidget {
                     isLightOn ? activeColor! : inactiveColor!,
                   ],
                 ),
-                borderRadius: BorderRadius.circular(30), // Changed to 30 for circular shape
+                borderRadius: BorderRadius.circular(UIConstants.timedToggleButtonBorderRadius),
                 boxShadow: isLightOn ? [
                   BoxShadow(
                     color: activeColor!.withOpacity(0.4),
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
+                    blurRadius: UIConstants.timedToggleButtonBoxShadowBlurRadius,
+                    offset: UIConstants.timedToggleButtonBoxShadowOffset,
                   ),
                 ] : null,
               ),
@@ -162,7 +163,7 @@ class _TimedToggleButtonView extends StatelessWidget {
                   Icon(
                     iconData,
                     color: iconColor,
-                    size: iconSize,
+                    size: UIConstants.timedToggleButtonIconSize,
                   ),
                   const SizedBox(width: 4), // Space between icon and timer
                   if (isLightOn && timeLeft.isNotEmpty)
