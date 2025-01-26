@@ -144,7 +144,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
             ],
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
+            icon: Icon(Icons.more_vert, size: UIConstants.popoutMenuIconSize),
             onSelected: (value) {
               if (value == 'settings') {
                 // Navigate to settings
@@ -174,6 +174,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
                 ),
               ),
             ],
+            iconSize: UIConstants.popoutMenuIconSize, // Use the new constant for icon size
           ),
         ],
       ),
