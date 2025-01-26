@@ -73,39 +73,26 @@ class EmissionControls extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.horizontal(
-          left: isLeftButton ? Radius.circular(16) : Radius.zero,
-          right: !isLeftButton ? Radius.circular(16) : Radius.zero,
+          left: isLeftButton ? const Radius.circular(16) : Radius.zero,
+          right: !isLeftButton ? const Radius.circular(16) : Radius.zero,
         ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          TimedToggleButton(
-            autoTurnOffDuration: duration,
-            periodicEmissionTimerDuration: interval,
-            isConnected: isConnected,
-            necklace: necklace,
-            bleConnectionBloc: bleConnectionBloc,
-            iconData: Icons.air,
-            activeColor: color,
-            inactiveColor: inactiveColor,
-            iconColor: Colors.white,
-            buttonSize: 48.0,
-            iconSize: 24.0,
-            onToggle: () {
-              onCommand(isLeftButton ? 1 : 2);
-            },
-          ),
-        ],
+      child: TimedToggleButton(
+        autoTurnOffDuration: duration,
+        periodicEmissionTimerDuration: interval,
+        isConnected: isConnected,
+        necklace: necklace,
+        bleConnectionBloc: bleConnectionBloc,
+        iconData: Icons.air,
+        activeColor: color,
+        inactiveColor: inactiveColor,
+        iconColor: Colors.white,
+        buttonSize: double.infinity,
+        iconSize: 24.0,
+        label: label,
+        onToggle: () {
+          onCommand(isLeftButton ? 1 : 2);
+        },
       ),
     );
   }

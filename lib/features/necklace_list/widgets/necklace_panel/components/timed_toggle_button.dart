@@ -19,6 +19,7 @@ class TimedToggleButton extends StatelessWidget {
   final Necklace necklace;
   final BleConnectionBloc bleConnectionBloc;
   final VoidCallback onToggle;
+  final String label;
 
   const TimedToggleButton({
     Key? key,
@@ -34,16 +35,14 @@ class TimedToggleButton extends StatelessWidget {
     required this.necklace,
     required this.bleConnectionBloc,
     required this.onToggle,
+    required this.label,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final repository = context.read<NecklaceRepository>();
-    final logger = LoggingService();
-    
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(
-        repository: repository,
+        repository: context.read<NecklaceRepository>(),
         necklace: necklace,
       ),
       child: _TimedToggleButtonView(
@@ -59,6 +58,7 @@ class TimedToggleButton extends StatelessWidget {
         periodicEmissionEnabled: necklace.periodicEmissionEnabled,
         isConnected: isConnected,
         onToggle: onToggle,
+        label: label,
       ),
     );
   }
@@ -77,6 +77,7 @@ class _TimedToggleButtonView extends StatelessWidget {
   final bool periodicEmissionEnabled;
   final bool isConnected;
   final VoidCallback onToggle;
+  final String label;
 
   const _TimedToggleButtonView({
     Key? key,
@@ -92,6 +93,7 @@ class _TimedToggleButtonView extends StatelessWidget {
     required this.periodicEmissionEnabled,
     required this.isConnected,
     required this.onToggle,
+    required this.label,
   }) : super(key: key);
 
   @override
@@ -119,69 +121,69 @@ class _TimedToggleButtonView extends StatelessWidget {
         bool isLightOn = state is LightOnState;
         String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
         
-        return Stack(
-          clipBehavior: Clip.none,
-          children: [
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(buttonSize / 2),
-                onTap: () {
-                  if (!isConnected) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Device not connected')),
-                    );
-                    return;
-                  }
-                  context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
-                },
-                child: Container(
-                  width: buttonSize,
-                  height: buttonSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isLightOn ? activeColor : inactiveColor,
-                    boxShadow: isLightOn ? [
-                      BoxShadow(
-                        color: activeColor!.withOpacity(0.4),
-                        blurRadius: 8,
-                        spreadRadius: 2,
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () {
+              if (!isConnected) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Device not connected')),
+                );
+                return;
+              }
+              context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+            },
+            child: Container(
+              height: 80,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              decoration: BoxDecoration(
+                color: isLightOn ? activeColor : inactiveColor,
+                boxShadow: isLightOn ? [
+                  BoxShadow(
+                    color: activeColor!.withOpacity(0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
+                ] : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isLightOn && timeLeft.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        timeLeft,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ] : null,
-                  ),
-                  child: Center(
-                    child: Icon(
-                      iconData,
-                      color: iconColor,
-                      size: iconSize,
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        iconData,
+                        color: iconColor,
+                        size: iconSize,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: iconColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
             ),
-            if (isLightOn)
-              Positioned(
-                top: -24,
-                left: 0,
-                right: 0,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    timeLeft,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-          ],
+          ),
         );
       },
     );

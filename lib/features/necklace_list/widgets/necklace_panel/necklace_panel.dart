@@ -191,6 +191,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
           iconData: icon,
           activeColor: activeColor,
           inactiveColor: inactiveColor,
+          label: 'Emission $buttonIndex',
           onToggle: () {
             setState(() {
               if (buttonIndex == 1) {
