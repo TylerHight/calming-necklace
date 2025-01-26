@@ -36,7 +36,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       _isActive = !_isActive;
       if (_isActive) {
         await _repository.toggleLight(necklace, true);
-        emit(const LightOnState(5)); // Start with 5 seconds
+        emit(LightOnState(necklace.emission1Duration.inSeconds)); // Start with the actual duration
         _startTimer(necklace.emission1Duration.inSeconds);
         _logger.logDebug('Light turned on, timer started');
       } else {
