@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
 import '../../add_device_dialog/add_device_dialog_bloc.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
-import 'package:calming_necklace/core/data/models/necklace.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/necklaces_bloc.dart';
 import '../../add_device_dialog/add_device_dialog.dart';
 
 class NecklacesScreen extends StatefulWidget {
@@ -15,30 +16,25 @@ class NecklacesScreen extends StatefulWidget {
 
 class _NecklacesScreenState extends State<NecklacesScreen> {
   late NecklaceRepository _repository;
-  List<Necklace> _necklaces = [];
 
   @override
   void initState() {
     super.initState();
     _repository = context.read<NecklaceRepository>();
-    _fetchNecklaces();
-  }
-
-  void _fetchNecklaces() {
-    setState(() {
-      _necklaces = _repository.getNecklaces();
-    });
+    context.read<NecklacesBloc>().add(FetchNecklacesEvent());
   }
 
   Future<void> _showAddNecklaceDialog() async {
     await showDialog(
       context: context,
       builder: (context) => BlocProvider(
-        create: (context) => AddDeviceDialogBloc(_repository),
+        create: (context) => AddDeviceDialogBloc(
+          _repository,
+          context.read<NecklacesBloc>(),
+        ),
         child: AddDeviceDialog(),
       ),
     );
-    _fetchNecklaces(); // Refresh the list after adding a new necklace
   }
 
   @override
@@ -86,7 +82,20 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
           ),
         ],
       ),
-      body: _necklaces.isEmpty ? _buildEmptyState() : _buildNecklaceList(),
+      body: BlocBuilder<NecklacesBloc, NecklacesState>(
+        builder: (context, state) {
+          if (state is NecklacesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is NecklacesLoaded) {
+            return state.necklaces.isEmpty 
+              ? _buildEmptyState() 
+              : _buildNecklaceList(state.necklaces);
+          } else if (state is NecklacesError) {
+            return Center(child: Text(state.message));
+          }
+          return _buildEmptyState();
+        },
+      ),
     );
   }
 
@@ -132,13 +141,13 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
     );
   }
 
-  Widget _buildNecklaceList() {
+  Widget _buildNecklaceList(List<Necklace> necklaces) {
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
-      itemCount: _necklaces.length,
+      itemCount: necklaces.length,
       itemBuilder: (context, index) {
         final repository = context.read<NecklaceRepository>();
-        final necklace = _necklaces[index];
+        final necklace = necklaces[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 12.0),
           child: NecklacePanel(

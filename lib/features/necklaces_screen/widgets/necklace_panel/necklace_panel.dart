@@ -75,7 +75,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
   Widget build(BuildContext context) {
     final logger = LoggingService();
     logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
-    final repository = widget.repository;
+    final repository = widget.repository; // TODO: handle with bloc instead of directly accessing repository
     
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(

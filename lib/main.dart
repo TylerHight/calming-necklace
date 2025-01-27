@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
+import 'features/necklaces_screen/blocs/necklaces_bloc.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logging_service.dart';
 
@@ -23,29 +24,38 @@ class MyApp extends StatelessWidget {
           create: (context) => NecklaceRepositoryImpl(),
         ),
       ],
-      child: MaterialApp(
-        title: 'Calming Necklace',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          cardTheme: CardTheme(
-            elevation: 4,
-            shadowColor: Colors.black.withOpacity(0.2),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => NecklacesBloc(
+              context.read<NecklaceRepository>(),
             ),
           ),
-          scaffoldBackgroundColor: Colors.grey[50],
-          appBarTheme: AppBarTheme(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
+        ],
+        child: MaterialApp(
+          title: 'Calming Necklace',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.blue,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+            cardTheme: CardTheme(
+              elevation: 4,
+              shadowColor: Colors.black.withOpacity(0.2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            scaffoldBackgroundColor: Colors.grey[50],
+            appBarTheme: AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+            ),
           ),
+          home: const MainScreen(),
+          debugShowCheckedModeBanner: false,
         ),
-        home: const MainScreen(),
-        debugShowCheckedModeBanner: false,
       ),
     );
   }
