@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
 import 'package:calming_necklace/features/necklace_list/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/services/logging_service.dart';
@@ -19,7 +18,6 @@ class TimedToggleButton extends StatelessWidget {
   final Duration periodicEmissionTimerDuration;
   final bool isConnected;
   final Necklace necklace;
-  final BleConnectionBloc bleConnectionBloc;
   final VoidCallback onToggle;
   final String label;
 
@@ -36,7 +34,6 @@ class TimedToggleButton extends StatelessWidget {
     required this.periodicEmissionTimerDuration,
     required this.isConnected,
     required this.necklace,
-    required this.bleConnectionBloc,
     required this.onToggle,
     required this.label,
   }) : super(key: key);
@@ -174,8 +171,8 @@ class _TimedToggleButtonView extends StatelessWidget {
                   if (isLightOn && timeLeft.isNotEmpty)
                     Text(
                       timeLeft,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: UIConstants.countdownTimerTextSize, // Use new constant
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),

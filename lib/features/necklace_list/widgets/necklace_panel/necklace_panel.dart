@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/blocs/ble_connection/ble_connection_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import 'components/timed_toggle_button.dart';
 import 'components/connection_status.dart';
@@ -15,7 +14,6 @@ class NecklacePanel extends StatefulWidget {
   final bool isConnected;
   final Necklace necklace;
   final NecklaceRepository repository;
-  final BleConnectionBloc bleConnectionBloc;
 
   const NecklacePanel({
     Key? key,
@@ -24,7 +22,6 @@ class NecklacePanel extends StatefulWidget {
     required this.isConnected,
     required this.necklace,
     required this.repository,
-    required this.bleConnectionBloc,
   }) : super(key: key);
 
   @override
@@ -209,7 +206,6 @@ class _NecklacePanelState extends State<NecklacePanel> {
         periodicEmissionTimerDuration: const Duration(seconds: 10),
         isConnected: widget.isConnected,
         necklace: widget.necklace,
-        bleConnectionBloc: widget.bleConnectionBloc,
         iconData: icon,
         activeColor: activeColor,
         inactiveColor: inactiveColor,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import 'package:calming_necklace/core/data/models/necklace.dart';
-import 'package:calming_necklace/core/blocs/ble_connection/ble_connection_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../repositories/necklace_repository.dart';
 
@@ -52,7 +51,6 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
     ),
   ];
 
-  final BleConnectionBloc _bleConnectionBloc = BleConnectionBloc();
 
   Future<void> _showAddNecklaceDialog() async {
     // Implement the dialog to add a new necklace
@@ -164,7 +162,6 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             name: necklace.name,
             isConnected: true,
             necklace: necklace,
-            bleConnectionBloc: _bleConnectionBloc,
           ),
         );
       },
