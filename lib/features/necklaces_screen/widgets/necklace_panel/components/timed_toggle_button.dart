@@ -110,6 +110,7 @@ class _TimedToggleButtonView extends StatelessWidget {
         return true;
       },
       builder: (context, state) {
+        final logger = LoggingService();
         if (state is TimedToggleButtonLoading) {
           return const CircularProgressIndicator();
         }
@@ -124,6 +125,8 @@ class _TimedToggleButtonView extends StatelessWidget {
         bool isLightOn = state is LightOnState;
         String timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
         
+        logger.logDebug('Building TimedToggleButton: isLightOn: $isLightOn, timeLeft: $timeLeft');
+
         return Material(
           color: Colors.transparent,
           child: InkWell(
@@ -172,7 +175,7 @@ class _TimedToggleButtonView extends StatelessWidget {
                     Text(
                       timeLeft,
                       style: TextStyle(
-                        fontSize: UIConstants.countdownTimerTextSize, // Use new constant
+                        fontSize: UIConstants.countdownTimerTextSize,
                         color: Colors.white,
                         fontWeight: FontWeight.w500,
                       ),

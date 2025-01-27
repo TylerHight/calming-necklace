@@ -11,8 +11,8 @@ class Necklace extends Equatable {
   final Duration releaseInterval1;
   final Duration emission2Duration;
   final Duration releaseInterval2;
-  bool isRelease1Active;
-  bool isRelease2Active;
+  final bool isRelease1Active;
+  final bool isRelease2Active;
 
   Necklace({
     required this.id,
@@ -33,6 +33,7 @@ class Necklace extends Equatable {
   List<Object?> get props => [
     id,
     name,
+    description,
     color,
     autoTurnOffEnabled,
     periodicEmissionEnabled,
@@ -40,5 +41,7 @@ class Necklace extends Equatable {
     releaseInterval1,
     emission2Duration,
     releaseInterval2,
+    isRelease1Active,
+    isRelease2Active,
   ];
 }

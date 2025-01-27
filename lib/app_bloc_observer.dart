@@ -1,27 +1,30 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'core/services/logging_service.dart';
 
 class AppBlocObserver extends BlocObserver {
+  final LoggingService _logger = LoggingService();
+
   @override
   void onEvent(Bloc bloc, Object? event) {
     super.onEvent(bloc, event);
-    print('Event: $event');
+    _logger.logDebug('Event: $event');
   }
 
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    print('Change: $change');
+    _logger.logDebug('Change: $change');
   }
 
   @override
   void onTransition(Bloc bloc, Transition transition) {
     super.onTransition(bloc, transition);
-    print('Transition: $transition');
+    _logger.logDebug('Transition: $transition');
   }
 
   @override
   void onError(BlocBase bloc, Object error, StackTrace stackTrace) {
-    print('Error: $error');
+    _logger.logError('Error: $error', error, stackTrace);
     super.onError(bloc, error, stackTrace);
   }
 }

@@ -14,53 +14,31 @@ class NecklacesScreen extends StatefulWidget {
 }
 
 class _NecklacesScreenState extends State<NecklacesScreen> {
-  final List<Necklace> _necklaces = [
-    Necklace(
-      id: '1',
-      name: 'Lavender Dream',
-      color: 'Purple',
-      autoTurnOffEnabled: true,
-      periodicEmissionEnabled: true,
-      emission1Duration: Duration(seconds: 3),
-      releaseInterval1: Duration(seconds: 20),
-      emission2Duration: Duration(seconds: 8),
-      releaseInterval2: Duration(seconds: 30),
-      description: 'This is the first necklace description.',
-    ),
-    Necklace(
-      id: '2',
-      name: 'Ocean Breeze',
-      color: 'Blue',
-      autoTurnOffEnabled: false,
-      periodicEmissionEnabled: true,
-      emission1Duration: Duration(seconds: 3),
-      releaseInterval1: Duration(seconds: 10),
-      emission2Duration: Duration(seconds: 8),
-      releaseInterval2: Duration(seconds: 20),
-      description: 'This is the second necklace description.',
-    ),
-    Necklace(
-      id: '3',
-      name: 'Forest Mist',
-      color: 'Green',
-      autoTurnOffEnabled: true,
-      periodicEmissionEnabled: false,
-      emission1Duration: Duration(minutes: 20),
-      releaseInterval1: Duration(minutes: 40),
-      emission2Duration: Duration(minutes: 25),
-      releaseInterval2: Duration(minutes: 50),
-      description: 'This is the third necklace description.',
-    ),
-  ];
+  late NecklaceRepository _repository;
+  List<Necklace> _necklaces = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _repository = context.read<NecklaceRepository>();
+    _fetchNecklaces();
+  }
+
+  void _fetchNecklaces() {
+    setState(() {
+      _necklaces = _repository.getNecklaces();
+    });
+  }
 
   Future<void> _showAddNecklaceDialog() async {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (context) => BlocProvider(
-        create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>()),
+        create: (context) => AddDeviceDialogBloc(_repository),
         child: AddDeviceDialog(),
       ),
     );
+    _fetchNecklaces(); // Refresh the list after adding a new necklace
   }
 
   @override
