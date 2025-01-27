@@ -1,4 +1,4 @@
-// lib/features/necklace_list/blocs/timed_toggle_button/timed_toggle_button_event.dart
+// lib/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_event.dart
 
 part of 'timed_toggle_button_bloc.dart';
 

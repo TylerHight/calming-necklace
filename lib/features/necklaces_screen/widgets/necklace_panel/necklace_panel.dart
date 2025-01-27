@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
+import '../../../../core/data/repositories/necklace_repository.dart';
 import 'components/timed_toggle_button.dart';
 import 'components/connection_status.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
-import '../../repositories/necklace_repository.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 
@@ -33,7 +33,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
   bool isRelease2Active = false;
 
   void _showOptions(BuildContext context, Offset tapPosition) {
-    final RenderBox overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
       context: context,
       position: RelativeRect.fromRect(

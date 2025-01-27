@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'dart:async';
 import 'package:calming_necklace/core/services/logging_service.dart';
 import '../../../../core/data/models/necklace.dart';
-import '../../repositories/necklace_repository.dart';
+import '../../../../core/data/repositories/necklace_repository.dart';
 import 'ticker.dart';
 
 part 'timed_toggle_button_event.dart';

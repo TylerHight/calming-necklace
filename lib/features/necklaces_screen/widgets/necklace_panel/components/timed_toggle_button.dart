@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:calming_necklace/features/necklace_list/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
+import 'package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../../core/data/models/necklace.dart';
+import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
-import '../../../repositories/necklace_repository.dart';
 import '../../../../../core/ui/ui_constants.dart';
 
 class TimedToggleButton extends StatelessWidget {
@@ -122,7 +122,7 @@ class _TimedToggleButtonView extends StatelessWidget {
         }
 
         bool isLightOn = state is LightOnState;
-        String timeLeft = isLightOn ? _formatTime((state as LightOnState).secondsLeft) : '';
+        String timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
         
         return Material(
           color: Colors.transparent,

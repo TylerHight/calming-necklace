@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../../core/data/repositories/necklace_repository.dart';
+import '../../add_device_dialog/add_device_dialog_bloc.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../repositories/necklace_repository.dart';
+import '../../add_device_dialog/add_device_dialog.dart';
 
 class NecklacesScreen extends StatefulWidget {
   const NecklacesScreen({super.key});
@@ -51,9 +53,14 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
     ),
   ];
 
-
   Future<void> _showAddNecklaceDialog() async {
-    // Implement the dialog to add a new necklace
+    showDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>()),
+        child: AddDeviceDialog(),
+      ),
+    );
   }
 
   @override

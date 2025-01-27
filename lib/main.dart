@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'features/necklace_list/presentation/necklaces_screen.dart';
+import 'core/data/repositories/necklace_repository.dart';
+import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'app_bloc_observer.dart';
-import 'features/necklace_list/repositories/necklace_repository.dart';
 import 'core/services/logging_service.dart';
 
 void main() {
