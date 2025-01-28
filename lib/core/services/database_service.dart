@@ -21,8 +21,9 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -52,6 +53,20 @@ class DatabaseService {
       periodicEmissionEnabled INTEGER
     )
   ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS notes(
+          id TEXT PRIMARY KEY,
+          content TEXT,
+          deviceId TEXT,
+          timestamp INTEGER,
+          FOREIGN KEY (deviceId) REFERENCES necklaces(id)
+        )
+      ''');
+    }
   }
 
   Future<void> insertNecklace(Necklace necklace) async {
