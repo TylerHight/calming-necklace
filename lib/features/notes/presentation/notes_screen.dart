@@ -64,10 +64,6 @@ class NotesScreen extends StatelessWidget {
           return _buildEmptyState();
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddNoteDialog(context),
-        child: const Icon(Icons.add),
-      ),
     );
   }
 

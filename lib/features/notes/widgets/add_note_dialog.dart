@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/ui/ui_constants.dart';
 import '../../../core/data/models/note.dart';
 import '../bloc/notes_bloc.dart';
 
@@ -18,9 +17,23 @@ class AddNoteDialog extends StatefulWidget {
 
 class _AddNoteDialogState extends State<AddNoteDialog> {
   final TextEditingController _contentController = TextEditingController();
+  bool _isButtonEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _contentController.addListener(_onTextChanged);
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      _isButtonEnabled = _contentController.text.isNotEmpty;
+    });
+  }
 
   @override
   void dispose() {
+    _contentController.removeListener(_onTextChanged);
     _contentController.dispose();
     super.dispose();
   }
@@ -110,15 +123,15 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                 ),
                 const SizedBox(width: 12),
                 ElevatedButton(
-                  onPressed: _contentController.text.isNotEmpty
+                  onPressed: _isButtonEnabled
                       ? () {
-                          final note = Note(
-                            content: _contentController.text,
-                            deviceId: widget.deviceId,
-                          );
-                          context.read<NotesBloc>().add(AddNote(note));
-                          Navigator.pop(context);
-                        }
+                    final note = Note(
+                      content: _contentController.text,
+                      deviceId: widget.deviceId,
+                    );
+                    context.read<NotesBloc>().add(AddNote(note));
+                    Navigator.pop(context);
+                  }
                       : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
