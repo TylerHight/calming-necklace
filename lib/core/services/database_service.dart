@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/necklace.dart';
+import '../data/models/note.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -26,6 +27,16 @@ class DatabaseService {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    await db.execute('''
+    CREATE TABLE notes(
+      id TEXT PRIMARY KEY,
+      content TEXT,
+      deviceId TEXT,
+      timestamp INTEGER,
+      FOREIGN KEY (deviceId) REFERENCES necklaces(id)
+    )
+  ''');
+  
     await db.execute('''
     CREATE TABLE necklaces(
       id TEXT PRIMARY KEY,
@@ -59,4 +70,47 @@ class DatabaseService {
       return Necklace.fromMap(maps[i]);
     });
   }
-} 
+
+  Future<void> insertNote(Note note) async {
+    final db = await database;
+    await db.insert(
+      'notes',
+      note.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<List<Note>> getNotes() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('notes');
+    return List.generate(maps.length, (i) {
+      return Note.fromMap(maps[i]);
+    });
+  }
+
+  Future<List<Note>> getNotesByDevice(String? deviceId) async {
+    final db = await database;
+    List<Map<String, dynamic>> maps;
+    if (deviceId != null) {
+      maps = await db.query(
+        'notes',
+        where: 'deviceId = ?',
+        whereArgs: [deviceId],
+      );
+    } else {
+      maps = await db.query('notes');
+    }
+    return List.generate(maps.length, (i) {
+      return Note.fromMap(maps[i]);
+    });
+  }
+
+  Future<void> deleteNote(String id) async {
+    final db = await database;
+    await db.delete(
+      'notes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+}

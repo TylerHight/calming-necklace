@@ -34,6 +34,8 @@ dependencies:
   equatable: ^2.0.3
   logger: ^1.0.0
   sqflite: ^2.0.0+3
+  intl: ^0.18.1
+  uuid: ^4.0.0
   path: ^1.8.0
   
   # The following adds the Cupertino Icons font to your application.

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'core/data/repositories/necklace_repository.dart';
+import 'core/services/database_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'features/necklaces_screen/blocs/necklaces_bloc.dart';
+import 'features/notes/bloc/notes_bloc.dart';
+import 'features/notes/presentation/notes_screen.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logging_service.dart';
 
@@ -22,6 +25,11 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<NecklaceRepository>(
           create: (context) => NecklaceRepositoryImpl(),
+          lazy: true,
+        ),
+        Provider<DatabaseService>(
+          create: (context) => DatabaseService(),
+          lazy: true,
         ),
       ],
       child: MultiBlocProvider(
@@ -29,6 +37,11 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => NecklacesBloc(
               context.read<NecklaceRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => NotesBloc(
+              context.read<DatabaseService>(),
             ),
           ),
         ],
@@ -73,6 +86,7 @@ class _MainScreenState extends State<MainScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     NecklacesScreen(),
+    NotesScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -95,8 +109,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.note),
+            label: 'Notes',
           ),
         ],
         currentIndex: _selectedIndex,
