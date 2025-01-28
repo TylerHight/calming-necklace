@@ -52,6 +52,10 @@ class MyApp extends StatelessWidget {
               seedColor: Colors.blue,
               brightness: Brightness.light,
             ),
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              selectedItemColor: Colors.blue[600],
+              unselectedItemColor: Colors.grey,
+            ),
             useMaterial3: true,
             cardTheme: CardTheme(
               elevation: 4,
@@ -114,6 +118,8 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
+        unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
         onTap: _onItemTapped,
       ),
     );

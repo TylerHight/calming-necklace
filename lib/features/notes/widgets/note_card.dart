@@ -60,7 +60,7 @@ class NoteCard extends StatelessWidget {
                       ),
                     ),
                   Text(
-                    DateFormat('MMM d, y HH:mm').format(note.timestamp),
+                    DateFormat('MMM d, y h:mm a').format(note.timestamp),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
