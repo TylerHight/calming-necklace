@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../blocs/add_device_dialog_bloc.dart';
+import '../blocs/add_device_dialog/add_device_dialog_state.dart';
+import '../blocs/device_selector/device_selector_bloc.dart';
+import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../widgets/device_selector.dart';
 import '../../../../core/data/models/ble_device.dart';
-import '../blocs/add_device_dialog_state.dart';
 
 // Dummy devices for testing
 final List<BleDevice> dummyDevices = [
@@ -18,7 +19,7 @@ final List<BleDevice> dummyDevices = [
     id: '2',
     name: 'Necklace Device 2',
     address: '66:77:88:99:AA:BB',
-    rssi: -72,
+    rssi: -50,
     deviceType: BleDeviceType.necklace,
   ),
   BleDevice(
@@ -52,25 +53,28 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
           );
         }
       },
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          constraints: const BoxConstraints(
-            maxWidth: 400,
-            maxHeight: 500,
+      child: BlocProvider(
+        create: (context) => DeviceSelectorBloc(),
+        child: Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 24),
-                _buildForm(context),
-              ],
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 400,
+              maxHeight: 500,
+            ),
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  const SizedBox(height: 24),
+                  _buildForm(context),
+                ],
+              ),
             ),
           ),
         ),
@@ -95,7 +99,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
       children: [
         _buildNameField(),
         const SizedBox(height: 24),
-        _buildDeviceSelector(),
+        _buildDeviceSelector(context),
         const SizedBox(height: 24),
         _buildButtons(context),
       ],
@@ -115,15 +119,18 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     );
   }
 
-  Widget _buildDeviceSelector() {
-    return DeviceSelector(
-      devices: dummyDevices.where((d) => d.deviceType == BleDeviceType.necklace).toList(),
-      selectedDevice: _selectedDevice,
-      onDeviceSelected: (device) {
-        setState(() {
-          _selectedDevice = device;
-        });
-      },
+  Widget _buildDeviceSelector(BuildContext context) {
+    return BlocProvider(
+      create: (context) => DeviceSelectorBloc(),
+      child: DeviceSelector(
+        devices: dummyDevices.where((d) => d.deviceType == BleDeviceType.necklace).toList(),
+        selectedDevice: _selectedDevice,
+        onDeviceSelected: (device) {
+          setState(() {
+            _selectedDevice = device;
+          });
+        },
+      ),
     );
   }
 

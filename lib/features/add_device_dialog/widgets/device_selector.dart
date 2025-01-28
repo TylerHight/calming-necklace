@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/models/ble_device.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/ui/components/signal_strength_icon.dart';
+import '../blocs/device_selector/device_selector_bloc.dart';
+import '../blocs/device_selector/device_selector_state.dart';
 
 class DeviceSelector extends StatelessWidget {
   final List<BleDevice> devices;
@@ -28,19 +31,16 @@ class DeviceSelector extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          constraints: const BoxConstraints(maxHeight: 200),
-          child: _buildDropdown(),
-        ),
+        _buildDropdown(context),
       ],
     );
   }
 
-  Widget _buildDropdown() {
+  Widget _buildDropdown(BuildContext context) {
     return DropdownButtonFormField<BleDevice>(
       value: selectedDevice,
       isExpanded: true,
-      isDense: true,
+      icon: const Icon(Icons.arrow_drop_down),
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -52,53 +52,27 @@ class DeviceSelector extends StatelessWidget {
         filled: true,
         fillColor: Colors.grey[50],
       ),
-      hint: const Text('Select a device'),
+      hint: const Text('No device selected'),
       items: [
-        const DropdownMenuItem<BleDevice>(
-          value: null,
-          child: Text('No device'),
-        ),
         ...devices.map((device) {
           return DropdownMenuItem<BleDevice>(
             value: device,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSignalStrengthIcon(device.rssi),
+                SignalStrengthIcon(rssi: device.rssi),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(device.name),
-                      Text(
-                        'Signal: ${device.rssi} dBm',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: Text(device.name),
                 ),
               ],
             ),
           );
         }).toList(),
       ],
-      onChanged: onDeviceSelected,
+      onChanged: (BleDevice? device) {
+        onDeviceSelected(device);
+      },
     );
-  }
-
-  Widget _buildSignalStrengthIcon(int rssi) {
-    if (rssi > -60) {
-      return SvgPicture.asset('assets/icons/signal_strong.svg');
-    } else if (rssi > -75) {
-      return SvgPicture.asset('assets/icons/signal_good.svg');
-    } else if (rssi > -90) {
-      return SvgPicture.asset('assets/icons/signal_weak.svg');
-    } else {
-      return SvgPicture.asset('assets/icons/signal_none.svg');
-    }
   }
 }

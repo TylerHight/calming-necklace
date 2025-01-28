@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../core/data/models/ble_device.dart';
-import '../../../core/data/repositories/necklace_repository.dart';
-import '../../../core/blocs/necklaces/necklaces_bloc.dart';
+import '../../../../core/data/models/ble_device.dart';
+import '../../../../core/data/repositories/necklace_repository.dart';
+import '../../../../core/blocs/necklaces/necklaces_bloc.dart';
 import 'add_device_dialog_state.dart';
 
 part 'add_device_dialog_event.dart';

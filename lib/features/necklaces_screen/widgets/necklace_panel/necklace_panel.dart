@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
+import '../../../../core/ui/components/signal_strength_icon.dart';
 import 'components/timed_toggle_button.dart';
 import 'components/connection_status.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';

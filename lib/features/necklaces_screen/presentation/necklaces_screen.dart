@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
-import '../../add_device_dialog/blocs/add_device_dialog_bloc.dart';
+import '../../add_device_dialog/blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../add_device_dialog/presentation/add_device_dialog.dart';
