@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'core/services/database_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
-import 'features/necklaces_screen/blocs/necklaces_bloc.dart';
+import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'features/notes/bloc/notes_bloc.dart';
 import 'features/notes/presentation/notes_screen.dart';
 import 'app_bloc_observer.dart';

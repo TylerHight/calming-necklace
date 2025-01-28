@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../core/data/models/ble_device.dart';
+import '../../../../core/data/models/ble_device.dart';
 
 abstract class AddDeviceDialogState extends Equatable {
   const AddDeviceDialogState();

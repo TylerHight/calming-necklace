@@ -7,7 +7,6 @@ class BleRepository {
   static final BleRepository _instance = BleRepository._internal();
   factory BleRepository() => _instance;
 
-  final FlutterBluePlus _flutterBlue = FlutterBluePlus.instance;
   final LoggingService _logger = LoggingService();
   final StreamController<List<BleDevice>> _devicesController = StreamController<List<BleDevice>>.broadcast();
 
