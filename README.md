@@ -42,6 +42,6 @@ samples, guidance on mobile development, and a full API reference.
 
 For inquiries, please reach out via email:
 
-- Dr. Cindy Bimle: [cpbimle@gmail.com](mailto:cpbimle@gmail.com)
-- Tyler Hight: [highttyler@gmail.com](mailto:highttyler@gmail.com)
+- Calming Necklace CEO: Dr. Cindy Bimle: [cpbimle@gmail.com](mailto:cpbimle@gmail.com)
+- Software Developer: Tyler Hight: [highttyler@gmail.com](mailto:highttyler@gmail.com)
 
