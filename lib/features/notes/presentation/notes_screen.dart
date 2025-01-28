@@ -2,14 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/notes_bloc.dart';
 import '../../../core/data/models/note.dart';
-import '../widgets/note_card.dart';
 import '../widgets/add_note_dialog.dart';
+import '../widgets/note_card.dart';
+import '../../../core/services/logging_service.dart';
 
-class NotesScreen extends StatelessWidget {
+class NotesScreen extends StatefulWidget {
   const NotesScreen({Key? key}) : super(key: key);
 
   @override
+  _NotesScreenState createState() => _NotesScreenState();
+}
+
+class _NotesScreenState extends State<NotesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load notes immediately when screen is created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      BlocProvider.of<NotesBloc>(context).add(LoadNotes());
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    LoggingService().logDebug('Building NotesScreen');
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -57,6 +73,7 @@ class NotesScreen extends StatelessWidget {
           if (state is NotesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NotesLoaded) {
+            LoggingService().logDebug('Notes loaded: ${state.notes}');
             return _buildNotesList(context, state.notes);
           } else if (state is NotesError) {
             return Center(child: Text('Error: ${state.message}'));
@@ -124,6 +141,7 @@ class NotesScreen extends StatelessWidget {
   }
 
   void _showAddNoteDialog(BuildContext context) {
+    LoggingService().logDebug('Showing AddNoteDialog');
     showDialog(
       context: context,
       builder: (context) => const AddNoteDialog(),

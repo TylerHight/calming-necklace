@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/note.dart';
 import '../bloc/notes_bloc.dart';
+import '../../../core/services/logging_service.dart';
 
 class AddNoteDialog extends StatefulWidget {
   final String? deviceId;
@@ -40,6 +41,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
 
   @override
   Widget build(BuildContext context) {
+    LoggingService().logDebug('Building AddNoteDialog');
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -129,6 +131,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                       content: _contentController.text,
                       deviceId: widget.deviceId,
                     );
+                    LoggingService().logDebug('New note created: $note');
                     context.read<NotesBloc>().add(AddNote(note));
                     Navigator.pop(context);
                   }

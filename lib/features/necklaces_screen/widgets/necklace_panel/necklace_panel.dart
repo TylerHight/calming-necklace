@@ -74,6 +74,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
   @override
   Widget build(BuildContext context) {
     final logger = LoggingService();
+    logger.logDebug('Building NecklacePanel for ${widget.name}');
     logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
     final repository = widget.repository; // TODO: handle with bloc instead of directly accessing repository
     

@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/necklace.dart';
 import '../data/models/note.dart';
+import 'logging_service.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -88,6 +89,7 @@ class DatabaseService {
 
   Future<void> insertNote(Note note) async {
     final db = await database;
+    LoggingService().logDebug('Inserting note: ${note.toMap()}');
     await db.insert(
       'notes',
       note.toMap(),
@@ -97,14 +99,19 @@ class DatabaseService {
 
   Future<List<Note>> getNotes() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('notes');
-    return List.generate(maps.length, (i) {
-      return Note.fromMap(maps[i]);
-    });
+    LoggingService().logDebug('Retrieving notes from database');
+    try {
+      final List<Map<String, dynamic>> maps = await db.query('notes', orderBy: 'timestamp DESC');
+      return List.generate(maps.length, (i) => Note.fromMap(maps[i]));
+    } catch (e) {
+      LoggingService().logError('Error retrieving notes: $e');
+      return [];
+    }
   }
 
   Future<List<Note>> getNotesByDevice(String? deviceId) async {
     final db = await database;
+    LoggingService().logDebug('Retrieving notes by device: $deviceId');
     List<Map<String, dynamic>> maps;
     if (deviceId != null) {
       maps = await db.query(
@@ -122,6 +129,7 @@ class DatabaseService {
 
   Future<void> deleteNote(String id) async {
     final db = await database;
+    LoggingService().logDebug('Deleting note with id: $id');
     await db.delete(
       'notes',
       where: 'id = ?',
