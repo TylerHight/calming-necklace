@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'add_device_dialog_bloc.dart';
+import '../../../core/data/models/ble_device.dart';
 import 'add_device_dialog_state.dart';
 
 class AddDeviceDialog extends StatelessWidget {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController bleDeviceController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
 
   AddDeviceDialog({Key? key}) : super(key: key);
 
@@ -30,22 +30,48 @@ class AddDeviceDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: nameController,
+              controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
             ),
-            TextField(
-              controller: bleDeviceController,
-              decoration: const InputDecoration(labelText: 'BLE Device'),
-            ),
+            const SizedBox(height: 16),
             BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
               builder: (context, state) {
-                if (state is AddDeviceDialogLoading) {
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: CircularProgressIndicator(),
+                if (state is ScanningForDevices) {
+                  return const Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 8),
+                      Text('Scanning for devices...'),
+                    ],
+                  );
+                } else if (state is DevicesFound) {
+                  return SizedBox(
+                    height: 200,
+                    child: ListView.builder(
+                      itemCount: state.devices.length,
+                      itemBuilder: (context, index) {
+                        final device = state.devices[index];
+                        return ListTile(
+                          title: Text(device.name),
+                          subtitle: Text('Signal: ${device.rssi} dBm'),
+                          onTap: () {
+                            context.read<AddDeviceDialogBloc>().add(
+                              SelectDeviceEvent(device),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   );
                 }
-                return const SizedBox.shrink();
+                return ElevatedButton(
+                  onPressed: () {
+                    context.read<AddDeviceDialogBloc>().add(
+                      StartScanningEvent(),
+                    );
+                  },
+                  child: const Text('Scan for Devices'),
+                );
               },
             ),
           ],
@@ -61,18 +87,17 @@ class AddDeviceDialog extends StatelessWidget {
                 onPressed: state is AddDeviceDialogLoading
                     ? null
                     : () {
-                        final name = nameController.text;
-                        final bleDevice = bleDeviceController.text;
-                        if (name.isEmpty || bleDevice.isEmpty) {
+                        final name = _nameController.text;
+                        if (name.isEmpty || state is! DeviceSelected) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Please fill in all fields'),
+                              content: Text('Please enter a name and select a device'),
                             ),
                           );
                           return;
                         }
                         context.read<AddDeviceDialogBloc>().add(
-                              SubmitAddDeviceEvent(name, bleDevice),
+                              SubmitAddDeviceEvent(name, state.device),
                             );
                       },
                 child: const Text('Add'),

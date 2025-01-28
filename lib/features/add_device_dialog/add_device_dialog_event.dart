@@ -9,10 +9,19 @@ abstract class AddDeviceDialogEvent extends Equatable {
 
 class SubmitAddDeviceEvent extends AddDeviceDialogEvent {
   final String name;
-  final String bleDevice;
+  final BleDevice device;
 
-  const SubmitAddDeviceEvent(this.name, this.bleDevice);
+  const SubmitAddDeviceEvent(this.name, this.device);
+}
 
+class StartScanningEvent extends AddDeviceDialogEvent {}
+
+class StopScanningEvent extends AddDeviceDialogEvent {}
+
+class SelectDeviceEvent extends AddDeviceDialogEvent {
+  final BleDevice device;
+  const SelectDeviceEvent(this.device);
+  
   @override
-  List<Object> get props => [name, bleDevice];
+  List<Object> get props => [device];
 }
