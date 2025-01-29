@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class UIConstants {
+  // General
+  static const Color fabColor = Colors.blueAccent; // Blue color for FABs
+
   // Note Card
   static const double noteCardContentTextSize = 18.0;
   static const double noteCardMetadataTextSize = 14.0;

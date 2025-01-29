@@ -6,6 +6,7 @@ import '../widgets/add_note_dialog.dart';
 import '../widgets/note_card.dart';
 import '../widgets/help_dialog.dart';
 import '../../../core/services/logging_service.dart';
+import '../../../core/ui/ui_constants.dart';
 
 class NotesScreen extends StatefulWidget {
   const NotesScreen({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddNoteDialog(context),
-        backgroundColor: Colors.grey[800],
+        backgroundColor: UIConstants.fabColor,
         child: const Icon(
           Icons.add,
           color: Colors.white,

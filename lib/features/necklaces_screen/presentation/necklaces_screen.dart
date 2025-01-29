@@ -7,6 +7,7 @@ import '../widgets/necklace_panel/necklace_panel.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../add_device_dialog/presentation/add_device_dialog.dart';
 import '../widgets/help_dialog.dart';
+import '../../../core/ui/ui_constants.dart';
 
 class NecklacesScreen extends StatefulWidget {
   const NecklacesScreen({super.key});
@@ -44,7 +45,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNecklaceDialog,
-        backgroundColor: Colors.grey[800],
+        backgroundColor: UIConstants.fabColor,
         child: const Icon(Icons.add, color: Colors.white),
       ),
       appBar: AppBar(
