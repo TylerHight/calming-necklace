@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/data/models/ble_device.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
+import '../widgets/device_selection_dialog.dart';
 import '../../../core/data/models/necklace.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -242,14 +244,40 @@ class SettingsContent extends StatelessWidget {
               title: const Text('Change Necklace Device'),
               trailing: const Icon(Icons.bluetooth),
               onTap: () {
-                // Show device selection dialog
+                showDialog<BleDevice>(
+                  context: context,
+                  builder: (context) => DeviceSelectionDialog(
+                    deviceType: BleDeviceType.necklace,
+                    title: 'Select Necklace Device',
+                  ),
+                ).then((device) {
+                  if (device != null) {
+                    // TODO: Implement device change logic
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Selected device: ${device.name}')),
+                    );
+                  }
+                });
               },
             ),
             ListTile(
               title: const Text('Change Heart Rate Monitor'),
               trailing: const Icon(Icons.heart_broken),
               onTap: () {
-                // Show device selection dialog
+                showDialog<BleDevice>(
+                  context: context,
+                  builder: (context) => DeviceSelectionDialog(
+                    deviceType: BleDeviceType.heartRateMonitor,
+                    title: 'Select Heart Rate Monitor',
+                  ),
+                ).then((device) {
+                  if (device != null) {
+                    // TODO: Implement device change logic
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Selected device: ${device.name}')),
+                    );
+                  }
+                });
               },
             ),
           ],
