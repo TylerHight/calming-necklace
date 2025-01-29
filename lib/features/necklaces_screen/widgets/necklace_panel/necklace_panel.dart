@@ -8,6 +8,7 @@ import 'components/connection_status.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
+import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
@@ -65,7 +66,11 @@ class _NecklacePanelState extends State<NecklacePanel> {
       ],
     ).then((value) {
       if (value == 'settings') {
-        // Navigate to settings
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => SettingsScreen(necklace: widget.necklace),
+          ),
+        );
       } else if (value == 'add_note') {
         // Add a note
       }
@@ -146,7 +151,11 @@ class _NecklacePanelState extends State<NecklacePanel> {
             icon: Icon(Icons.more_vert, size: UIConstants.popoutMenuIconSize),
             onSelected: (value) {
               if (value == 'settings') {
-                // Navigate to settings
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SettingsScreen(necklace: widget.necklace),
+                  ),
+                );
               } else if (value == 'add_note') {
                 // Add a note
               }
