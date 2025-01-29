@@ -6,6 +6,7 @@ import '../../add_device_dialog/blocs/add_device_dialog/add_device_dialog_bloc.d
 import '../widgets/necklace_panel/necklace_panel.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../add_device_dialog/presentation/add_device_dialog.dart';
+import '../widgets/help_dialog.dart';
 
 class NecklacesScreen extends StatefulWidget {
   const NecklacesScreen({super.key});
@@ -41,6 +42,11 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddNecklaceDialog,
+        backgroundColor: Colors.grey[800],
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
       appBar: AppBar(
         title: const Text(
           'My Necklaces',
@@ -53,32 +59,15 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Material(
-              color: Colors.blue[600],
-              borderRadius: BorderRadius.circular(12),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: _showAddNecklaceDialog,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.add, color: Colors.white, size: 20),
-                      SizedBox(width: 4),
-                      Text(
-                        'Add Necklace',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: 'How to use necklaces',
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => const NecklacesHelpDialog(),
+              );
+            },
           ),
         ],
       ),
