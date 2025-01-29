@@ -8,6 +8,7 @@ abstract class NecklaceRepository {
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
   Future<void> addNecklace(String name, String bleDevice);
   Future<List<Necklace>> getNecklaces();
+  Future<String> getDeviceNameById(String deviceId);
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
@@ -70,5 +71,16 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<List<Necklace>> getNecklaces() async {
     return _dbService.getNecklaces();
+  }
+
+  @override
+  Future<String> getDeviceNameById(String deviceId) async {
+    try {
+      final necklaces = await getNecklaces();
+      final necklace = necklaces.firstWhere((n) => n.id == deviceId);
+      return necklace.name;
+    } catch (e) {
+      return 'Unknown Device';
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/note.dart';
+import '../../../core/data/repositories/necklace_repository.dart';
 import '../bloc/notes_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../core/ui/ui_constants.dart';
@@ -19,10 +20,18 @@ class NoteCard extends StatelessWidget {
       key: Key(note.id),
       direction: DismissDirection.endToStart,
       background: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4.0),
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.only(right: UIConstants.noteCardDeviceTagPadding),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(Icons.delete_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Delete', style: TextStyle(color: Colors.white)),
+          ],
+        ),
       ),
       onDismissed: (direction) {
         context.read<NotesBloc>().add(DeleteNote(note.id));
@@ -31,45 +40,49 @@ class NoteCard extends StatelessWidget {
         );
       },
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: UIConstants.noteCardMargin),
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(vertical: 4.0),
         child: Padding(
-          padding: EdgeInsets.all(UIConstants.noteCardPadding),
+          padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 note.content,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontSize: UIConstants.noteCardContentTextSize,
+                  height: 1.5,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                maxLines: 5,
               ),
-              SizedBox(height: UIConstants.noteCardSpacing),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (note.deviceId != null)
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: UIConstants.noteCardDeviceTagPadding,
-                        vertical: UIConstants.noteCardDeviceTagVerticalPadding,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(
-                          UIConstants.noteCardDeviceTagBorderRadius,
-                        ),
-                      ),
-                      child: Text(
-                        'Device: ${note.deviceId}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontSize: UIConstants.noteCardMetadataTextSize,
-                        ),
-                      ),
-                    ),
                   Text(
                     DateFormat('MMM d, y h:mm a').format(note.timestamp),
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                    ),
                   ),
+                  if (note.deviceId != null)
+                    FutureBuilder<String>(
+                      future: context.read<NecklaceRepository>().getDeviceNameById(note.deviceId!),
+                      builder: (context, snapshot) {
+                        final deviceName = snapshot.data ?? 'Unknown Device';
+                        return Text(
+                          'Necklace: $deviceName',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.blue[700],
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          maxLines: 1,
+                        );
+                      },
+                    ),
                 ],
               ),
             ],

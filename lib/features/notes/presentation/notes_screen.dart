@@ -4,6 +4,7 @@ import '../bloc/notes_bloc.dart';
 import '../../../core/data/models/note.dart';
 import '../widgets/add_note_dialog.dart';
 import '../widgets/note_card.dart';
+import '../widgets/help_dialog.dart';
 import '../../../core/services/logging_service.dart';
 
 class NotesScreen extends StatefulWidget {
@@ -27,6 +28,14 @@ class _NotesScreenState extends State<NotesScreen> {
   Widget build(BuildContext context) {
     LoggingService().logDebug('Building NotesScreen');
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddNoteDialog(context),
+        backgroundColor: Colors.blue,
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
       appBar: AppBar(
         title: const Text(
           'Notes',
@@ -39,32 +48,12 @@ class _NotesScreenState extends State<NotesScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: Material(
-              color: Colors.blue[600],
-              borderRadius: BorderRadius.circular(12),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => _showAddNoteDialog(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.add, color: Colors.white, size: 20),
-                      SizedBox(width: 4),
-                      Text(
-                        'Add Note',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: 'How to use notes',
+            onPressed: () {
+              showDialog(context: context, builder: (context) => const NotesHelpDialog());
+            },
           ),
         ],
       ),
@@ -92,9 +81,10 @@ class _NotesScreenState extends State<NotesScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(8.0),
       itemCount: notes.length,
-      itemBuilder: (context, index) {
-        return NoteCard(note: notes[index]);
-      },
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+        child: NoteCard(note: notes[index]),
+      ),
     );
   }
 
