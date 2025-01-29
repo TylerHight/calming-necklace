@@ -1,0 +1,346 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../blocs/settings/settings_bloc.dart';
+import '../widgets/duration_picker_dialog.dart';
+import '../../../core/data/models/necklace.dart';
+
+class SettingsScreen extends StatelessWidget {
+  final Necklace necklace;
+
+  const SettingsScreen({Key? key, required this.necklace}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => SettingsBloc(necklace),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Device Settings'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: () {
+                // Save settings implementation
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+        body: const SettingsContent(),
+      ),
+    );
+  }
+}
+
+class SettingsContent extends StatelessWidget {
+  const SettingsContent({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SettingsBloc, SettingsState>(
+      builder: (context, state) {
+        return ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            _buildDeviceInfoSection(context, state),
+            const SizedBox(height: 16),
+            _buildScent1Section(context, state),
+            const SizedBox(height: 16),
+            _buildScent2Section(context, state),
+            const SizedBox(height: 16),
+            _buildConnectionSection(context, state),
+            const SizedBox(height: 16),
+            _buildDangerZone(context, state),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDeviceInfoSection(BuildContext context, SettingsState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Device Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildNameField(context, state),
+            const SizedBox(height: 8),
+            Text('Device ID: ${state.necklace.id}'),
+            Text('BLE Address: ${state.necklace.bleDevice}'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNameField(BuildContext context, SettingsState state) {
+    return TextFormField(
+      initialValue: state.necklace.name,
+      decoration: const InputDecoration(
+        labelText: 'Device Name',
+        border: OutlineInputBorder(),
+      ),
+      onChanged: (value) {
+        context.read<SettingsBloc>().add(UpdateNecklaceName(value));
+      },
+    );
+  }
+
+  Widget _buildScent1Section(BuildContext context, SettingsState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Scent 1 Settings',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Enable Periodic Emission'),
+              value: state.necklace.periodicEmissionEnabled,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(
+                      UpdatePeriodicEmission(value, 1),
+                    );
+              },
+            ),
+            ListTile(
+              title: const Text('Emission Duration'),
+              subtitle: Text(
+                '${state.necklace.emission1Duration.inSeconds} seconds',
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () => _showDurationPicker(
+                context,
+                'Scent 1 Emission Duration',
+                state.necklace.emission1Duration,
+                (duration) {
+                  context.read<SettingsBloc>().add(
+                        UpdateEmissionDuration(duration, 1),
+                      );
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text('Release Interval'),
+              subtitle: Text(
+                '${state.necklace.releaseInterval1.inMinutes} minutes',
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () => _showDurationPicker(
+                context,
+                'Scent 1 Release Interval',
+                state.necklace.releaseInterval1,
+                (duration) {
+                  context.read<SettingsBloc>().add(
+                        UpdateReleaseInterval(duration, 1),
+                      );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScent2Section(BuildContext context, SettingsState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Scent 2 Settings',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Enable Periodic Emission'),
+              value: state.necklace.periodicEmissionEnabled,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(
+                      UpdatePeriodicEmission(value, 2),
+                    );
+              },
+            ),
+            ListTile(
+              title: const Text('Emission Duration'),
+              subtitle: Text(
+                '${state.necklace.emission2Duration.inSeconds} seconds',
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () => _showDurationPicker(
+                context,
+                'Scent 2 Emission Duration',
+                state.necklace.emission2Duration,
+                (duration) {
+                  context.read<SettingsBloc>().add(
+                        UpdateEmissionDuration(duration, 2),
+                      );
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text('Release Interval'),
+              subtitle: Text(
+                '${state.necklace.releaseInterval2.inMinutes} minutes',
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () => _showDurationPicker(
+                context,
+                'Scent 2 Release Interval',
+                state.necklace.releaseInterval2,
+                (duration) {
+                  context.read<SettingsBloc>().add(
+                        UpdateReleaseInterval(duration, 2),
+                      );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConnectionSection(BuildContext context, SettingsState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Connection Settings',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              title: const Text('Change Necklace Device'),
+              trailing: const Icon(Icons.bluetooth),
+              onTap: () {
+                // Show device selection dialog
+              },
+            ),
+            ListTile(
+              title: const Text('Change Heart Rate Monitor'),
+              trailing: const Icon(Icons.heart_broken),
+              onTap: () {
+                // Show device selection dialog
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDangerZone(BuildContext context, SettingsState state) {
+    return Card(
+      color: Colors.red.shade50,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Danger Zone',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              title: const Text(
+                'Delete Device',
+                style: TextStyle(color: Colors.red),
+              ),
+              trailing: const Icon(Icons.delete_forever, color: Colors.red),
+              onTap: () {
+                _showDeleteConfirmation(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showDurationPicker(
+    BuildContext context,
+    String title,
+    Duration initialDuration,
+    Function(Duration) onDurationSelected,
+  ) async {
+    final Duration? result = await showDialog<Duration>(
+      context: context,
+      builder: (BuildContext context) {
+        return DurationPickerDialog(
+          title: title,
+          initialDuration: initialDuration,
+        );
+      },
+    );
+
+    if (result != null) {
+      onDurationSelected(result);
+    }
+  }
+
+  Future<void> _showDeleteConfirmation(BuildContext context) async {
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Device'),
+          content: const Text(
+            'Are you sure you want to delete this device? This action cannot be undone.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm == true) {
+      // Implement delete functionality
+      Navigator.of(context).pop();
+    }
+  }
+}
