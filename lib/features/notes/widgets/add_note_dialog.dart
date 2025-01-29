@@ -19,11 +19,13 @@ class AddNoteDialog extends StatefulWidget {
 class _AddNoteDialogState extends State<AddNoteDialog> {
   final TextEditingController _contentController = TextEditingController();
   bool _isButtonEnabled = false;
+  late final String? deviceId;
 
   @override
   void initState() {
     super.initState();
     _contentController.addListener(_onTextChanged);
+    deviceId = widget.deviceId;
   }
 
   void _onTextChanged() {
@@ -129,7 +131,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                       ? () {
                     final note = Note(
                       content: _contentController.text,
-                      deviceId: widget.deviceId,
+                      deviceId: deviceId,
                     );
                     LoggingService().logDebug('New note created: $note');
                     context.read<NotesBloc>().add(AddNote(note));

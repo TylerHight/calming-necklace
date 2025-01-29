@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 class Note {
   final String id;
   final String content;
-  final String? deviceId;
+  final String? deviceId; // equal to "id" in the necklace model if associated with a device
   final DateTime timestamp;
 
   Note({

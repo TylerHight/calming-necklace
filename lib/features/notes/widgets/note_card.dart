@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/note.dart';
 import '../bloc/notes_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../core/ui/ui_constants.dart';
 
 class NoteCard extends StatelessWidget {
   final Note note;
@@ -19,7 +20,7 @@ class NoteCard extends StatelessWidget {
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20.0),
+        padding: EdgeInsets.only(right: UIConstants.noteCardDeviceTagPadding),
         color: Colors.red,
         child: const Icon(Icons.delete, color: Colors.white),
       ),
@@ -30,33 +31,39 @@ class NoteCard extends StatelessWidget {
         );
       },
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 4.0),
+        margin: const EdgeInsets.symmetric(vertical: UIConstants.noteCardMargin),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(UIConstants.noteCardPadding),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 note.content,
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontSize: UIConstants.noteCardContentTextSize,
+                ),
               ),
-              const SizedBox(height: 8.0),
+              SizedBox(height: UIConstants.noteCardSpacing),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   if (note.deviceId != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8.0,
-                        vertical: 4.0,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: UIConstants.noteCardDeviceTagPadding,
+                        vertical: UIConstants.noteCardDeviceTagVerticalPadding,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.0),
+                        borderRadius: BorderRadius.circular(
+                          UIConstants.noteCardDeviceTagBorderRadius,
+                        ),
                       ),
                       child: Text(
                         'Device: ${note.deviceId}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          fontSize: UIConstants.noteCardMetadataTextSize,
+                        ),
                       ),
                     ),
                   Text(

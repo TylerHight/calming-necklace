@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
 class UIConstants {
+  // Note Card
+  static const double noteCardContentTextSize = 18.0;
+  static const double noteCardMetadataTextSize = 14.0;
+  static const double noteCardPadding = 16.0;
+  static const double noteCardMargin = 4.0;
+  static const double noteCardDeviceTagPadding = 8.0;
+  static const double noteCardDeviceTagVerticalPadding = 4.0;
+  static const double noteCardDeviceTagBorderRadius = 12.0;
+  static const double noteCardSpacing = 8.0;
+
   // Necklace Panel
   static const double necklacePanelPadding = 16.0;
   static const double necklacePanelElevation = 2.0;

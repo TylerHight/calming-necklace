@@ -9,6 +9,7 @@ import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
+import '../../../../features/notes/widgets/add_note_dialog.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
@@ -57,7 +58,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
           value: 'add_note',
           child: Row(
             children: [
-              Icon(Icons.note_add),
+              const Icon(Icons.note_add),
               SizedBox(width: 8),
               Text('Add Note'),
             ],
@@ -72,7 +73,12 @@ class _NecklacePanelState extends State<NecklacePanel> {
           ),
         );
       } else if (value == 'add_note') {
-        // Add a note
+        showDialog(
+          context: context,
+          builder: (context) => AddNoteDialog(
+            deviceId: widget.necklace.id,
+          ),
+        );
       }
     });
   }
@@ -157,7 +163,12 @@ class _NecklacePanelState extends State<NecklacePanel> {
                   ),
                 );
               } else if (value == 'add_note') {
-                // Add a note
+                showDialog(
+                  context: context,
+                  builder: (context) => AddNoteDialog(
+                    deviceId: widget.necklace.id,
+                  ),
+                );
               }
             },
             itemBuilder: (BuildContext context) => [
