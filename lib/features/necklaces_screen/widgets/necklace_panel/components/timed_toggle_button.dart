@@ -4,6 +4,7 @@ import 'package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_bu
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
+import '../../../../../core/services/database_service.dart';
 import '../../../../../core/ui/ui_constants.dart';
 
 class TimedToggleButton extends StatelessWidget {
@@ -18,6 +19,7 @@ class TimedToggleButton extends StatelessWidget {
   final Duration periodicEmissionTimerDuration;
   final bool isConnected;
   final Necklace necklace;
+  final DatabaseService databaseService;
   final VoidCallback onToggle;
   final String label;
 
@@ -34,6 +36,7 @@ class TimedToggleButton extends StatelessWidget {
     required this.periodicEmissionTimerDuration,
     required this.isConnected,
     required this.necklace,
+    required this.databaseService,
     required this.onToggle,
     required this.label,
   }) : super(key: key);
@@ -58,14 +61,16 @@ class TimedToggleButton extends StatelessWidget {
         periodicEmissionTimerDuration: periodicEmissionTimerDuration,
         periodicEmissionEnabled: necklace.periodicEmissionEnabled,
         isConnected: isConnected,
+        databaseService: databaseService,
         onToggle: onToggle,
         label: label,
+        necklace: necklace,
       ),
     );
   }
 }
 
-class _TimedToggleButtonView extends StatelessWidget {
+class _TimedToggleButtonView extends StatefulWidget {
   final Color? activeColor;
   final Color? inactiveColor;
   final IconData iconData;
@@ -78,8 +83,10 @@ class _TimedToggleButtonView extends StatelessWidget {
   final Duration periodicEmissionTimerDuration;
   final bool periodicEmissionEnabled;
   final bool isConnected;
+  final DatabaseService databaseService;
   final VoidCallback onToggle;
   final String label;
+  final Necklace necklace;
 
   const _TimedToggleButtonView({
     Key? key,
@@ -95,9 +102,38 @@ class _TimedToggleButtonView extends StatelessWidget {
     required this.periodicEmissionTimerDuration,
     required this.periodicEmissionEnabled,
     required this.isConnected,
+    required this.databaseService,
     required this.onToggle,
     required this.label,
+    required this.necklace,
   }) : super(key: key);
+
+  @override
+  State<_TimedToggleButtonView> createState() => _TimedToggleButtonState();
+}
+
+class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
+  Duration? _duration;
+
+  @override
+  void initState() {
+    super.initState();
+    _duration = widget.autoTurnOffDuration;
+    _refreshDuration();
+  }
+
+  Future<void> _refreshDuration() async {
+    try {
+      final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
+      if (updatedNecklace != null && mounted) {
+        setState(() {
+          _duration = widget.label.contains('1') ? updatedNecklace.emission1Duration : updatedNecklace.emission2Duration;
+        });
+      }
+    } catch (e) {
+      LoggingService().logError('Error refreshing duration: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +167,7 @@ class _TimedToggleButtonView extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              if (!isConnected) {
+              if (!widget.isConnected) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Device not connected')),
                 );
@@ -148,14 +184,14 @@ class _TimedToggleButtonView extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    isLightOn ? activeColor!.withOpacity(0.9) : inactiveColor!.withOpacity(0.9),
-                    isLightOn ? activeColor! : inactiveColor!,
+                    isLightOn ? widget.activeColor!.withOpacity(0.9) : widget.inactiveColor!.withOpacity(0.9),
+                    isLightOn ? widget.activeColor! : widget.inactiveColor!,
                   ],
                 ),
                 borderRadius: BorderRadius.circular(UIConstants.timedToggleButtonBorderRadius),
                 boxShadow: isLightOn ? [
                   BoxShadow(
-                    color: activeColor!.withOpacity(0.4),
+                    color: widget.activeColor!.withOpacity(0.4),
                     blurRadius: UIConstants.timedToggleButtonBoxShadowBlurRadius,
                     offset: UIConstants.timedToggleButtonBoxShadowOffset,
                   ),
@@ -166,8 +202,8 @@ class _TimedToggleButtonView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    iconData,
-                    color: iconColor,
+                    widget.iconData,
+                    color: widget.iconColor,
                     size: UIConstants.timedToggleButtonIconSize,
                   ),
                   const SizedBox(width: 4),

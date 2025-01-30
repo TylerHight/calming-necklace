@@ -164,4 +164,15 @@ class DatabaseService {
     );
     //LoggingService().logDebug('Updated necklace settings: $settings');
   }
+
+  Future<Necklace?> getNecklaceById(String id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'necklaces',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isEmpty) return null;
+    return Necklace.fromMap(maps.first);
+  }
 }

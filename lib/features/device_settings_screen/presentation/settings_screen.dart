@@ -11,11 +11,10 @@ import '../widgets/device_selection_dialog.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/ui/ui_constants.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final Necklace necklace;
   final NecklaceRepository repository;
   final DatabaseService databaseService;
-  final LoggingService _logger = LoggingService();
 
   SettingsScreen({
     Key? key,
@@ -25,9 +24,29 @@ class SettingsScreen extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  final LoggingService _logger = LoggingService();
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshSettings();
+  }
+
+  Future<void> _refreshSettings() async {
+    final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
+    if (updatedNecklace != null) {
+      context.read<SettingsBloc>().add(RefreshSettings(updatedNecklace));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsBloc(necklace, repository, databaseService),
+      create: (context) => SettingsBloc(widget.necklace, widget.repository, widget.databaseService),
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -50,14 +69,24 @@ class SettingsScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: const SettingsContent(),
+        body: SettingsContent(
+          databaseService: widget.databaseService,
+          necklace: widget.necklace,
+        ),
       ),
     );
   }
 }
 
 class SettingsContent extends StatefulWidget {
-  const SettingsContent({Key? key}) : super(key: key);
+  final DatabaseService databaseService;
+  final Necklace necklace;
+
+  const SettingsContent({
+    Key? key,
+    required this.databaseService,
+    required this.necklace,
+  }) : super(key: key);
 
   @override
   _SettingsContentState createState() => _SettingsContentState();
@@ -174,7 +203,8 @@ class _SettingsContentState extends State<SettingsContent> {
                   context,
                   'Scent 1 Emission Duration',
                   state.necklace.emission1Duration,
-                      (duration) {
+                  databaseService: widget.databaseService,
+                  onDurationSelected: (duration) {
                     context.read<SettingsBloc>().add(
                       UpdateEmissionDuration(duration, 1),
                     );
@@ -200,7 +230,8 @@ class _SettingsContentState extends State<SettingsContent> {
                   context,
                   'Scent 1 Release Interval',
                   state.necklace.releaseInterval1,
-                      (duration) {
+                  databaseService: widget.databaseService,
+                  onDurationSelected: (duration) {
                     context.read<SettingsBloc>().add(
                       UpdateReleaseInterval(duration, 1),
                     );
@@ -248,7 +279,8 @@ class _SettingsContentState extends State<SettingsContent> {
                 context,
                 'Scent 2 Emission Duration',
                 state.necklace.emission2Duration,
-                    (duration) {
+                databaseService: widget.databaseService,
+                onDurationSelected: (duration) {
                   context.read<SettingsBloc>().add(
                     UpdateEmissionDuration(duration, 2),
                   );
@@ -265,7 +297,8 @@ class _SettingsContentState extends State<SettingsContent> {
                 context,
                 'Scent 2 Release Interval',
                 state.necklace.releaseInterval2,
-                    (duration) {
+                databaseService: widget.databaseService,
+                onDurationSelected: (duration) {
                   context.read<SettingsBloc>().add(
                     UpdateReleaseInterval(duration, 2),
                   );
@@ -376,7 +409,7 @@ class _SettingsContentState extends State<SettingsContent> {
       BuildContext context,
       String title,
       Duration initialDuration,
-      Function(Duration) onDurationSelected,
+      {required DatabaseService databaseService, required Function(Duration) onDurationSelected,}
       ) async {
     await showDialog<void>(
       context: context,
@@ -385,6 +418,9 @@ class _SettingsContentState extends State<SettingsContent> {
           title: title,
           initialDuration: initialDuration,
           isEmissionDuration: title.contains('Emission'),
+          necklaceId: widget.necklace.id,
+          scentNumber: title.contains('1') ? 1 : 2,
+          databaseService: databaseService,
           onDurationChanged: (duration) {
             onDurationSelected(duration);
             _logger.logDebug('Duration changed: $duration');

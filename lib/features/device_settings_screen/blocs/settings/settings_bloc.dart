@@ -60,6 +60,13 @@ class ArchiveNecklace extends SettingsEvent {
   const ArchiveNecklace(this.id);
 }
 
+class RefreshSettings extends SettingsEvent {
+  final Necklace necklace;
+  const RefreshSettings(this.necklace);
+  @override
+  List<Object?> get props => [necklace];
+}
+
 // State
 class SettingsState extends Equatable {
   final Necklace necklace;
@@ -106,6 +113,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateReleaseInterval>(_onUpdateReleaseInterval);
     on<ArchiveNecklace>(_onArchiveNecklace);
     on<SaveSettings>(_onSaveSettings);
+    on<RefreshSettings>(_onRefreshSettings);
   }
 
   Future<void> _onSaveSettings(
@@ -246,5 +254,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     } catch (e) {
       emit(state.copyWith(isSaving: false, error: e.toString()));
     }
+  }
+
+  void _onRefreshSettings(RefreshSettings event, Emitter<SettingsState> emit) {
+    emit(state.copyWith(necklace: event.necklace));
   }
 }

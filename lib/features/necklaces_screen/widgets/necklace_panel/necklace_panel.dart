@@ -238,6 +238,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
         autoTurnOffDuration: const Duration(seconds: 5),
         periodicEmissionTimerDuration: const Duration(seconds: 10),
         isConnected: widget.isConnected,
+        databaseService: widget.databaseService,
         necklace: widget.necklace,
         iconData: icon,
         activeColor: activeColor,

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numberpicker/numberpicker.dart';
 import '../../../core/ui/ui_constants.dart';
 import '../../../core/services/logging_service.dart';
+import '../../../core/services/database_service.dart';
 import '../blocs/duration_picker/duration_picker_bloc.dart';
 
 class DurationPickerDialog extends StatelessWidget {
@@ -12,7 +13,10 @@ class DurationPickerDialog extends StatelessWidget {
   final bool isEmissionDuration;
   final Function(Duration) onDurationChanged;
   final LoggingService _logger;
+  final DatabaseService _databaseService;
   final Duration defaultDuration;
+  final String necklaceId;
+  final int scentNumber;
 
   DurationPickerDialog({
     Key? key,
@@ -20,8 +24,11 @@ class DurationPickerDialog extends StatelessWidget {
     required this.initialDuration,
     required this.isEmissionDuration,
     required this.onDurationChanged,
+    required this.necklaceId,
+    required this.scentNumber,
+    DatabaseService? databaseService,
     this.defaultDuration = const Duration(seconds: 10),
-  }) : _logger = LoggingService(), super(key: key);
+  }) : _logger = LoggingService(), _databaseService = databaseService ?? DatabaseService(), super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -106,20 +113,25 @@ class DurationPickerDialog extends StatelessWidget {
                   child: const Text('Cancel'),
                 ),
                 const SizedBox(width: 8),
-                BlocBuilder<DurationPickerBloc, DurationPickerState>(
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        onDurationChanged(Duration(
-                          hours: state.hours,
-                          minutes: state.minutes,
-                          seconds: state.seconds,
-                        ));
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Set'),
-                    );
+                ElevatedButton(
+                  onPressed: () async {
+                    try {
+                      final newDuration = Duration(
+                        hours: state.hours,
+                        minutes: state.minutes,
+                        seconds: state.seconds,
+                      );
+                      await _databaseService.updateNecklaceSettings(
+                        necklaceId,
+                        {'emission${scentNumber}Duration': newDuration.inSeconds},
+                      );
+                      onDurationChanged(newDuration);
+                    } catch (e) {
+                      LoggingService().logError('Error updating duration: $e');
+                    }
+                    Navigator.pop(context);
                   },
+                  child: const Text('Set'),
                 ),
               ],
             ),
