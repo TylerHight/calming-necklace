@@ -30,6 +30,14 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
     _duration = widget.initialDuration;
   }
 
+  void _handleDurationChange(Duration newDuration) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _duration = newDuration;
+    });
+    widget.onDurationChanged(_duration);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -59,7 +67,7 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-              Container(
+              SizedBox(
                 height: 280,
                 width: 280,
                 child: Theme(
@@ -69,17 +77,19 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                       secondary: _accentColor.withOpacity(0.5),
                     ),
                   ),
-                  child: DurationPicker(
-                    duration: _duration,
-                    onChange: (val) {
-                      HapticFeedback.selectionClick();
-                      setState(() {
-                        _duration = val;
-                        widget.onDurationChanged(_duration);
-                      });
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      return DurationPicker(
+                        duration: _duration,
+                        onChange: (val) {
+                          setState(() {
+                            _handleDurationChange(val);
+                          });
+                        },
+                        snapToMins: widget.isEmissionDuration ? 0.0 : 1.0,
+                        baseUnit: widget.isEmissionDuration ? BaseUnit.second : BaseUnit.minute,
+                      );
                     },
-                    snapToMins: widget.isEmissionDuration ? 0.0 : 1.0,
-                    baseUnit: widget.isEmissionDuration ? BaseUnit.second : BaseUnit.minute,
                   ),
                 ),
               ),
@@ -97,7 +107,9 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                       if (_duration.inSeconds > 0) {
                         Navigator.of(context).pop(_duration);
                       } else {
-                        const SnackBar(content: Text('Please select a duration greater than 0'));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please select a duration greater than 0')),
+                        );
                       }
                     },
                     child: const Text('Set Duration'),

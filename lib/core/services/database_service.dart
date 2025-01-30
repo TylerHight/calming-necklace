@@ -162,6 +162,6 @@ class DatabaseService {
       where: 'id = ?',
       whereArgs: [id],
     );
-    LoggingService().logDebug('Updated necklace settings: $settings');
+    //LoggingService().logDebug('Updated necklace settings: $settings');
   }
 }
