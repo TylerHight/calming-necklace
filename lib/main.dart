@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'core/data/models/necklace.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'core/services/database_service.dart';
+import 'features/device_settings_screen/blocs/settings/settings_bloc.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'features/notes/bloc/notes_bloc.dart';
@@ -40,6 +42,13 @@ class MyApp extends StatelessWidget {
               context.read<NecklaceRepository>(),
             ),
           ),
+          BlocProvider<SettingsBloc>(
+            create: (context) => SettingsBloc(
+              context.read<Necklace>(),
+              context.read<NecklaceRepository>(),
+              context.read<DatabaseService>(),
+            ),
+          ),
           BlocProvider(
             create: (context) => NotesBloc(
               context.read<DatabaseService>(),
@@ -74,57 +83,9 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.transparent,
             ),
           ),
-          home: const MainScreen(),
+          home: const NecklacesScreen(), // Ensure this is the correct screen
           debugShowCheckedModeBanner: false,
         ),
-      ),
-    );
-  }
-}
-
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _widgetOptions = <Widget>[
-    NecklacesScreen(),
-    NotesScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final logger = LoggingService();
-    logger.logDebug('MainScreen: Created NecklaceRepositoryImpl:');
-
-    return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.note),
-            label: 'Notes',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
-        unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
-        onTap: _onItemTapped,
       ),
     );
   }
