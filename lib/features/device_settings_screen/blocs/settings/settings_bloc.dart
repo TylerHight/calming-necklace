@@ -13,6 +13,13 @@ abstract class SettingsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class SaveSettings extends SettingsEvent {
+  const SaveSettings();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class UpdateNecklaceName extends SettingsEvent {
   final String name;
   const UpdateNecklaceName(this.name);
@@ -57,28 +64,32 @@ class ArchiveNecklace extends SettingsEvent {
 class SettingsState extends Equatable {
   final Necklace necklace;
   final bool isSaving;
+  final bool isSaved;
   final String? error;
 
   const SettingsState({
     required this.necklace,
     this.isSaving = false,
+    this.isSaved = false,
     this.error,
   });
 
   SettingsState copyWith({
     Necklace? necklace,
     bool? isSaving,
+    bool? isSaved,
     String? error,
   }) {
     return SettingsState(
       necklace: necklace ?? this.necklace,
       isSaving: isSaving ?? this.isSaving,
+      isSaved: isSaved ?? this.isSaved,
       error: error,
     );
   }
 
   @override
-  List<Object?> get props => [necklace, isSaving, error];
+  List<Object?> get props => [necklace, isSaving, isSaved, error];
 }
 
 // Bloc
@@ -94,6 +105,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateEmissionDuration>(_onUpdateEmissionDuration);
     on<UpdateReleaseInterval>(_onUpdateReleaseInterval);
     on<ArchiveNecklace>(_onArchiveNecklace);
+    on<SaveSettings>(_onSaveSettings);
+  }
+
+  Future<void> _onSaveSettings(
+      SaveSettings event,
+      Emitter<SettingsState> emit,
+      ) async {
+    try {
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        state.necklace.toMap(),
+      );
+      emit(state.copyWith(isSaved: true));
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 
   void _onUpdateName(UpdateNecklaceName event, Emitter<SettingsState> emit) {

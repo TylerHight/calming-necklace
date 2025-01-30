@@ -1,118 +1,101 @@
 import 'package:flutter/material.dart';
-import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:numberpicker/numberpicker.dart';
+import '../../../core/ui/ui_constants.dart';
+import '../blocs/duration_picker/duration_picker_bloc.dart';
 
-class DurationPickerDialog extends StatefulWidget {
-  final Duration initialDuration;
+class DurationPickerDialog extends StatelessWidget {
   final String title;
+  final Duration initialDuration;
   final bool isEmissionDuration;
   final Function(Duration) onDurationChanged;
 
   const DurationPickerDialog({
     Key? key,
-    required this.initialDuration,
     required this.title,
+    required this.initialDuration,
     required this.isEmissionDuration,
     required this.onDurationChanged,
   }) : super(key: key);
 
   @override
-  State<DurationPickerDialog> createState() => _DurationPickerDialogState();
-}
-
-class _DurationPickerDialogState extends State<DurationPickerDialog> {
-  late Duration _duration;
-  final Color _accentColor = Colors.blue;
-
-  @override
-  void initState() {
-    super.initState();
-    _duration = widget.initialDuration;
-  }
-
-  void _handleDurationChange(Duration newDuration) {
-    HapticFeedback.selectionClick();
-    setState(() {
-      _duration = newDuration;
-    });
-    widget.onDurationChanged(_duration);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      elevation: 4,
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+    return BlocProvider(
+      create: (context) => DurationPickerBloc()
+        ..add(UpdateHours(initialDuration.inHours))
+        ..add(UpdateMinutes(initialDuration.inMinutes % 60))
+        ..add(UpdateSeconds(initialDuration.inSeconds % 60)),
+      child: Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(UIConstants.durationPickerDialogRadius),
         ),
-        child: Padding(
+        child: Container(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 8),
+              const SizedBox(height: UIConstants.durationPickerSpacing / 2),
               Text(
-                widget.title,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: _accentColor,
-                  fontWeight: FontWeight.w600,
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: UIConstants.durationPickerSpacing),
               SizedBox(
-                height: 280,
-                width: 280,
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    colorScheme: Theme.of(context).colorScheme.copyWith(
-                      primary: _accentColor,
-                      secondary: _accentColor.withOpacity(0.5),
+                height: UIConstants.durationPickerHeight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildNumberPicker(
+                      context,
+                      0,
+                      23,
+                      initialDuration.inHours,
+                      (value) => context.read<DurationPickerBloc>().add(UpdateHours(value)),
+                      'Hours',
                     ),
-                  ),
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return DurationPicker(
-                        duration: _duration,
-                        onChange: (val) {
-                          setState(() {
-                            _handleDurationChange(val);
-                          });
-                        },
-                        snapToMins: widget.isEmissionDuration ? 0.0 : 1.0,
-                        baseUnit: widget.isEmissionDuration ? BaseUnit.second : BaseUnit.minute,
-                      );
-                    },
-                  ),
+                    _buildSeparator(),
+                    _buildNumberPicker(
+                      context,
+                      0,
+                      59,
+                      initialDuration.inMinutes % 60,
+                      (value) => context.read<DurationPickerBloc>().add(UpdateMinutes(value)),
+                      'Minutes',
+                    ),
+                    _buildSeparator(),
+                    _buildNumberPicker(
+                      context,
+                      0,
+                      59,
+                      initialDuration.inSeconds % 60,
+                      (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
+                      'Seconds',
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: UIConstants.durationPickerSpacing),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => Navigator.pop(context),
                     child: const Text('Cancel'),
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_duration.inSeconds > 0) {
-                        Navigator.of(context).pop(_duration);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please select a duration greater than 0')),
-                        );
-                      }
+                  BlocBuilder<DurationPickerBloc, DurationPickerState>(
+                    builder: (context, state) {
+                      return ElevatedButton(
+                        onPressed: () {
+                          onDurationChanged(state.duration);
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Set'),
+                      );
                     },
-                    child: const Text('Set Duration'),
                   ),
                 ],
               ),
@@ -120,6 +103,55 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNumberPicker(
+    BuildContext context,
+    int minValue,
+    int maxValue,
+    int initialValue,
+    Function(int) onChanged,
+    String label,
+  ) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: UIConstants.durationPickerColumnWidth,
+          child: NumberPicker(
+            value: initialValue,
+            minValue: minValue,
+            maxValue: maxValue,
+            itemHeight: UIConstants.durationPickerItemExtent,
+            textStyle: TextStyle(
+              fontSize: UIConstants.durationPickerFontSize,
+            ),
+            selectedTextStyle: TextStyle(
+              fontSize: UIConstants.durationPickerFontSize,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+            onChanged: (value) {
+              HapticFeedback.selectionClick();
+              onChanged(value);
+            },
+          ),
+        ),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSeparator() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      width: UIConstants.durationPickerSeparatorWidth,
+      height: UIConstants.durationPickerHeight * 0.6,
+      color: UIConstants.durationPickerSeparatorColor.withOpacity(0.3),
     );
   }
 }

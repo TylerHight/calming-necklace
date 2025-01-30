@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class UIConstants {
   // General
-  static const Color fabColor = Colors.blueAccent; // Blue color for Floating Action Buttons
+  static const Color floatingActionButtonColor = Colors.blueAccent; // Blue color for Floating Action Buttons
   
   // Settings Screen
   static const double settingsScreenHorizontalPadding = 16.0;
@@ -50,4 +50,17 @@ class UIConstants {
   static const double timedToggleButtonBoxShadowBlurRadius = 8.0;
   static const Offset timedToggleButtonBoxShadowOffset = Offset(0, 2);
   static const double countdownTimerTextSize = 16.0;
+
+  // Duration Picker
+  static const double durationPickerHeight = 220.0;
+  static const double durationPickerWidth = 280.0;
+  static const double durationPickerItemExtent = 32.0;
+  static const double durationPickerFontSize = 20.0;
+  static const double durationPickerSpacing = 24.0;
+  static const double durationPickerSeparatorWidth = 2.0;
+  static const Color durationPickerSeparatorColor = Colors.grey;
+  static const double durationPickerLabelSpacing = 8.0;
+  static const double durationPickerDialogRadius = 20.0;
+  static const double durationPickerButtonSpacing = 16.0;
+  static const double durationPickerColumnWidth = 80.0;
 }
