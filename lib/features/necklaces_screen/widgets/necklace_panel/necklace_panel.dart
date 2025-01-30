@@ -69,7 +69,10 @@ class _NecklacePanelState extends State<NecklacePanel> {
       if (value == 'settings') {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => SettingsScreen(necklace: widget.necklace),
+            builder: (context) => SettingsScreen(
+              necklace: widget.necklace,
+              repository: widget.repository,
+            ),
           ),
         );
       } else if (value == 'add_note') {
@@ -159,7 +162,10 @@ class _NecklacePanelState extends State<NecklacePanel> {
               if (value == 'settings') {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => SettingsScreen(necklace: widget.necklace),
+                    builder: (context) => SettingsScreen(
+                      necklace: widget.necklace,
+                      repository: widget.repository,
+                    ),
                   ),
                 );
               } else if (value == 'add_note') {

@@ -8,6 +8,7 @@ abstract class NecklaceRepository {
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
   Future<void> addNecklace(String name, String bleDevice);
   Future<List<Necklace>> getNecklaces();
+  Future<void> deleteNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
 }
 
@@ -71,6 +72,17 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<List<Necklace>> getNecklaces() async {
     return _dbService.getNecklaces();
+  }
+
+  @override
+  Future<void> deleteNecklace(String id) async {
+    try {
+      await _dbService.deleteNecklace(id);
+      _logger.logInfo('Successfully deleted necklace with id: $id');
+    } catch (e) {
+      _logger.logError('Error deleting necklace: $e');
+      throw Exception('Failed to delete necklace: $e');
+    }
   }
 
   @override

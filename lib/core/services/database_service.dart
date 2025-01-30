@@ -136,4 +136,14 @@ class DatabaseService {
       whereArgs: [id],
     );
   }
+
+  Future<void> deleteNecklace(String id) async {
+    final db = await database;
+    LoggingService().logDebug('Deleting necklace with id: $id');
+    await db.transaction((txn) async {
+      // Delete the necklace
+      await txn.delete('necklaces', where: 'id = ?', whereArgs: [id]);
+      // Don't delete associated notes, they should remain in history
+    });
+  }
 }

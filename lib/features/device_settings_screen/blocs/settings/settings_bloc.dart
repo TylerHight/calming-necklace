@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/data/models/necklace.dart';
+import '../../../../core/data/repositories/necklace_repository.dart';
 
 // Events
 abstract class SettingsEvent extends Equatable {
@@ -45,6 +46,11 @@ class UpdateReleaseInterval extends SettingsEvent {
   List<Object?> get props => [interval, scentNumber];
 }
 
+class DeleteNecklace extends SettingsEvent {
+  final String id;
+  const DeleteNecklace(this.id);
+}
+
 // State
 class SettingsState extends Equatable {
   final Necklace necklace;
@@ -75,11 +81,14 @@ class SettingsState extends Equatable {
 
 // Bloc
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  SettingsBloc(Necklace necklace) : super(SettingsState(necklace: necklace)) {
+  final NecklaceRepository _repository;
+
+  SettingsBloc(Necklace necklace, this._repository) : super(SettingsState(necklace: necklace)) {
     on<UpdateNecklaceName>(_onUpdateName);
     on<UpdatePeriodicEmission>(_onUpdatePeriodicEmission);
     on<UpdateEmissionDuration>(_onUpdateEmissionDuration);
     on<UpdateReleaseInterval>(_onUpdateReleaseInterval);
+    on<DeleteNecklace>(_onDeleteNecklace);
   }
 
   void _onUpdateName(UpdateNecklaceName event, Emitter<SettingsState> emit) {
@@ -164,5 +173,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             releaseInterval2: event.interval,
           );
     emit(state.copyWith(necklace: updatedNecklace));
+  }
+
+  Future<void> _onDeleteNecklace(DeleteNecklace event, Emitter<SettingsState> emit) async {
+    try {
+      emit(state.copyWith(isSaving: true));
+      await _repository.deleteNecklace(event.id);
+      emit(state.copyWith(isSaving: false));
+    } catch (e) {
+      emit(state.copyWith(isSaving: false, error: e.toString()));
+    }
   }
 }

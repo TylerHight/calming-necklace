@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
+import '../../../core/data/repositories/necklace_repository.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
@@ -8,13 +10,14 @@ import '../../../core/data/models/necklace.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Necklace necklace;
+  final NecklaceRepository repository;
 
-  const SettingsScreen({Key? key, required this.necklace}) : super(key: key);
+  const SettingsScreen({Key? key, required this.necklace, required this.repository}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsBloc(necklace),
+      create: (context) => SettingsBloc(necklace, repository),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Device Settings'),
@@ -310,7 +313,7 @@ class SettingsContent extends StatelessWidget {
               ),
               trailing: const Icon(Icons.delete_forever, color: Colors.red),
               onTap: () {
-                _showDeleteConfirmation(context);
+                _showDeleteConfirmation(context, state);
               },
             ),
           ],
@@ -340,7 +343,7 @@ class SettingsContent extends StatelessWidget {
     }
   }
 
-  Future<void> _showDeleteConfirmation(BuildContext context) async {
+  Future<void> _showDeleteConfirmation(BuildContext context, SettingsState state) async {
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -367,8 +370,20 @@ class SettingsContent extends StatelessWidget {
     );
 
     if (confirm == true) {
-      // Implement delete functionality
-      Navigator.of(context).pop();
+      try {
+        context.read<SettingsBloc>().add(DeleteNecklace(state.necklace.id));
+        // Refresh the necklaces list
+        context.read<NecklacesBloc>().add(FetchNecklacesEvent());
+        // Show success message and pop back to main screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Device deleted successfully')),
+        );
+        Navigator.of(context).pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting device: $e')),
+        );
+      }
     }
   }
 }
