@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class DurationPickerDialog extends StatefulWidget {
   final Duration initialDuration;
   final String title;
+  final Color accentColor;
 
   const DurationPickerDialog({
     Key? key,
     required this.initialDuration,
     required this.title,
+    this.accentColor = Colors.blue,
   }) : super(key: key);
 
   @override
@@ -28,55 +30,70 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              widget.title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildNumberPicker(
-                  value: minutes,
-                  maxValue: 59,
-                  label: 'Minutes',
-                  onChanged: (value) => setState(() => minutes = value),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      elevation: 4,
+      backgroundColor: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8)],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                widget.title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: widget.accentColor,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(width: 16),
-                _buildNumberPicker(
-                  value: seconds,
-                  maxValue: 59,
-                  label: 'Seconds',
-                  onChanged: (value) => setState(() => seconds = value),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(
-                      Duration(minutes: minutes, seconds: seconds),
-                    );
-                  },
-                  child: const Text('Confirm'),
-                ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildNumberPicker(
+                    value: minutes,
+                    maxValue: 59,
+                    label: 'Minutes',
+                    onChanged: (value) => setState(() => minutes = value),
+                  ),
+                  const SizedBox(width: 16),
+                  _buildNumberPicker(
+                    value: seconds,
+                    maxValue: 59,
+                    label: 'Seconds',
+                    onChanged: (value) => setState(() => seconds = value),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Cancel'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(
+                        Duration(minutes: minutes, seconds: seconds),
+                      );
+                    },
+                    child: const Text('Confirm'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

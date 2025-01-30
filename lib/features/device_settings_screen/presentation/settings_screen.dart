@@ -7,6 +7,7 @@ import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
 import '../../../core/data/models/necklace.dart';
+import '../../../core/ui/ui_constants.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Necklace necklace;
@@ -20,11 +21,20 @@ class SettingsScreen extends StatelessWidget {
       create: (context) => SettingsBloc(necklace, repository),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Device Settings'),
+          title: const Text(
+            'Device Settings',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
           actions: [
             IconButton(
               icon: const Icon(Icons.save),
-              onPressed: () {
+              onPressed: () async {
                 // Save settings implementation
                 Navigator.pop(context);
               },
@@ -45,7 +55,12 @@ class SettingsContent extends StatelessWidget {
     return BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
         return ListView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: UIConstants.settingsScreenHorizontalPadding,
+            vertical: UIConstants.settingsScreenVerticalPadding,
+          ),
+          physics: const BouncingScrollPhysics(),
+          clipBehavior: Clip.none,
           children: [
             _buildDeviceInfoSection(context, state),
             const SizedBox(height: 16),
@@ -102,63 +117,76 @@ class SettingsContent extends StatelessWidget {
 
   Widget _buildScent1Section(BuildContext context, SettingsState state) {
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Scent 1 Settings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade50],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Scent 1 Settings',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Enable Periodic Emission'),
-              value: state.necklace.periodicEmissionEnabled,
-              onChanged: (value) {
-                context.read<SettingsBloc>().add(
-                      UpdatePeriodicEmission(value, 1),
-                    );
-              },
-            ),
-            ListTile(
-              title: const Text('Emission Duration'),
-              subtitle: Text(
-                '${state.necklace.emission1Duration.inSeconds} seconds',
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () => _showDurationPicker(
-                context,
-                'Scent 1 Emission Duration',
-                state.necklace.emission1Duration,
-                (duration) {
+              const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text('Enable Periodic Emission'),
+                value: state.necklace.periodicEmissionEnabled,
+                onChanged: (value) {
                   context.read<SettingsBloc>().add(
-                        UpdateEmissionDuration(duration, 1),
+                        UpdatePeriodicEmission(value, 1),
                       );
                 },
               ),
-            ),
-            ListTile(
-              title: const Text('Release Interval'),
-              subtitle: Text(
-                '${state.necklace.releaseInterval1.inMinutes} minutes',
+              ListTile(
+                title: const Text('Emission Duration'),
+                subtitle: Text(
+                  '${state.necklace.emission1Duration.inSeconds} seconds',
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () => _showDurationPicker(
+                  context,
+                  'Scent 1 Emission Duration',
+                  state.necklace.emission1Duration,
+                  (duration) {
+                    context.read<SettingsBloc>().add(
+                          UpdateEmissionDuration(duration, 1),
+                        );
+                  },
+                ),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () => _showDurationPicker(
-                context,
-                'Scent 1 Release Interval',
-                state.necklace.releaseInterval1,
-                (duration) {
-                  context.read<SettingsBloc>().add(
-                        UpdateReleaseInterval(duration, 1),
-                      );
-                },
+              ListTile(
+                title: const Text('Release Interval'),
+                subtitle: Text(
+                  '${state.necklace.releaseInterval1.inMinutes} minutes',
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () => _showDurationPicker(
+                  context,
+                  'Scent 1 Release Interval',
+                  state.necklace.releaseInterval1,
+                  (duration) {
+                    context.read<SettingsBloc>().add(
+                          UpdateReleaseInterval(duration, 1),
+                        );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
