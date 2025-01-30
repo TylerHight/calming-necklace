@@ -29,6 +29,15 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
     context.read<NecklacesBloc>().add(FetchNecklacesEvent());
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Refresh necklaces when returning to screen
+    if (mounted) {
+      context.read<NecklacesBloc>().add(FetchNecklacesEvent());
+    }
+  }
+
   Future<void> _showAddNecklaceDialog() async {
     await showDialog(
       context: context,

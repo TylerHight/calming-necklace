@@ -118,7 +118,6 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   @override
   void initState() {
     super.initState();
-    _duration = widget.autoTurnOffDuration;
     _refreshDuration();
   }
 

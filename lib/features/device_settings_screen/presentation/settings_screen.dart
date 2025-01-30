@@ -37,9 +37,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _refreshSettings() async {
-    final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
-    if (updatedNecklace != null) {
-      context.read<SettingsBloc>().add(RefreshSettings(updatedNecklace));
+    try {
+      final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
+      if (updatedNecklace != null && mounted) {
+        context.read<SettingsBloc>().add(RefreshSettings(updatedNecklace));
+      }
+    } catch (e) {
+      _logger.logError('Error refreshing settings: $e');
     }
   }
 

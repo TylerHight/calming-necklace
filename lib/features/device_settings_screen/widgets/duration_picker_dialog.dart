@@ -121,11 +121,16 @@ class DurationPickerDialog extends StatelessWidget {
                         minutes: state.minutes,
                         seconds: state.seconds,
                       );
+                      // Save to database
+                      final settingKey = isEmissionDuration 
+                        ? 'emission${scentNumber}Duration' 
+                        : 'releaseInterval${scentNumber}';
                       await _databaseService.updateNecklaceSettings(
                         necklaceId,
-                        {'emission${scentNumber}Duration': newDuration.inSeconds},
+                        {settingKey: newDuration.inSeconds},
                       );
                       onDurationChanged(newDuration);
+                      LoggingService().logDebug('Successfully saved duration: $newDuration');
                     } catch (e) {
                       LoggingService().logError('Error updating duration: $e');
                     }
