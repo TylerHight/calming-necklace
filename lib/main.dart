@@ -6,6 +6,7 @@ import 'core/services/database_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'features/notes/bloc/notes_bloc.dart';
+import 'features/device_settings_screen/blocs/duration_picker/duration_picker_bloc.dart';
 import 'features/notes/presentation/notes_screen.dart';
 import 'app_bloc_observer.dart';
 import 'core/services/logging_service.dart';
@@ -29,6 +30,10 @@ class MyApp extends StatelessWidget {
         ),
         Provider<DatabaseService>(
           create: (context) => DatabaseService(),
+          lazy: true,
+        ),
+        Provider<DurationPickerBloc>(
+          create: (context) => DurationPickerBloc(),
           lazy: true,
         ),
       ],

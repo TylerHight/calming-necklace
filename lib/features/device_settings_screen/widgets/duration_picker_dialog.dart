@@ -48,34 +48,40 @@ class DurationPickerDialog extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildNumberPicker(
-                      context,
-                      0,
-                      23,
-                      initialDuration.inHours,
-                      (value) => context.read<DurationPickerBloc>().add(UpdateHours(value)),
-                      'Hours',
+                    Expanded(
+                      child: _buildNumberPicker(
+                        context,
+                        0,
+                        23,
+                        initialDuration.inHours,
+                            (value) => context.read<DurationPickerBloc>().add(UpdateHours(value)),
+                        'Hours',
+                      ),
                     ),
                     _buildSeparator(),
-                    _buildNumberPicker(
-                      context,
-                      0,
-                      59,
-                      initialDuration.inMinutes % 60,
-                      (value) => context.read<DurationPickerBloc>().add(UpdateMinutes(value)),
-                      'Minutes',
+                    Expanded(
+                      child: _buildNumberPicker(
+                        context,
+                        0,
+                        59,
+                        initialDuration.inMinutes % 60,
+                            (value) => context.read<DurationPickerBloc>().add(UpdateMinutes(value)),
+                        'Minutes',
+                      ),
                     ),
                     _buildSeparator(),
-                    _buildNumberPicker(
-                      context,
-                      0,
-                      59,
-                      initialDuration.inSeconds % 60,
-                      (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
-                      'Seconds',
+                    Expanded(
+                      child: _buildNumberPicker(
+                        context,
+                        0,
+                        59,
+                        initialDuration.inSeconds % 60,
+                            (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
+                        'Seconds',
+                      ),
                     ),
                   ],
-                ),
+                )
               ),
               const SizedBox(height: UIConstants.durationPickerSpacing),
               Row(
