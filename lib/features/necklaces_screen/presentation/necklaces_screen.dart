@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
+import '../../../core/services/database_service.dart';
 import '../../add_device_dialog/blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
@@ -18,11 +19,13 @@ class NecklacesScreen extends StatefulWidget {
 
 class _NecklacesScreenState extends State<NecklacesScreen> {
   late NecklaceRepository _repository;
+  late DatabaseService _databaseService;
 
   @override
   void initState() {
     super.initState();
     _repository = context.read<NecklaceRepository>();
+    _databaseService = context.read<DatabaseService>(); // Initialize DatabaseService
     context.read<NecklacesBloc>().add(FetchNecklacesEvent());
   }
 
@@ -77,8 +80,8 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
           if (state is NecklacesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NecklacesLoaded) {
-            return state.necklaces.isEmpty 
-              ? _buildEmptyState() 
+            return state.necklaces.isEmpty
+              ? _buildEmptyState()
               : _buildNecklaceList(state.necklaces);
           } else if (state is NecklacesError) {
             return Center(child: Text(state.message));
@@ -146,6 +149,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             name: necklace.name,
             isConnected: true,
             necklace: necklace,
+            databaseService: _databaseService, // Pass DatabaseService
           ),
         );
       },

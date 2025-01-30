@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:duration_picker/duration_picker.dart';
+import 'package:flutter/services.dart';
 
 class DurationPickerDialog extends StatefulWidget {
   final Duration initialDuration;
   final String title;
-  final Color accentColor;
+  final bool isEmissionDuration;
+  final Function(Duration) onDurationChanged;
 
   const DurationPickerDialog({
     Key? key,
     required this.initialDuration,
     required this.title,
-    this.accentColor = Colors.blue,
+    required this.isEmissionDuration,
+    required this.onDurationChanged,
   }) : super(key: key);
 
   @override
@@ -17,14 +21,13 @@ class DurationPickerDialog extends StatefulWidget {
 }
 
 class _DurationPickerDialogState extends State<DurationPickerDialog> {
-  late int minutes;
-  late int seconds;
+  late Duration _duration;
+  final Color _accentColor = Colors.blue;
 
   @override
   void initState() {
     super.initState();
-    minutes = widget.initialDuration.inMinutes;
-    seconds = widget.initialDuration.inSeconds % 60;
+    _duration = widget.initialDuration;
   }
 
   @override
@@ -46,32 +49,39 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              const SizedBox(height: 8),
               Text(
                 widget.title,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: widget.accentColor,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: _accentColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildNumberPicker(
-                    value: minutes,
-                    maxValue: 59,
-                    label: 'Minutes',
-                    onChanged: (value) => setState(() => minutes = value),
+              const SizedBox(height: 16),
+              Container(
+                height: 280,
+                width: 280,
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: Theme.of(context).colorScheme.copyWith(
+                      primary: _accentColor,
+                      secondary: _accentColor.withOpacity(0.5),
+                    ),
                   ),
-                  const SizedBox(width: 16),
-                  _buildNumberPicker(
-                    value: seconds,
-                    maxValue: 59,
-                    label: 'Seconds',
-                    onChanged: (value) => setState(() => seconds = value),
+                  child: DurationPicker(
+                    duration: _duration,
+                    onChange: (val) {
+                      HapticFeedback.selectionClick();
+                      setState(() {
+                        _duration = val;
+                        widget.onDurationChanged(_duration);
+                      });
+                    },
+                    snapToMins: widget.isEmissionDuration ? 0.0 : 1.0,
+                    baseUnit: widget.isEmissionDuration ? BaseUnit.second : BaseUnit.minute,
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 24),
               Row(
@@ -84,11 +94,13 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
                   const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(
-                        Duration(minutes: minutes, seconds: seconds),
-                      );
+                      if (_duration.inSeconds > 0) {
+                        Navigator.of(context).pop(_duration);
+                      } else {
+                        const SnackBar(content: Text('Please select a duration greater than 0'));
+                      }
                     },
-                    child: const Text('Confirm'),
+                    child: const Text('Set Duration'),
                   ),
                 ],
               ),
@@ -96,39 +108,6 @@ class _DurationPickerDialogState extends State<DurationPickerDialog> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildNumberPicker({
-    required int value,
-    required int maxValue,
-    required String label,
-    required ValueChanged<int> onChanged,
-  }) {
-    return Column(
-      children: [
-        Text(label),
-        const SizedBox(height: 8),
-        SizedBox(
-          width: 64,
-          child: TextField(
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            controller: TextEditingController(text: value.toString()),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            onChanged: (text) {
-              final newValue = int.tryParse(text) ?? 0;
-              if (newValue >= 0 && newValue <= maxValue) {
-                onChanged(newValue);
-              }
-            },
-          ),
-        ),
-      ],
     );
   }
 }

@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
+import '../../../core/services/database_service.dart';
+import '../../../core/services/logging_service.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
@@ -12,13 +14,20 @@ import '../../../core/ui/ui_constants.dart';
 class SettingsScreen extends StatelessWidget {
   final Necklace necklace;
   final NecklaceRepository repository;
+  final DatabaseService databaseService;
+  final LoggingService _logger = LoggingService();
 
-  const SettingsScreen({Key? key, required this.necklace, required this.repository}) : super(key: key);
+  SettingsScreen({
+    Key? key,
+    required this.necklace,
+    required this.repository,
+    required this.databaseService,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsBloc(necklace, repository),
+      create: (context) => SettingsBloc(necklace, repository, databaseService),
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -47,8 +56,15 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class SettingsContent extends StatelessWidget {
+class SettingsContent extends StatefulWidget {
   const SettingsContent({Key? key}) : super(key: key);
+
+  @override
+  _SettingsContentState createState() => _SettingsContentState();
+}
+
+class _SettingsContentState extends State<SettingsContent> {
+  late final LoggingService _logger;
 
   @override
   Widget build(BuildContext context) {
@@ -142,15 +158,6 @@ class SettingsContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              SwitchListTile(
-                title: const Text('Enable Periodic Emission'),
-                value: state.necklace.periodicEmissionEnabled,
-                onChanged: (value) {
-                  context.read<SettingsBloc>().add(
-                        UpdatePeriodicEmission(value, 1),
-                      );
-                },
-              ),
               ListTile(
                 title: const Text('Emission Duration'),
                 subtitle: Text(
@@ -167,6 +174,15 @@ class SettingsContent extends StatelessWidget {
                         );
                   },
                 ),
+              ),
+              SwitchListTile(
+                title: const Text('Enable Periodic Emission'),
+                value: state.necklace.periodicEmissionEnabled,
+                onChanged: (value) {
+                  context.read<SettingsBloc>().add(
+                        UpdatePeriodicEmission(value, 1),
+                      );
+                },
               ),
               ListTile(
                 title: const Text('Release Interval'),
@@ -356,19 +372,20 @@ class SettingsContent extends StatelessWidget {
     Duration initialDuration,
     Function(Duration) onDurationSelected,
   ) async {
-    final Duration? result = await showDialog<Duration>(
+    await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return DurationPickerDialog(
           title: title,
           initialDuration: initialDuration,
+          isEmissionDuration: title.contains('Emission'),
+          onDurationChanged: (duration) {
+            onDurationSelected(duration);
+            _logger.logDebug('Duration changed: $duration');
+          },
         );
       },
     );
-
-    if (result != null) {
-      onDurationSelected(result);
-    }
   }
 
   Future<void> _showDeleteConfirmation(BuildContext context, SettingsState state) async {

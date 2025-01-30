@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
+import '../../../../core/services/database_service.dart';
+import '../../../../core/services/logging_service.dart';
 
 // Events
 abstract class SettingsEvent extends Equatable {
@@ -82,8 +84,11 @@ class SettingsState extends Equatable {
 // Bloc
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final NecklaceRepository _repository;
+  final DatabaseService _databaseService;
+  final LoggingService _logger = LoggingService();
 
-  SettingsBloc(Necklace necklace, this._repository) : super(SettingsState(necklace: necklace)) {
+  SettingsBloc(Necklace necklace, this._repository, this._databaseService) 
+      : super(SettingsState(necklace: necklace)) {
     on<UpdateNecklaceName>(_onUpdateName);
     on<UpdatePeriodicEmission>(_onUpdatePeriodicEmission);
     on<UpdateEmissionDuration>(_onUpdateEmissionDuration);
@@ -138,7 +143,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
-  void _onUpdateEmissionDuration(UpdateEmissionDuration event, Emitter<SettingsState> emit) {
+  void _onUpdateEmissionDuration(UpdateEmissionDuration event, Emitter<SettingsState> emit) async {
     final updatedNecklace = event.scentNumber == 1
         ? Necklace(
             id: state.necklace.id,
@@ -165,9 +170,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             isArchived: state.necklace.isArchived,
           );
     emit(state.copyWith(necklace: updatedNecklace));
+    try {
+      emit(state.copyWith(isSaving: true));
+      _logger.logDebug('Updating emission duration: ${event.duration.inSeconds} seconds for scent ${event.scentNumber}');
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        {
+          'emission${event.scentNumber}Duration': event.duration.inSeconds,
+        },
+      );
+      emit(state.copyWith(
+        necklace: updatedNecklace,
+        isSaving: false,
+      ));
+    } catch (e) {
+      _logger.logError('Error updating emission duration: $e');
+      emit(state.copyWith(error: e.toString(), isSaving: false));
+    }
   }
 
-  void _onUpdateReleaseInterval(UpdateReleaseInterval event, Emitter<SettingsState> emit) {
+  Future<void> _onUpdateReleaseInterval(UpdateReleaseInterval event, Emitter<SettingsState> emit) async {
     final updatedNecklace = event.scentNumber == 1
         ? Necklace(
             id: state.necklace.id,
@@ -193,7 +215,23 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             isRelease2Active: state.necklace.isRelease2Active,
             isArchived: state.necklace.isArchived,
           );
-    emit(state.copyWith(necklace: updatedNecklace));
+    try {
+      emit(state.copyWith(isSaving: true));
+      _logger.logDebug('Updating release interval: ${event.interval.inSeconds} seconds for scent ${event.scentNumber}');
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        {
+          'releaseInterval${event.scentNumber}': event.interval.inSeconds,
+        },
+      );
+      emit(state.copyWith(
+        necklace: updatedNecklace,
+        isSaving: false,
+      ));
+    } catch (e) {
+      _logger.logError('Error updating release interval: $e');
+      emit(state.copyWith(error: e.toString(), isSaving: false));
+    }
   }
 
   Future<void> _onArchiveNecklace(ArchiveNecklace event, Emitter<SettingsState> emit) async {

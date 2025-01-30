@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
+import '../../../../core/services/database_service.dart';
 import '../../../../core/ui/components/signal_strength_icon.dart';
 import 'components/timed_toggle_button.dart';
 import 'components/connection_status.dart';
@@ -17,6 +18,7 @@ class NecklacePanel extends StatefulWidget {
   final bool isConnected;
   final Necklace necklace;
   final NecklaceRepository repository;
+  final DatabaseService databaseService;
 
   const NecklacePanel({
     Key? key,
@@ -25,6 +27,7 @@ class NecklacePanel extends StatefulWidget {
     required this.isConnected,
     required this.necklace,
     required this.repository,
+    required this.databaseService,
   }) : super(key: key);
 
   @override
@@ -72,6 +75,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
             builder: (context) => SettingsScreen(
               necklace: widget.necklace,
               repository: widget.repository,
+              databaseService: widget.databaseService, // Pass DatabaseService
             ),
           ),
         );
@@ -165,6 +169,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
                     builder: (context) => SettingsScreen(
                       necklace: widget.necklace,
                       repository: widget.repository,
+                      databaseService: widget.databaseService, // Pass DatabaseService
                     ),
                   ),
                 );

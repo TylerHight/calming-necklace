@@ -153,4 +153,15 @@ class DatabaseService {
         where: 'id = ?', whereArgs: [id]);
     });
   }
+
+  Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
+    final db = await database;
+    await db.update(
+      'necklaces',
+      settings,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    LoggingService().logDebug('Updated necklace settings: $settings');
+  }
 }
