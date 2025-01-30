@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../../core/services/logging_service.dart';
 
 // Events
 abstract class DurationPickerEvent extends Equatable {
@@ -39,11 +40,14 @@ class DurationPickerState extends Equatable {
   final int minutes;
   final int seconds;
   final Duration duration;
+  final bool isValid;
+  final LoggingService _logger = LoggingService();
 
   DurationPickerState({
     this.hours = 0,
     this.minutes = 0,
     this.seconds = 0,
+    this.isValid = true,
   }) : duration = Duration(
           hours: hours,
           minutes: minutes,
@@ -54,35 +58,42 @@ class DurationPickerState extends Equatable {
     int? hours,
     int? minutes,
     int? seconds,
+    bool? isValid,
   }) {
     return DurationPickerState(
       hours: hours ?? this.hours,
       minutes: minutes ?? this.minutes,
       seconds: seconds ?? this.seconds,
+      isValid: isValid ?? this.isValid,
     );
   }
 
   @override
-  List<Object> get props => [hours, minutes, seconds, duration];
+  List<Object> get props => [hours, minutes, seconds, duration, isValid];
 }
 
 // Bloc
 class DurationPickerBloc extends Bloc<DurationPickerEvent, DurationPickerState> {
-  DurationPickerBloc() : super(DurationPickerState()) {
+  DurationPickerBloc() : super(DurationPickerState(seconds: 10)) {
     on<UpdateHours>(_onUpdateHours);
     on<UpdateMinutes>(_onUpdateMinutes);
     on<UpdateSeconds>(_onUpdateSeconds);
   }
 
   void _onUpdateHours(UpdateHours event, Emitter<DurationPickerState> emit) {
-    emit(state.copyWith(hours: event.hours));
+    state._logger.logDebug('Updating hours to: ${event.hours}');
+    if (event.hours >= 0) {
+      emit(state.copyWith(hours: event.hours));
+    }
   }
 
   void _onUpdateMinutes(UpdateMinutes event, Emitter<DurationPickerState> emit) {
+    state._logger.logDebug('Updating minutes to: ${event.minutes}');
     emit(state.copyWith(minutes: event.minutes));
   }
 
   void _onUpdateSeconds(UpdateSeconds event, Emitter<DurationPickerState> emit) {
+    state._logger.logDebug('Updating seconds to: ${event.seconds}');
     emit(state.copyWith(seconds: event.seconds));
   }
 }

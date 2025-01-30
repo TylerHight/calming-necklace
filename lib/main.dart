@@ -32,10 +32,6 @@ class MyApp extends StatelessWidget {
           create: (context) => DatabaseService(),
           lazy: true,
         ),
-        Provider<DurationPickerBloc>(
-          create: (context) => DurationPickerBloc(),
-          lazy: true,
-        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -48,6 +44,9 @@ class MyApp extends StatelessWidget {
             create: (context) => NotesBloc(
               context.read<DatabaseService>(),
             ),
+          ),
+          BlocProvider(
+            create: (context) => DurationPickerBloc(),
           ),
         ],
         child: MaterialApp(

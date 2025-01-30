@@ -29,6 +29,36 @@ class Necklace extends Equatable {
     this.isArchived = false,
   });
 
+  Necklace copyWith({
+    String? id,
+    String? name,
+    String? bleDevice,
+    bool? autoTurnOffEnabled,
+    bool? periodicEmissionEnabled,
+    Duration? emission1Duration,
+    Duration? releaseInterval1,
+    Duration? emission2Duration,
+    Duration? releaseInterval2,
+    bool? isRelease1Active,
+    bool? isRelease2Active,
+    bool? isArchived,
+  }) {
+    return Necklace(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      bleDevice: bleDevice ?? this.bleDevice,
+      autoTurnOffEnabled: autoTurnOffEnabled ?? this.autoTurnOffEnabled,
+      periodicEmissionEnabled: periodicEmissionEnabled ?? this.periodicEmissionEnabled,
+      emission1Duration: emission1Duration ?? this.emission1Duration,
+      releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
+      emission2Duration: emission2Duration ?? this.emission2Duration,
+      releaseInterval2: releaseInterval2 ?? this.releaseInterval2,
+      isRelease1Active: isRelease1Active ?? this.isRelease1Active,
+      isRelease2Active: isRelease2Active ?? this.isRelease2Active,
+      isArchived: isArchived ?? this.isArchived,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,

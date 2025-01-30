@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:numberpicker/numberpicker.dart';
 import '../../../core/ui/ui_constants.dart';
+import '../../../core/services/logging_service.dart';
 import '../blocs/duration_picker/duration_picker_bloc.dart';
 
 class DurationPickerDialog extends StatelessWidget {
@@ -10,14 +11,17 @@ class DurationPickerDialog extends StatelessWidget {
   final Duration initialDuration;
   final bool isEmissionDuration;
   final Function(Duration) onDurationChanged;
+  final LoggingService _logger;
+  final Duration defaultDuration;
 
-  const DurationPickerDialog({
+  DurationPickerDialog({
     Key? key,
     required this.title,
     required this.initialDuration,
     required this.isEmissionDuration,
     required this.onDurationChanged,
-  }) : super(key: key);
+    this.defaultDuration = const Duration(seconds: 10),
+  }) : _logger = LoggingService(), super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,100 +30,114 @@ class DurationPickerDialog extends StatelessWidget {
         ..add(UpdateHours(initialDuration.inHours))
         ..add(UpdateMinutes(initialDuration.inMinutes % 60))
         ..add(UpdateSeconds(initialDuration.inSeconds % 60)),
-      child: Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(UIConstants.durationPickerDialogRadius),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: UIConstants.durationPickerSpacing / 2),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+      child: BlocBuilder<DurationPickerBloc, DurationPickerState>(
+        builder: (context, state) {
+          return _buildDialog(context, state);
+        },
+      ),
+    );
+  }
+
+  Widget _buildDialog(BuildContext context, DurationPickerState state) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(UIConstants.durationPickerDialogRadius),
+      ),
+      content: Container(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: UIConstants.durationPickerSpacing / 2),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: UIConstants.durationPickerSpacing),
-              SizedBox(
-                height: UIConstants.durationPickerHeight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: _buildNumberPicker(
-                        context,
-                        0,
-                        23,
-                        initialDuration.inHours,
-                            (value) => context.read<DurationPickerBloc>().add(UpdateHours(value)),
-                        'Hours',
-                      ),
-                    ),
-                    _buildSeparator(),
-                    Expanded(
-                      child: _buildNumberPicker(
-                        context,
-                        0,
-                        59,
-                        initialDuration.inMinutes % 60,
-                            (value) => context.read<DurationPickerBloc>().add(UpdateMinutes(value)),
-                        'Minutes',
-                      ),
-                    ),
-                    _buildSeparator(),
-                    Expanded(
-                      child: _buildNumberPicker(
-                        context,
-                        0,
-                        59,
-                        initialDuration.inSeconds % 60,
-                            (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
-                        'Seconds',
-                      ),
-                    ),
-                  ],
-                )
-              ),
-              const SizedBox(height: UIConstants.durationPickerSpacing),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+            ),
+            const SizedBox(height: UIConstants.durationPickerSpacing),
+            SizedBox(
+              height: UIConstants.durationPickerHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                  Expanded(
+                    child: _buildNumberPicker(
+                      context,
+                      0,
+                      23,
+                      state.hours,
+                          (value) => context.read<DurationPickerBloc>().add(UpdateHours(value)),
+                      'Hours',
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  BlocBuilder<DurationPickerBloc, DurationPickerState>(
-                    builder: (context, state) {
-                      return ElevatedButton(
-                        onPressed: () {
-                          onDurationChanged(state.duration);
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Set'),
-                      );
-                    },
+                  _buildSeparator(),
+                  Expanded(
+                    child: _buildNumberPicker(
+                      context,
+                      0,
+                      59,
+                      state.minutes,
+                          (value) => context.read<DurationPickerBloc>().add(UpdateMinutes(value)),
+                      'Minutes',
+                    ),
+                  ),
+                  _buildSeparator(),
+                  Expanded(
+                    child: _buildNumberPicker(
+                      context,
+                      0,
+                      59,
+                      state.seconds,
+                          (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
+                      'Seconds',
+                    ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: UIConstants.durationPickerSpacing),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(foregroundColor: Colors.grey),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 8),
+                BlocBuilder<DurationPickerBloc, DurationPickerState>(
+                  builder: (context, state) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        onDurationChanged(Duration(
+                          hours: state.hours,
+                          minutes: state.minutes,
+                          seconds: state.seconds,
+                        ));
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Set'),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildNumberPicker(
-    BuildContext context,
-    int minValue,
-    int maxValue,
-    int initialValue,
-    Function(int) onChanged,
-    String label,
-  ) {
+      BuildContext context,
+      int minValue,
+      int maxValue,
+      int initialValue,
+      Function(int) onChanged,
+      String label,
+      ) {
+    _logger.logDebug('Building NumberPicker with initial value: $initialValue');
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -129,7 +147,9 @@ class DurationPickerDialog extends StatelessWidget {
             value: initialValue,
             minValue: minValue,
             maxValue: maxValue,
+            step: 1,
             itemHeight: UIConstants.durationPickerItemExtent,
+            haptics: true,
             textStyle: TextStyle(
               fontSize: UIConstants.durationPickerFontSize,
             ),

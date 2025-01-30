@@ -170,49 +170,26 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
-  void _onUpdateEmissionDuration(UpdateEmissionDuration event, Emitter<SettingsState> emit) async {
-    final updatedNecklace = event.scentNumber == 1
-        ? Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            emission1Duration: event.duration,
-            emission2Duration: state.necklace.emission2Duration,
-            releaseInterval1: state.necklace.releaseInterval1,
-            releaseInterval2: state.necklace.releaseInterval2,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          )
-        : Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            emission1Duration: state.necklace.emission1Duration,
-            emission2Duration: event.duration,
-            releaseInterval1: state.necklace.releaseInterval1,
-            releaseInterval2: state.necklace.releaseInterval2,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          );
-    emit(state.copyWith(necklace: updatedNecklace));
+  void _onUpdateEmissionDuration(
+      UpdateEmissionDuration event,
+      Emitter<SettingsState> emit,
+      ) async {
+    _logger.logDebug('Updating emission duration: ${event.duration}');
     try {
-      emit(state.copyWith(isSaving: true));
-      _logger.logDebug('Updating emission duration: ${event.duration.inSeconds} seconds for scent ${event.scentNumber}');
+      final updatedNecklace = state.necklace.copyWith(
+        emission1Duration: event.scentNumber == 1 ? event.duration : state.necklace.emission1Duration,
+        emission2Duration: event.scentNumber == 2 ? event.duration : state.necklace.emission2Duration,
+      );
       await _databaseService.updateNecklaceSettings(
         state.necklace.id,
         {
           'emission${event.scentNumber}Duration': event.duration.inSeconds,
+          'isRelease${event.scentNumber}Active': false,
         },
       );
-      emit(state.copyWith(
-        necklace: updatedNecklace,
-        isSaving: false,
-      ));
+      emit(state.copyWith(necklace: updatedNecklace));
     } catch (e) {
       _logger.logError('Error updating emission duration: $e');
-      emit(state.copyWith(error: e.toString(), isSaving: false));
     }
   }
 

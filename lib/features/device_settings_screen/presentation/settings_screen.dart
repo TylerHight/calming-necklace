@@ -67,6 +67,12 @@ class _SettingsContentState extends State<SettingsContent> {
   late final LoggingService _logger;
 
   @override
+  void initState() {
+    super.initState();
+    _logger = LoggingService();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
       builder: (context, state) {
@@ -168,10 +174,10 @@ class _SettingsContentState extends State<SettingsContent> {
                   context,
                   'Scent 1 Emission Duration',
                   state.necklace.emission1Duration,
-                  (duration) {
+                      (duration) {
                     context.read<SettingsBloc>().add(
-                          UpdateEmissionDuration(duration, 1),
-                        );
+                      UpdateEmissionDuration(duration, 1),
+                    );
                   },
                 ),
               ),
@@ -180,8 +186,8 @@ class _SettingsContentState extends State<SettingsContent> {
                 value: state.necklace.periodicEmissionEnabled,
                 onChanged: (value) {
                   context.read<SettingsBloc>().add(
-                        UpdatePeriodicEmission(value, 1),
-                      );
+                    UpdatePeriodicEmission(value, 1),
+                  );
                 },
               ),
               ListTile(
@@ -194,10 +200,10 @@ class _SettingsContentState extends State<SettingsContent> {
                   context,
                   'Scent 1 Release Interval',
                   state.necklace.releaseInterval1,
-                  (duration) {
+                      (duration) {
                     context.read<SettingsBloc>().add(
-                          UpdateReleaseInterval(duration, 1),
-                        );
+                      UpdateReleaseInterval(duration, 1),
+                    );
                   },
                 ),
               ),
@@ -228,8 +234,8 @@ class _SettingsContentState extends State<SettingsContent> {
               value: state.necklace.periodicEmissionEnabled,
               onChanged: (value) {
                 context.read<SettingsBloc>().add(
-                      UpdatePeriodicEmission(value, 2),
-                    );
+                  UpdatePeriodicEmission(value, 2),
+                );
               },
             ),
             ListTile(
@@ -242,10 +248,10 @@ class _SettingsContentState extends State<SettingsContent> {
                 context,
                 'Scent 2 Emission Duration',
                 state.necklace.emission2Duration,
-                (duration) {
+                    (duration) {
                   context.read<SettingsBloc>().add(
-                        UpdateEmissionDuration(duration, 2),
-                      );
+                    UpdateEmissionDuration(duration, 2),
+                  );
                 },
               ),
             ),
@@ -259,10 +265,10 @@ class _SettingsContentState extends State<SettingsContent> {
                 context,
                 'Scent 2 Release Interval',
                 state.necklace.releaseInterval2,
-                (duration) {
+                    (duration) {
                   context.read<SettingsBloc>().add(
-                        UpdateReleaseInterval(duration, 2),
-                      );
+                    UpdateReleaseInterval(duration, 2),
+                  );
                 },
               ),
             ),
@@ -367,11 +373,11 @@ class _SettingsContentState extends State<SettingsContent> {
   }
 
   Future<void> _showDurationPicker(
-    BuildContext context,
-    String title,
-    Duration initialDuration,
-    Function(Duration) onDurationSelected,
-  ) async {
+      BuildContext context,
+      String title,
+      Duration initialDuration,
+      Function(Duration) onDurationSelected,
+      ) async {
     await showDialog<void>(
       context: context,
       builder: (BuildContext context) {
