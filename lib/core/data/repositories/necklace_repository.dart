@@ -8,7 +8,7 @@ abstract class NecklaceRepository {
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
   Future<void> addNecklace(String name, String bleDevice);
   Future<List<Necklace>> getNecklaces();
-  Future<void> deleteNecklace(String id);
+  Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
 }
 
@@ -20,7 +20,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
     try {
-      // Implement actual BLE communication here
+      // Implement actual Bluetooth Low Energy communication here
       _logger.logInfo('Toggle light ${isOn ? 'on' : 'off'} for necklace ${necklace.id}');
     } catch (e) {
       _logger.logError('Error toggling light: $e');
@@ -59,10 +59,11 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
         releaseInterval1: Duration(seconds: 20),
         emission2Duration: Duration(seconds: 8),
         releaseInterval2: Duration(seconds: 30),
+        isArchived: false,
       );
       
       await _dbService.insertNecklace(necklace);
-      _logger.logInfo('Successfully added necklace: $name with BLE device: $bleDevice');
+      _logger.logInfo('Successfully added necklace: $name with Bluetooth Low Energy device: $bleDevice');
     } catch (e) {
       _logger.logError('Error adding necklace: $e');
       throw Exception('Failed to add necklace: $e');
@@ -71,17 +72,18 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
 
   @override
   Future<List<Necklace>> getNecklaces() async {
-    return _dbService.getNecklaces();
+    final necklaces = await _dbService.getNecklaces();
+    return necklaces.where((n) => !n.isArchived).toList();
   }
 
   @override
-  Future<void> deleteNecklace(String id) async {
+  Future<void> archiveNecklace(String id) async {
     try {
-      await _dbService.deleteNecklace(id);
-      _logger.logInfo('Successfully deleted necklace with id: $id');
+      await _dbService.archiveNecklace(id);
+      _logger.logInfo('Successfully archived necklace with id: $id');
     } catch (e) {
-      _logger.logError('Error deleting necklace: $e');
-      throw Exception('Failed to delete necklace: $e');
+      _logger.logError('Error archiving necklace: $e');
+      throw Exception('Failed to archive necklace: $e');
     }
   }
 

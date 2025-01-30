@@ -371,7 +371,7 @@ class SettingsContent extends StatelessWidget {
 
     if (confirm == true) {
       try {
-        context.read<SettingsBloc>().add(DeleteNecklace(state.necklace.id));
+        context.read<SettingsBloc>().add(ArchiveNecklace(state.necklace.id));
         // Refresh the necklaces list
         context.read<NecklacesBloc>().add(FetchNecklacesEvent());
         // Show success message and pop back to main screen

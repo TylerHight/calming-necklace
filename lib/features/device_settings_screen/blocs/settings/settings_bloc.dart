@@ -46,9 +46,9 @@ class UpdateReleaseInterval extends SettingsEvent {
   List<Object?> get props => [interval, scentNumber];
 }
 
-class DeleteNecklace extends SettingsEvent {
+class ArchiveNecklace extends SettingsEvent {
   final String id;
-  const DeleteNecklace(this.id);
+  const ArchiveNecklace(this.id);
 }
 
 // State
@@ -88,7 +88,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdatePeriodicEmission>(_onUpdatePeriodicEmission);
     on<UpdateEmissionDuration>(_onUpdateEmissionDuration);
     on<UpdateReleaseInterval>(_onUpdateReleaseInterval);
-    on<DeleteNecklace>(_onDeleteNecklace);
+    on<ArchiveNecklace>(_onArchiveNecklace);
   }
 
   void _onUpdateName(UpdateNecklaceName event, Emitter<SettingsState> emit) {
@@ -100,6 +100,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emission2Duration: state.necklace.emission2Duration,
       releaseInterval1: state.necklace.releaseInterval1,
       releaseInterval2: state.necklace.releaseInterval2,
+      isRelease1Active: state.necklace.isRelease1Active,
+      isRelease2Active: state.necklace.isRelease2Active,
+      isArchived: state.necklace.isArchived,
     );
     emit(state.copyWith(necklace: updatedNecklace));
   }
@@ -115,6 +118,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: state.necklace.emission2Duration,
             releaseInterval1: state.necklace.releaseInterval1,
             releaseInterval2: state.necklace.releaseInterval2,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           )
         : Necklace(
             id: state.necklace.id,
@@ -125,6 +131,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: state.necklace.emission2Duration,
             releaseInterval1: state.necklace.releaseInterval1,
             releaseInterval2: state.necklace.releaseInterval2,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           );
     emit(state.copyWith(necklace: updatedNecklace));
   }
@@ -139,6 +148,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: state.necklace.emission2Duration,
             releaseInterval1: state.necklace.releaseInterval1,
             releaseInterval2: state.necklace.releaseInterval2,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           )
         : Necklace(
             id: state.necklace.id,
@@ -148,6 +160,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: event.duration,
             releaseInterval1: state.necklace.releaseInterval1,
             releaseInterval2: state.necklace.releaseInterval2,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           );
     emit(state.copyWith(necklace: updatedNecklace));
   }
@@ -162,6 +177,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: state.necklace.emission2Duration,
             releaseInterval1: event.interval,
             releaseInterval2: state.necklace.releaseInterval2,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           )
         : Necklace(
             id: state.necklace.id,
@@ -171,14 +189,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
             emission2Duration: state.necklace.emission2Duration,
             releaseInterval1: state.necklace.releaseInterval1,
             releaseInterval2: event.interval,
+            isRelease1Active: state.necklace.isRelease1Active,
+            isRelease2Active: state.necklace.isRelease2Active,
+            isArchived: state.necklace.isArchived,
           );
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
-  Future<void> _onDeleteNecklace(DeleteNecklace event, Emitter<SettingsState> emit) async {
+  Future<void> _onArchiveNecklace(ArchiveNecklace event, Emitter<SettingsState> emit) async {
     try {
       emit(state.copyWith(isSaving: true));
-      await _repository.deleteNecklace(event.id);
+      await _repository.archiveNecklace(event.id);
       emit(state.copyWith(isSaving: false));
     } catch (e) {
       emit(state.copyWith(isSaving: false, error: e.toString()));

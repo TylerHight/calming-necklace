@@ -22,7 +22,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -50,6 +50,7 @@ class DatabaseService {
       releaseInterval2 INTEGER,
       isRelease1Active INTEGER,
       isRelease2Active INTEGER,
+      isArchived INTEGER DEFAULT 0,
       autoTurnOffEnabled INTEGER,
       periodicEmissionEnabled INTEGER
     )
@@ -66,6 +67,13 @@ class DatabaseService {
           timestamp INTEGER,
           FOREIGN KEY (deviceId) REFERENCES necklaces(id)
         )
+      ''');
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        ALTER TABLE necklaces 
+        ADD COLUMN isArchived INTEGER 
+        DEFAULT 0
       ''');
     }
   }
@@ -137,13 +145,12 @@ class DatabaseService {
     );
   }
 
-  Future<void> deleteNecklace(String id) async {
+  Future<void> archiveNecklace(String id) async {
     final db = await database;
-    LoggingService().logDebug('Deleting necklace with id: $id');
+    LoggingService().logDebug('Archiving necklace with id: $id');
     await db.transaction((txn) async {
-      // Delete the necklace
-      await txn.delete('necklaces', where: 'id = ?', whereArgs: [id]);
-      // Don't delete associated notes, they should remain in history
+      await txn.update('necklaces', {'isArchived': 1}, 
+        where: 'id = ?', whereArgs: [id]);
     });
   }
 }

@@ -12,6 +12,7 @@ class Necklace extends Equatable {
   final Duration releaseInterval2;
   final bool isRelease1Active;
   final bool isRelease2Active;
+  final bool isArchived;
 
   Necklace({
     required this.id,
@@ -25,6 +26,7 @@ class Necklace extends Equatable {
     required this.releaseInterval2,
     this.isRelease1Active = false,
     this.isRelease2Active = false,
+    this.isArchived = false,
   });
 
   @override
@@ -40,6 +42,7 @@ class Necklace extends Equatable {
     releaseInterval2,
     isRelease1Active,
     isRelease2Active,
+    isArchived,
   ];
 
   Map<String, dynamic> toMap() {
@@ -55,6 +58,7 @@ class Necklace extends Equatable {
       'releaseInterval2': releaseInterval2.inSeconds,
       'isRelease1Active': isRelease1Active ? 1 : 0,
       'isRelease2Active': isRelease2Active ? 1 : 0,
+      'isArchived': isArchived ? 1 : 0,
     };
   }
 
@@ -71,6 +75,7 @@ class Necklace extends Equatable {
       releaseInterval2: Duration(seconds: map['releaseInterval2']),
       isRelease1Active: map['isRelease1Active'] == 1,
       isRelease2Active: map['isRelease2Active'] == 1,
+      isArchived: map['isArchived'] == 1,
     );
   }
 }
