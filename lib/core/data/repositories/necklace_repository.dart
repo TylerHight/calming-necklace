@@ -57,8 +57,6 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
         bleDevice: bleDevice,
         emission1Duration: Duration(seconds: 3),
         releaseInterval1: Duration(seconds: 20),
-        emission2Duration: Duration(seconds: 8),
-        releaseInterval2: Duration(seconds: 30),
         isArchived: false,
       );
       

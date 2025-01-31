@@ -126,7 +126,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
       final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
       if (updatedNecklace != null && mounted) {
         setState(() {
-          _duration = widget.label.contains('1') ? updatedNecklace.emission1Duration : updatedNecklace.emission2Duration;
+          _duration = updatedNecklace.emission1Duration;
         });
       }
     } catch (e) {

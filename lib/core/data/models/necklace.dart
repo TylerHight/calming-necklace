@@ -8,10 +8,7 @@ class Necklace extends Equatable {
   final bool periodicEmissionEnabled;
   final Duration emission1Duration;
   final Duration releaseInterval1;
-  final Duration emission2Duration;
-  final Duration releaseInterval2;
   final bool isRelease1Active;
-  final bool isRelease2Active;
   final bool isArchived;
 
   Necklace({
@@ -22,10 +19,7 @@ class Necklace extends Equatable {
     this.periodicEmissionEnabled = false,
     required this.emission1Duration,
     required this.releaseInterval1,
-    required this.emission2Duration,
-    required this.releaseInterval2,
     this.isRelease1Active = false,
-    this.isRelease2Active = false,
     this.isArchived = false,
   });
 
@@ -37,10 +31,7 @@ class Necklace extends Equatable {
     bool? periodicEmissionEnabled,
     Duration? emission1Duration,
     Duration? releaseInterval1,
-    Duration? emission2Duration,
-    Duration? releaseInterval2,
     bool? isRelease1Active,
-    bool? isRelease2Active,
     bool? isArchived,
   }) {
     return Necklace(
@@ -51,10 +42,7 @@ class Necklace extends Equatable {
       periodicEmissionEnabled: periodicEmissionEnabled ?? this.periodicEmissionEnabled,
       emission1Duration: emission1Duration ?? this.emission1Duration,
       releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
-      emission2Duration: emission2Duration ?? this.emission2Duration,
-      releaseInterval2: releaseInterval2 ?? this.releaseInterval2,
       isRelease1Active: isRelease1Active ?? this.isRelease1Active,
-      isRelease2Active: isRelease2Active ?? this.isRelease2Active,
       isArchived: isArchived ?? this.isArchived,
     );
   }
@@ -68,10 +56,7 @@ class Necklace extends Equatable {
     periodicEmissionEnabled,
     emission1Duration,
     releaseInterval1,
-    emission2Duration,
-    releaseInterval2,
     isRelease1Active,
-    isRelease2Active,
     isArchived,
   ];
 
@@ -84,10 +69,7 @@ class Necklace extends Equatable {
       'periodicEmissionEnabled': periodicEmissionEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
       'releaseInterval1': releaseInterval1.inSeconds,
-      'emission2Duration': emission2Duration.inSeconds,
-      'releaseInterval2': releaseInterval2.inSeconds,
       'isRelease1Active': isRelease1Active ? 1 : 0,
-      'isRelease2Active': isRelease2Active ? 1 : 0,
       'isArchived': isArchived ? 1 : 0,
     };
   }
@@ -101,10 +83,7 @@ class Necklace extends Equatable {
       periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
       emission1Duration: Duration(seconds: map['emission1Duration'] ?? 5),
       releaseInterval1: Duration(minutes: map['releaseInterval1'] ?? 30),
-      emission2Duration: Duration(seconds: map['emission2Duration'] ?? 10),
-      releaseInterval2: Duration(minutes: map['releaseInterval2'] ?? 40),
       isRelease1Active: map['isRelease1Active'] == 1,
-      isRelease2Active: map['isRelease2Active'] == 1,
       isArchived: map['isArchived'] == 1,
     );
   }

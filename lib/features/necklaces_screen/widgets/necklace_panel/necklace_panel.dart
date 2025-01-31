@@ -36,7 +36,6 @@ class NecklacePanel extends StatefulWidget {
 
 class _NecklacePanelState extends State<NecklacePanel> {
   bool isRelease1Active = false;
-  bool isRelease2Active = false;
 
   void _showOptions(BuildContext context, Offset tapPosition) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
@@ -141,97 +140,68 @@ class _NecklacePanelState extends State<NecklacePanel> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.name,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 4),
-              _buildConnectionStatus(),
-            ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.name,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
           ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, size: UIConstants.popoutMenuIconSize),
-            onSelected: (value) {
-              if (value == 'settings') {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => SettingsScreen(
-                      necklace: widget.necklace,
-                      repository: widget.repository,
-                      databaseService: widget.databaseService, // Pass DatabaseService
-                    ),
-                  ),
-                );
-              } else if (value == 'add_note') {
-                showDialog(
-                  context: context,
-                  builder: (context) => AddNoteDialog(
-                    deviceId: widget.necklace.id,
-                  ),
-                );
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings, color: Colors.grey[700]),
-                    const SizedBox(width: 8),
-                    Text('Settings'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'add_note',
-                child: Row(
-                  children: [
-                    Icon(Icons.note_add, color: Colors.grey[700]),
-                    const SizedBox(width: 8),
-                    Text('Add Note'),
-                  ],
-                ),
-              ),
-            ],
-            iconSize: UIConstants.popoutMenuIconSize, // Use the new constant for icon size
-          ),
-        ],
-      ),
+        ),
+        _buildConnectionIndicator(),
+      ],
     );
   }
 
-  Widget _buildConnectionStatus() {
-    return ConnectionStatus(isConnected: widget.isConnected);
+  Widget _buildConnectionIndicator() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: ConnectionStatus(isConnected: widget.isConnected),
+    );
   }
 
   Widget _buildControls() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: _buildTimedToggleButton(Icons.spa, 1, Colors.pink[400]!, Colors.pink[100]!),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(
+                    necklace: widget.necklace,
+                    repository: widget.repository,
+                    databaseService: widget.databaseService,
+                  ),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.note_add),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => AddNoteDialog(
+                  deviceId: widget.necklace.id,
+                ),
+              ),
+            ),
+          ],
         ),
-        SizedBox(width: UIConstants.timedToggleButtonSpacing),
         Expanded(
-          child: _buildTimedToggleButton(Icons.spa, 2, Colors.greenAccent[400]!, Colors.greenAccent[100]!),
+          child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!),
         ),
       ],
     );
   }
 
-  Widget _buildTimedToggleButton(IconData icon, int buttonIndex, Color activeColor, Color inactiveColor) {
+  Widget _buildTimedToggleButton(IconData icon, Color activeColor, Color inactiveColor) {
     return Container(
       margin: EdgeInsets.zero, // Remove any margin
       child: TimedToggleButton(
@@ -243,16 +213,12 @@ class _NecklacePanelState extends State<NecklacePanel> {
         iconData: icon,
         activeColor: activeColor,
         inactiveColor: inactiveColor,
-        label: 'Emission $buttonIndex',
+        label: 'Emission 1',
         buttonWidth: UIConstants.timedToggleButtonWidth,
         buttonHeight: UIConstants.timedToggleButtonHeight,
         onToggle: () {
           setState(() {
-            if (buttonIndex == 1) {
-              isRelease1Active = !isRelease1Active;
-            } else if (buttonIndex == 2) {
-              isRelease2Active = !isRelease2Active;
-            }
+            isRelease1Active = !isRelease1Active;
           });
         },
       ),

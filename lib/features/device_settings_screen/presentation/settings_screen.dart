@@ -121,10 +121,7 @@ class _SettingsContentState extends State<SettingsContent> {
             const SizedBox(height: 16),
             _buildScent1Section(context, state),
             const SizedBox(height: 16),
-            _buildScent2Section(context, state),
-            const SizedBox(height: 16),
             _buildConnectionSection(context, state),
-            const SizedBox(height: 16),
             _buildDangerZone(context, state),
           ],
         );
@@ -210,7 +207,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   databaseService: widget.databaseService,
                   onDurationSelected: (duration) {
                     context.read<SettingsBloc>().add(
-                      UpdateEmissionDuration(duration, 1),
+                      UpdateEmissionDuration(duration),
                     );
                   },
                 ),
@@ -220,7 +217,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 value: state.necklace.periodicEmissionEnabled,
                 onChanged: (value) {
                   context.read<SettingsBloc>().add(
-                    UpdatePeriodicEmission(value, 1),
+                    UpdatePeriodicEmission(value),
                   );
                 },
               ),
@@ -244,72 +241,6 @@ class _SettingsContentState extends State<SettingsContent> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScent2Section(BuildContext context, SettingsState state) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Scent 2 Settings',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Enable Periodic Emission'),
-              value: state.necklace.periodicEmissionEnabled,
-              onChanged: (value) {
-                context.read<SettingsBloc>().add(
-                  UpdatePeriodicEmission(value, 2),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Emission Duration'),
-              subtitle: Text(
-                '${state.necklace.emission2Duration.inSeconds} seconds',
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () => _showDurationPicker(
-                context,
-                'Scent 2 Emission Duration',
-                state.necklace.emission2Duration,
-                databaseService: widget.databaseService,
-                onDurationSelected: (duration) {
-                  context.read<SettingsBloc>().add(
-                    UpdateEmissionDuration(duration, 2),
-                  );
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Release Interval'),
-              subtitle: Text(
-                '${state.necklace.releaseInterval2.inMinutes} minutes',
-              ),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () => _showDurationPicker(
-                context,
-                'Scent 2 Release Interval',
-                state.necklace.releaseInterval2,
-                databaseService: widget.databaseService,
-                onDurationSelected: (duration) {
-                  context.read<SettingsBloc>().add(
-                    UpdateReleaseInterval(duration, 2),
-                  );
-                },
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -423,7 +354,7 @@ class _SettingsContentState extends State<SettingsContent> {
           initialDuration: initialDuration,
           isEmissionDuration: title.contains('Emission'),
           necklaceId: widget.necklace.id,
-          scentNumber: title.contains('1') ? 1 : 2,
+          scentNumber: 1,
           databaseService: databaseService,
           onDurationChanged: (duration) {
             onDurationSelected(duration);

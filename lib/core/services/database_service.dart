@@ -48,10 +48,7 @@ class DatabaseService {
       bleDevice TEXT,
       emission1Duration INTEGER,
       releaseInterval1 INTEGER,
-      emission2Duration INTEGER,
-      releaseInterval2 INTEGER,
       isRelease1Active INTEGER,
-      isRelease2Active INTEGER,
       isArchived INTEGER DEFAULT 0,
       autoTurnOffEnabled INTEGER,
       periodicEmissionEnabled INTEGER

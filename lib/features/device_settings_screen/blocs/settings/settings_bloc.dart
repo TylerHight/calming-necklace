@@ -30,20 +30,18 @@ class UpdateNecklaceName extends SettingsEvent {
 
 class UpdatePeriodicEmission extends SettingsEvent {
   final bool enabled;
-  final int scentNumber;
-  const UpdatePeriodicEmission(this.enabled, this.scentNumber);
+  const UpdatePeriodicEmission(this.enabled);
 
   @override
-  List<Object?> get props => [enabled, scentNumber];
+  List<Object?> get props => [enabled];
 }
 
 class UpdateEmissionDuration extends SettingsEvent {
   final Duration duration;
-  final int scentNumber;
-  const UpdateEmissionDuration(this.duration, this.scentNumber);
+  const UpdateEmissionDuration(this.duration);
 
   @override
-  List<Object?> get props => [duration, scentNumber];
+  List<Object?> get props => [duration];
 }
 
 class UpdateReleaseInterval extends SettingsEvent {
@@ -137,44 +135,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       name: event.name,
       bleDevice: state.necklace.bleDevice,
       emission1Duration: state.necklace.emission1Duration,
-      emission2Duration: state.necklace.emission2Duration,
       releaseInterval1: state.necklace.releaseInterval1,
-      releaseInterval2: state.necklace.releaseInterval2,
       isRelease1Active: state.necklace.isRelease1Active,
-      isRelease2Active: state.necklace.isRelease2Active,
       isArchived: state.necklace.isArchived,
     );
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
   void _onUpdatePeriodicEmission(UpdatePeriodicEmission event, Emitter<SettingsState> emit) {
-    final updatedNecklace = event.scentNumber == 1
-        ? Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            periodicEmissionEnabled: event.enabled,
-            emission1Duration: state.necklace.emission1Duration,
-            emission2Duration: state.necklace.emission2Duration,
-            releaseInterval1: state.necklace.releaseInterval1,
-            releaseInterval2: state.necklace.releaseInterval2,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          )
-        : Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            periodicEmissionEnabled: event.enabled,
-            emission1Duration: state.necklace.emission1Duration,
-            emission2Duration: state.necklace.emission2Duration,
-            releaseInterval1: state.necklace.releaseInterval1,
-            releaseInterval2: state.necklace.releaseInterval2,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          );
+    final updatedNecklace = Necklace(
+      id: state.necklace.id,
+      name: state.necklace.name,
+      bleDevice: state.necklace.bleDevice,
+      periodicEmissionEnabled: event.enabled,
+      emission1Duration: state.necklace.emission1Duration,
+      releaseInterval1: state.necklace.releaseInterval1,
+      isRelease1Active: state.necklace.isRelease1Active,
+      isArchived: state.necklace.isArchived,
+    );
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
@@ -185,14 +163,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     _logger.logDebug('Updating emission duration: ${event.duration}');
     try {
       final updatedNecklace = state.necklace.copyWith(
-        emission1Duration: event.scentNumber == 1 ? event.duration : state.necklace.emission1Duration,
-        emission2Duration: event.scentNumber == 2 ? event.duration : state.necklace.emission2Duration,
+        emission1Duration: event.duration,
       );
       await _databaseService.updateNecklaceSettings(
         state.necklace.id,
         {
-          'emission${event.scentNumber}Duration': event.duration.inSeconds,
-          'isRelease${event.scentNumber}Active': false,
+          'emission1Duration': event.duration.inSeconds,
+          'isRelease1Active': false,
         },
       );
       emit(state.copyWith(necklace: updatedNecklace));
@@ -202,38 +179,22 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   Future<void> _onUpdateReleaseInterval(UpdateReleaseInterval event, Emitter<SettingsState> emit) async {
-    final updatedNecklace = event.scentNumber == 1
-        ? Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            emission1Duration: state.necklace.emission1Duration,
-            emission2Duration: state.necklace.emission2Duration,
-            releaseInterval1: event.interval,
-            releaseInterval2: state.necklace.releaseInterval2,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          )
-        : Necklace(
-            id: state.necklace.id,
-            name: state.necklace.name,
-            bleDevice: state.necklace.bleDevice,
-            emission1Duration: state.necklace.emission1Duration,
-            emission2Duration: state.necklace.emission2Duration,
-            releaseInterval1: state.necklace.releaseInterval1,
-            releaseInterval2: event.interval,
-            isRelease1Active: state.necklace.isRelease1Active,
-            isRelease2Active: state.necklace.isRelease2Active,
-            isArchived: state.necklace.isArchived,
-          );
+    final updatedNecklace = Necklace(
+      id: state.necklace.id,
+      name: state.necklace.name,
+      bleDevice: state.necklace.bleDevice,
+      emission1Duration: state.necklace.emission1Duration,
+      releaseInterval1: event.interval,
+      isRelease1Active: state.necklace.isRelease1Active,
+      isArchived: state.necklace.isArchived,
+    );
     try {
       emit(state.copyWith(isSaving: true));
       _logger.logDebug('Updating release interval: ${event.interval.inSeconds} seconds for scent ${event.scentNumber}');
       await _databaseService.updateNecklaceSettings(
         state.necklace.id,
         {
-          'releaseInterval${event.scentNumber}': event.interval.inSeconds,
+          'releaseInterval1': event.interval.inSeconds,
         },
       );
       emit(state.copyWith(
