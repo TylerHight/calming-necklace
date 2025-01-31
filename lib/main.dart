@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => NecklacesBloc(
               context.read<NecklaceRepository>(),
+              context.read<DatabaseService>(),
             ),
           ),
           BlocProvider<SettingsBloc>(

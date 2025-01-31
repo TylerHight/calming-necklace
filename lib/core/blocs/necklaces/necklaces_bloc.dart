@@ -2,6 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../data/repositories/necklace_repository.dart';
 import '../../data/models/necklace.dart';
+import '../../services/database_service.dart';
+import 'dart:async';
 
 // Events
 abstract class NecklacesEvent extends Equatable {
@@ -41,9 +43,14 @@ class NecklacesError extends NecklacesState {
 
 class NecklacesBloc extends Bloc<NecklacesEvent, NecklacesState> {
   final NecklaceRepository _repository;
+  final DatabaseService _databaseService;
+  late final StreamSubscription<void> _databaseSubscription;
 
-  NecklacesBloc(this._repository) : super(NecklacesInitial()) {
+  NecklacesBloc(this._repository, this._databaseService) : super(NecklacesInitial()) {
     on<FetchNecklacesEvent>(_onFetchNecklaces);
+    _databaseSubscription = _databaseService.onNecklaceUpdate.listen((_) {
+      add(FetchNecklacesEvent());
+    });
   }
 
   Future<void> _onFetchNecklaces(FetchNecklacesEvent event, Emitter<NecklacesState> emit) async {
@@ -55,4 +62,10 @@ class NecklacesBloc extends Bloc<NecklacesEvent, NecklacesState> {
       emit(NecklacesError(e.toString()));
     }
   }
-} 
+
+  @override
+  Future<void> close() {
+    _databaseSubscription.cancel();
+    return super.close();
+  }
+}

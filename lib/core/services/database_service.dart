@@ -9,6 +9,8 @@ class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
   static Database? _database;
+  final _necklaceUpdateController = StreamController<void>.broadcast();
+  Stream<void> get onNecklaceUpdate => _necklaceUpdateController.stream;
 
   DatabaseService._internal();
 
@@ -162,6 +164,7 @@ class DatabaseService {
       where: 'id = ?',
       whereArgs: [id],
     );
+    _necklaceUpdateController.add(null);
     LoggingService().logDebug('Updated necklace settings: $settings');
   }
 
@@ -174,5 +177,9 @@ class DatabaseService {
     );
     if (maps.isEmpty) return null;
     return Necklace.fromMap(maps.first);
+  }
+
+  void dispose() {
+    _necklaceUpdateController.close();
   }
 }
