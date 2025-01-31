@@ -194,7 +194,8 @@ class _NecklacePanelState extends State<NecklacePanel> {
             ),
           ],
         ),
-        Expanded(
+        SizedBox(
+          width: UIConstants.timedToggleButtonWidth,
           child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!),
         ),
       ],

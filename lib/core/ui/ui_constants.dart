@@ -12,6 +12,11 @@ class UIConstants {
   static const double settingsSectionSpacing = 16.0;
   static const double settingsTitleSize = 20.0;
   static const double settingsSubtitleSize = 16.0;
+  
+  // Action buttons and status indicators
+  static const double actionButtonIconSize = 24.0;
+  static const double connectionStatusTextSize = 14.0;
+  static const FontWeight connectionStatusFontWeight = FontWeight.w500;
 
   // Note Card
   static const double noteCardContentTextSize = 18.0;
@@ -34,15 +39,17 @@ class UIConstants {
   static const Offset necklacePanelBoxShadowOffset = Offset(0, 4);
   static const Color necklacePanelBoxShadowColor = Colors.black;
   static const double popoutMenuIconSize = 30.0;
-  
-  // Device Selection Dialog
-  static const double deviceSelectionDialogBorderRadius = 20.0;
-  static const double deviceSelectionDialogElevation = 4.0;
-  static const double deviceSelectionDialogPadding = 24.0;
-  static const double deviceSelectionListHeight = 200.0;
+
+  // Connection Status
+  static const double connectionStatusPaddingH = 8.0;
+  static const double connectionStatusPaddingV = 4.0;
+  static const double connectionStatusBorderRadius = 12.0;
+  static const double connectionStatusDotSize = 6.0;
+  static const double connectionStatusDotSpacing = 6.0;
+  static const double connectionStatusSpacing = 8.0;
 
   // Timed Toggle Button
-  static const double timedToggleButtonWidth = 120.0;  // Width of buttons
+  static const double timedToggleButtonWidth = 160.0;  // Width of buttons
   static const double timedToggleButtonHeight = 55.0;
   static const double timedToggleButtonIconSize = 32.0;
   static const double timedToggleButtonSpacing = 12.0;  // Spacing between buttons
