@@ -140,20 +140,23 @@ class _NecklacePanelState extends State<NecklacePanel> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.name,
-          style: const TextStyle(
-            fontSize: UIConstants.titleTextSize,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: UIConstants.necklacePanelHeaderHorizontalPadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.name,
+            style: const TextStyle(
+              fontSize: UIConstants.titleTextSize,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        _buildConnectionIndicator(),
-      ],
+          _buildConnectionIndicator(),
+        ],
+      ),
     );
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../../core/ui/ui_constants.dart';
 
 class ConnectionStatus extends StatelessWidget {
   final bool isConnected;
@@ -11,30 +12,33 @@ class ConnectionStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: UIConstants.connectionStatusPaddingH,
+        vertical: UIConstants.connectionStatusPaddingV,
+      ),
       decoration: BoxDecoration(
         color: isConnected
             ? Colors.green.withOpacity(0.1)
             : Colors.red.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(UIConstants.connectionStatusBorderRadius),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 8,
-            height: 8,
+            width: UIConstants.connectionStatusDotSize,
+            height: UIConstants.connectionStatusDotSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isConnected ? Colors.green : Colors.red,
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: UIConstants.connectionStatusDotSpacing),
           Text(
             isConnected ? 'Connected' : 'Disconnected',
             style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontSize: UIConstants.connectionStatusTextSize,
+              fontWeight: UIConstants.connectionStatusFontWeight,
               color: isConnected ? Colors.green[700] : Colors.red[700],
             ),
           ),

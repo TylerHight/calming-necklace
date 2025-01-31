@@ -12,11 +12,6 @@ class UIConstants {
   static const double settingsSectionSpacing = 16.0;
   static const double settingsTitleSize = 20.0;
   static const double settingsSubtitleSize = 16.0;
-  
-  // Action buttons and status indicators
-  static const double actionButtonIconSize = 24.0;
-  static const double connectionStatusTextSize = 14.0;
-  static const FontWeight connectionStatusFontWeight = FontWeight.w500;
 
   // Note Card
   static const double noteCardContentTextSize = 18.0;
@@ -39,13 +34,16 @@ class UIConstants {
   static const Offset necklacePanelBoxShadowOffset = Offset(0, 4);
   static const Color necklacePanelBoxShadowColor = Colors.black;
   static const double titleTextSize = 24.0;
-  static const double settingsIconSize = 30.0;
-  static const double notesIconSize = 30.0;
+  static const double settingsIconSize = 29.0;
+  static const double notesIconSize = 29.0;
   static const double settingsNotesSpacing = 0.0;
   static const double notesToggleSpacing = 14.0;
+  static const double necklacePanelHeaderHorizontalPadding = 14.0;
 
   // Connection Status
-  static const double connectionStatusPaddingH = 8.0;
+  static const double connectionStatusTextSize = 14.0;
+  static const FontWeight connectionStatusFontWeight = FontWeight.w500;
+  static const double connectionStatusPaddingH = 10.0;
   static const double connectionStatusPaddingV = 4.0;
   static const double connectionStatusBorderRadius = 12.0;
   static const double connectionStatusDotSize = 6.0;
