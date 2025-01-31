@@ -147,7 +147,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
         Text(
           widget.name,
           style: const TextStyle(
-            fontSize: 20,
+            fontSize: UIConstants.titleTextSize,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
           ),
@@ -165,40 +165,43 @@ class _NecklacePanelState extends State<NecklacePanel> {
   }
 
   Widget _buildControls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.settings),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => SettingsScreen(
-                    necklace: widget.necklace,
-                    repository: widget.repository,
-                    databaseService: widget.databaseService,
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0.0), // Add padding around the row
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Evenly space the buttons
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            iconSize: UIConstants.settingsIconSize,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => SettingsScreen(
+                  necklace: widget.necklace,
+                  repository: widget.repository,
+                  databaseService: widget.databaseService,
                 ),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.note_add),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) => AddNoteDialog(
-                  deviceId: widget.necklace.id,
-                ),
+          ),
+          const SizedBox(width: UIConstants.settingsNotesSpacing), // Spacing between the settings button and the notes button
+          IconButton(
+            icon: const Icon(Icons.note_add),
+            iconSize: UIConstants.notesIconSize,
+            onPressed: () => showDialog(
+              context: context,
+              builder: (context) => AddNoteDialog(
+                deviceId: widget.necklace.id,
               ),
             ),
-          ],
-        ),
-        SizedBox(
-          width: UIConstants.timedToggleButtonWidth,
-          child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!),
-        ),
-      ],
+          ),
+          const SizedBox(width: UIConstants.notesToggleSpacing), // Spacing between the notes button and the toggle button
+          SizedBox(
+            width: UIConstants.timedToggleButtonWidth,
+            child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!),
+          ),
+        ],
+      ),
     );
   }
 

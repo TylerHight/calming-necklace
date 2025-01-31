@@ -38,7 +38,11 @@ class UIConstants {
   static const double necklacePanelBoxShadowBlurRadius = 8.0;
   static const Offset necklacePanelBoxShadowOffset = Offset(0, 4);
   static const Color necklacePanelBoxShadowColor = Colors.black;
-  static const double popoutMenuIconSize = 30.0;
+  static const double titleTextSize = 24.0;
+  static const double settingsIconSize = 30.0;
+  static const double notesIconSize = 30.0;
+  static const double settingsNotesSpacing = 0.0;
+  static const double notesToggleSpacing = 14.0;
 
   // Connection Status
   static const double connectionStatusPaddingH = 8.0;
