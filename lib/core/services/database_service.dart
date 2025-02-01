@@ -48,10 +48,10 @@ class DatabaseService {
       bleDevice TEXT,
       emission1Duration INTEGER,
       releaseInterval1 INTEGER,
+      periodicEmissionEnabled INTEGER,
       isRelease1Active INTEGER,
       isArchived INTEGER DEFAULT 0,
-      autoTurnOffEnabled INTEGER,
-      periodicEmissionEnabled INTEGER
+      autoTurnOffEnabled INTEGER
     )
   ''');
   }
@@ -73,6 +73,18 @@ class DatabaseService {
         ALTER TABLE necklaces 
         ADD COLUMN isArchived INTEGER 
         DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN emission1Duration INTEGER
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN releaseInterval1 INTEGER
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN periodicEmissionEnabled INTEGER
       ''');
     }
   }

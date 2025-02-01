@@ -46,11 +46,10 @@ class UpdateEmissionDuration extends SettingsEvent {
 
 class UpdateReleaseInterval extends SettingsEvent {
   final Duration interval;
-  final int scentNumber;
-  const UpdateReleaseInterval(this.interval, this.scentNumber);
+  const UpdateReleaseInterval(this.interval);
 
   @override
-  List<Object?> get props => [interval, scentNumber];
+  List<Object?> get props => [interval];
 }
 
 class ArchiveNecklace extends SettingsEvent {
@@ -136,6 +135,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       bleDevice: state.necklace.bleDevice,
       emission1Duration: state.necklace.emission1Duration,
       releaseInterval1: state.necklace.releaseInterval1,
+      periodicEmissionEnabled: state.necklace.periodicEmissionEnabled,
       isRelease1Active: state.necklace.isRelease1Active,
       isArchived: state.necklace.isArchived,
     );
@@ -147,9 +147,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       id: state.necklace.id,
       name: state.necklace.name,
       bleDevice: state.necklace.bleDevice,
-      periodicEmissionEnabled: event.enabled,
       emission1Duration: state.necklace.emission1Duration,
       releaseInterval1: state.necklace.releaseInterval1,
+      periodicEmissionEnabled: event.enabled,
       isRelease1Active: state.necklace.isRelease1Active,
       isArchived: state.necklace.isArchived,
     );
@@ -179,18 +179,11 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   Future<void> _onUpdateReleaseInterval(UpdateReleaseInterval event, Emitter<SettingsState> emit) async {
-    final updatedNecklace = Necklace(
-      id: state.necklace.id,
-      name: state.necklace.name,
-      bleDevice: state.necklace.bleDevice,
-      emission1Duration: state.necklace.emission1Duration,
+    final updatedNecklace = state.necklace.copyWith(
       releaseInterval1: event.interval,
-      isRelease1Active: state.necklace.isRelease1Active,
-      isArchived: state.necklace.isArchived,
     );
     try {
       emit(state.copyWith(isSaving: true));
-      _logger.logDebug('Updating release interval: ${event.interval.inSeconds} seconds for scent ${event.scentNumber}');
       await _databaseService.updateNecklaceSettings(
         state.necklace.id,
         {

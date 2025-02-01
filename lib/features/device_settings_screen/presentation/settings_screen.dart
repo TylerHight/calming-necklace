@@ -237,7 +237,7 @@ class _SettingsContentState extends State<SettingsContent> {
                   databaseService: widget.databaseService,
                   onDurationSelected: (duration) {
                     context.read<SettingsBloc>().add(
-                      UpdateReleaseInterval(duration, 1),
+                      UpdateReleaseInterval(duration),
                     );
                   },
                 ),
