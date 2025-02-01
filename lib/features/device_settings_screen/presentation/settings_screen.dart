@@ -5,6 +5,7 @@ import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
 import '../../../core/services/database_service.dart';
 import '../../../core/services/logging_service.dart';
+import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
@@ -33,6 +34,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    _loadLatestSettings();
+  }
+
+  Future<void> _loadLatestSettings() async {
+    final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
+    if (updatedNecklace != null && mounted) {
+      context.read<SettingsBloc>().add(RefreshSettings(updatedNecklace));
+    }
   }
 
   Future<void> _refreshSettings() async {
@@ -200,7 +209,7 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 title: const Text('Emission Duration'),
                 subtitle: Text(
-                  '${state.necklace.emission1Duration.inSeconds} seconds',
+                  formatDuration(state.necklace.emission1Duration),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(
@@ -227,7 +236,7 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 title: const Text('Release Interval'),
                 subtitle: Text(
-                  '${state.necklace.releaseInterval1.inMinutes} minutes',
+                  formatDuration(state.necklace.releaseInterval1),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(

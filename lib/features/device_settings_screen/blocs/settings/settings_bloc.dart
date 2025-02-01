@@ -142,18 +142,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     emit(state.copyWith(necklace: updatedNecklace));
   }
 
-  void _onUpdatePeriodicEmission(UpdatePeriodicEmission event, Emitter<SettingsState> emit) {
-    final updatedNecklace = Necklace(
-      id: state.necklace.id,
-      name: state.necklace.name,
-      bleDevice: state.necklace.bleDevice,
-      emission1Duration: state.necklace.emission1Duration,
-      releaseInterval1: state.necklace.releaseInterval1,
-      periodicEmissionEnabled: event.enabled,
-      isRelease1Active: state.necklace.isRelease1Active,
-      isArchived: state.necklace.isArchived,
-    );
-    emit(state.copyWith(necklace: updatedNecklace));
+  void _onUpdatePeriodicEmission(UpdatePeriodicEmission event, Emitter<SettingsState> emit) async {
+    try {
+      await _databaseService.updateNecklaceSettings(state.necklace.id, {'periodicEmissionEnabled': event.enabled ? 1 : 0});
+      final updatedNecklace = Necklace(
+        id: state.necklace.id,
+        name: state.necklace.name,
+        bleDevice: state.necklace.bleDevice,
+        emission1Duration: state.necklace.emission1Duration,
+        releaseInterval1: state.necklace.releaseInterval1,
+        periodicEmissionEnabled: event.enabled,
+        isRelease1Active: state.necklace.isRelease1Active,
+        isArchived: state.necklace.isArchived,
+      );
+      emit(state.copyWith(necklace: updatedNecklace));
+    } catch (e) {
+      _logger.logError('Error updating periodic emission: $e');
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 
   void _onUpdateEmissionDuration(
