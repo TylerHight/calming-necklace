@@ -18,3 +18,11 @@ class _TimerTicked extends TimedToggleButtonEvent {
   @override
   List<Object> get props => [duration];
 }
+
+class _PeriodicEmissionTicked extends TimedToggleButtonEvent {
+  const _PeriodicEmissionTicked({required this.duration});
+  final int duration;
+
+  @override
+  List<Object> get props => [duration];
+}
