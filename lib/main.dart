@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'core/data/models/necklace.dart';
+import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'core/services/database_service.dart';
-import 'features/device_settings_screen/blocs/settings/settings_bloc.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
-import 'core/blocs/necklaces/necklaces_bloc.dart';
+import 'features/notes/presentation/notes_screen.dart';
 import 'features/notes/bloc/notes_bloc.dart';
 import 'features/device_settings_screen/blocs/duration_picker/duration_picker_bloc.dart';
-import 'features/notes/presentation/notes_screen.dart';
 import 'app_bloc_observer.dart';
-import 'core/services/logging_service.dart';
 
 void main() {
   Bloc.observer = AppBlocObserver();
@@ -39,13 +36,6 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => NecklacesBloc(
-              context.read<NecklaceRepository>(),
-              context.read<DatabaseService>(),
-            ),
-          ),
-          BlocProvider<SettingsBloc>(
-            create: (context) => SettingsBloc(
-              context.read<Necklace>(),
               context.read<NecklaceRepository>(),
               context.read<DatabaseService>(),
             ),
@@ -84,9 +74,54 @@ class MyApp extends StatelessWidget {
               backgroundColor: Colors.transparent,
             ),
           ),
-          home: const NecklacesScreen(), // Ensure this is the correct screen
+          home: const MainScreen(), // Use MainScreen as the home
           debugShowCheckedModeBanner: false,
         ),
+      ),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    NecklacesScreen(),
+    NotesScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.spa),
+            label: 'Necklaces',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.note),
+            label: 'Notes',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue[600],
+        unselectedItemColor: Colors.grey,
+        onTap: _onItemTapped,
       ),
     );
   }

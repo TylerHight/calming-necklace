@@ -33,7 +33,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _refreshSettings();
   }
 
   Future<void> _refreshSettings() async {
@@ -50,7 +49,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SettingsBloc(widget.necklace, widget.repository, widget.databaseService),
+      create: (context) => SettingsBloc(
+        widget.necklace,
+        widget.repository,
+        widget.databaseService
+      ),
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
