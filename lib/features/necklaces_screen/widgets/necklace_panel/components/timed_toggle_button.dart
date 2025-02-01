@@ -6,6 +6,7 @@ import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
 import '../../../../../core/services/database_service.dart';
 import '../../../../../core/ui/ui_constants.dart';
+import 'release_interval_countdown.dart'; // Import the new countdown widget
 
 class TimedToggleButton extends StatelessWidget {
   final Color? activeColor;
@@ -200,6 +201,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (widget.periodicEmissionEnabled) const ReleaseIntervalCountdown(),
                   Icon(
                     widget.iconData,
                     color: widget.iconColor,

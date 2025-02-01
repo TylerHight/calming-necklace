@@ -36,7 +36,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     try {
       emit(TimedToggleButtonLoading());
       _logger.logDebug('Toggle light event received. Current state: ${state.runtimeType}');
-      
+
       _isActive = !_isActive;
       if (_isActive) {
         await _repository.toggleLight(necklace, true);
@@ -67,7 +67,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   }
 
   void _onPeriodicEmissionTicked(_PeriodicEmissionTicked event, Emitter<TimedToggleButtonState> emit) {
-    emit(PeriodicEmissionState(event.duration));
+    if (state is! LightOnState) {
+      emit(PeriodicEmissionState(event.duration, 
+          isEmitting: false, intervalSecondsLeft: event.intervalDuration));
+    }
     if (event.duration == 0) {
       add(ToggleLightEvent());
     }
@@ -77,7 +80,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _tickerSubscription?.cancel();
     _tickerSubscription = _ticker
         .tick(ticks: duration)
-        .listen((duration) => add(_TimerTicked(duration: duration)));
+        .listen((duration) => add(_TimerTicked(duration: duration, isPeriodicEmission: true))); // TODO: Get the proper value of isPeriodicEmission
   }
 
   void _stopTimer(Emitter<TimedToggleButtonState> emit) {
@@ -90,7 +93,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _periodicEmissionTicker?.dispose();
     _periodicEmissionTicker = PeriodicEmissionTicker(interval: interval);
     _periodicEmissionSubscription = _periodicEmissionTicker?.tick().listen(
-      (duration) => add(_PeriodicEmissionTicked(duration: duration))
+      (duration) => add(_PeriodicEmissionTicked(duration: duration, intervalDuration: interval)), // TODO: Ensure the proper value of intervalDuration is being obtained
     );
   }
 
