@@ -6,7 +6,9 @@ import '../../../../core/services/database_service.dart';
 import '../../../../core/ui/components/signal_strength_icon.dart';
 import 'components/timed_toggle_button.dart';
 import 'components/connection_status.dart';
+import 'components/periodic_emission_timer.dart';
 import '../../blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
+import '../../blocs/periodic_emission/periodic_emission_bloc.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
@@ -95,19 +97,27 @@ class _NecklacePanelState extends State<NecklacePanel> {
     logger.logDebug('Building NecklacePanel for ${widget.name}');
     logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
     final repository = widget.repository; // TODO: handle with bloc instead of directly accessing repository
-    
-    return BlocProvider(
-      create: (context) => TimedToggleButtonBloc(
-        repository: repository,
-        necklace: widget.necklace,
-      ),
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TimedToggleButtonBloc(
+            repository: widget.repository,
+            necklace: widget.necklace,
+          ),
+        ),
+        BlocProvider(
+          create: (context) => PeriodicEmissionBloc(
+            necklace: widget.necklace,
+          ),
+        ),
+      ],
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         elevation: 2,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-
         color: Colors.white,
         child: Container(
           decoration: BoxDecoration(
@@ -115,7 +125,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.white, Colors.grey.shade200], // Lighter gradient for a softer look
+              colors: [Colors.white, Colors.grey.shade200],
             ),
             boxShadow: [
               BoxShadow(
@@ -125,12 +135,13 @@ class _NecklacePanelState extends State<NecklacePanel> {
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16.0), // Reduced padding for a tighter layout
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
-              const SizedBox(height: 16), // Reduced space for a more compact design
+              if (widget.necklace.periodicEmissionEnabled) const PeriodicEmissionTimer(),
+              const SizedBox(height: 16),
               _buildControls(),
             ],
           ),

@@ -201,7 +201,6 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (widget.periodicEmissionEnabled) const ReleaseIntervalCountdown(),
                   Icon(
                     widget.iconData,
                     color: widget.iconColor,
