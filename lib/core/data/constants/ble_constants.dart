@@ -1,7 +1,7 @@
 class BleConstants {
   // Device Information
-  static const String DEVICE_NAME = "QUE Device";
-  static const String DEVICE_NAME_PREFIX = "QUE";
+  static const String DEVICE_NAME = "Calming Necklace";
+  static const String DEVICE_NAME_PREFIX = "CN";
 
   // Connection settings
   static const Duration CONNECTION_TIMEOUT = Duration(seconds: 180);
@@ -14,18 +14,13 @@ class BleConstants {
   // Service UUIDs
   static const String LED_SERVICE_UUID = "180A";
   static const String SETTINGS_SERVICE_UUID = "180F";
-  static const String HEARTRATE_SERVICE_UUID = "180D";
 
   // Characteristic UUIDs
   static const String SWITCH_CHARACTERISTIC_UUID = "2A57";
   static const String KEEPALIVE_CHARACTERISTIC_UUID = "2A3B";
   static const String EMISSION1_CHARACTERISTIC_UUID = "2A19";
-  static const String EMISSION2_CHARACTERISTIC_UUID = "2A1A";
   static const String INTERVAL1_CHARACTERISTIC_UUID = "2A1B";
-  static const String INTERVAL2_CHARACTERISTIC_UUID = "2A1C";
   static const String PERIODIC1_CHARACTERISTIC_UUID = "2A1D";
-  static const String PERIODIC2_CHARACTERISTIC_UUID = "2A1E";
-  static const String HEARTRATE_CHARACTERISTIC_UUID = "2A1F";
 
   // MTU Settings
   static const int DEFAULT_MTU = 23;
