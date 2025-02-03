@@ -13,6 +13,7 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
   Timer? _timer;
   final Necklace necklace;
   final NecklaceRepository repository;
+  bool _isPaused = false;
 
   PeriodicEmissionBloc({required this.necklace, required this.repository}) 
       : super(PeriodicEmissionInitial()) {
@@ -21,6 +22,15 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     on<InitializePeriodicEmission>(_onInitializePeriodicEmission);
     on<UpdateInterval>(_onUpdateInterval);
     on<TimerTick>(_onTimerTick);
+    
+    // Listen to emission events
+    repository.periodicEmissionStream.listen((isEmitting) {
+      if (isEmitting) {
+        _isPaused = true;
+      } else {
+        _isPaused = false;
+      }
+    });
   }
 
   void _onStartPeriodicEmission(
@@ -73,9 +83,10 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     if (state is PeriodicEmissionRunning) {
       final currentState = state as PeriodicEmissionRunning;
       final newSecondsLeft = currentState.intervalSecondsLeft - 1;
-      _logger.logDebug('Periodic emission timer tick: $newSecondsLeft seconds left');
       
-      if (newSecondsLeft <= 0) {
+      if (_isPaused) {
+        emit(PeriodicEmissionRunning(intervalSecondsLeft: currentState.intervalSecondsLeft, totalInterval: currentState.totalInterval, isPaused: true));
+      } else if (newSecondsLeft <= 0) {
         _logger.logDebug('Periodic emission timer reached zero, triggering emission');
         repository.triggerPeriodicEmission();
         emit(PeriodicEmissionRunning(

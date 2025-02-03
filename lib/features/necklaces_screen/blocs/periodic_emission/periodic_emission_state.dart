@@ -12,14 +12,16 @@ class PeriodicEmissionInitial extends PeriodicEmissionState {}
 class PeriodicEmissionRunning extends PeriodicEmissionState {
   final int intervalSecondsLeft;
   final int totalInterval;
+  final bool isPaused;
 
   const PeriodicEmissionRunning({
     required this.intervalSecondsLeft,
     required this.totalInterval,
+    this.isPaused = false,
   });
 
   @override
-  List<Object> get props => [intervalSecondsLeft, totalInterval];
+  List<Object> get props => [intervalSecondsLeft, totalInterval, isPaused];
 }
 
 class PeriodicEmissionStopped extends PeriodicEmissionState {}
