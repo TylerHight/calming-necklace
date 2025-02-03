@@ -31,6 +31,7 @@ class _NotesScreenState extends State<NotesScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddNoteDialog(context),
+        shape: const CircleBorder(),
         backgroundColor: UIConstants.floatingActionButtonColor,
         child: const Icon(
           Icons.add,

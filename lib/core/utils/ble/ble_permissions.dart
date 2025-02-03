@@ -5,21 +5,24 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class BlePermissions {
-  /// Request all necessary BLE permissions based on platform
+  /// Request all necessary Bluetooth Low Energy permissions based on platform
   static Future<bool> requestPermissions() async {
+    bool allGranted = true;
     if (Platform.isAndroid) {
       final locationStatus = await Permission.locationWhenInUse.request();
       if (!locationStatus.isGranted) {
-        return false;
+        allGranted = false;
       }
 
       // For Android 12+ additional permissions are required
-      if (await Permission.bluetoothScan.request().isGranted &&
-          await Permission.bluetoothConnect.request().isGranted &&
-          await Permission.bluetoothAdvertise.request().isGranted) {
-        return true;
+      final bluetoothScan = await Permission.bluetoothScan.request();
+      final bluetoothConnect = await Permission.bluetoothConnect.request();
+      final bluetoothAdvertise = await Permission.bluetoothAdvertise.request();
+      
+      if (!bluetoothScan.isGranted || !bluetoothConnect.isGranted || !bluetoothAdvertise.isGranted) {
+        allGranted = false;
       }
-      return false;
+      return allGranted;
     }
     else if (Platform.isIOS) {
       final bluetoothStatus = await Permission.bluetooth.request();
@@ -32,7 +35,7 @@ class BlePermissions {
   /// Check if Bluetooth is available and enabled
   static Future<bool> checkBleStatus() async {
     try {
-      // Check if BLE is supported on the device
+      // Check if Bluetooth Low Energy is supported on the device
       if (await FlutterBluePlus.isSupported == false) {
         throw Exception("Bluetooth not supported on this device");
       }
@@ -51,7 +54,7 @@ class BlePermissions {
 
       return true;
     } catch (e) {
-      print('Error checking BLE status: $e');
+      print('Error checking Bluetooth Low Energy status: $e');
       return false;
     }
   }
@@ -59,6 +62,21 @@ class BlePermissions {
   /// Monitor Bluetooth state changes
   static Stream<bool> get bluetoothStateStream {
     return FlutterBluePlus.adapterState.map((state) => state == BluetoothAdapterState.on);
+  }
+
+  /// Open app settings if permissions are denied
+  static Future<void> openSettings() async {
+    await openAppSettings();
+  }
+
+  /// Check if permissions are permanently denied
+  static Future<bool> arePermissionsPermanentlyDenied() async {
+    if (Platform.isAndroid) {
+      return await Permission.bluetoothConnect.isPermanentlyDenied ||
+             await Permission.bluetoothScan.isPermanentlyDenied ||
+             await Permission.locationWhenInUse.isPermanentlyDenied;
+    }
+    return false;
   }
 
   /// Check if all required permissions are granted

@@ -93,6 +93,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  bool _blePermissionsGranted = false;
 
   static const List<Widget> _widgetOptions = <Widget>[
     NecklacesScreen(),
@@ -102,14 +103,23 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    _requestBlePermissions();
+    _checkAndRequestBlePermissions();
   }
 
-  Future<void> _requestBlePermissions() async {
-    bool granted = await BlePermissions.requestPermissions();
-    if (!granted) {
-      // Handle the case when permissions are not granted
-      print('BLE permissions not granted');
+  Future<void> _checkAndRequestBlePermissions() async {
+    if (!await BlePermissions.checkPermissions()) {
+      bool granted = await BlePermissions.requestPermissions();
+      setState(() {
+        _blePermissionsGranted = granted;
+      });
+      
+      if (!granted && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Bluetooth permissions are required for device connectivity'),
+          ),
+        );
+      }
     }
   }
 

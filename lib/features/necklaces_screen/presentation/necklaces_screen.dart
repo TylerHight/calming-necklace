@@ -57,8 +57,12 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       backgroundColor: Colors.grey[50],
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddNecklaceDialog,
+        shape: const CircleBorder(),
         backgroundColor: UIConstants.floatingActionButtonColor,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       appBar: AppBar(
         title: const Text(
