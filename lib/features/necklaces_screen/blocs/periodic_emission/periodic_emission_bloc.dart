@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import 'dart:async';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/services/logging_service.dart';
+import '../../../../core/data/repositories/necklace_repository.dart';
 
 part 'periodic_emission_event.dart';
 part 'periodic_emission_state.dart';
@@ -11,11 +12,13 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
   final LoggingService _logger = LoggingService();
   Timer? _timer;
   final Necklace necklace;
+  final NecklaceRepository repository;
 
-  PeriodicEmissionBloc({required this.necklace}) 
+  PeriodicEmissionBloc({required this.necklace, required this.repository}) 
       : super(PeriodicEmissionInitial()) {
     on<StartPeriodicEmission>(_onStartPeriodicEmission);
     on<StopPeriodicEmission>(_onStopPeriodicEmission);
+    on<InitializePeriodicEmission>(_onInitializePeriodicEmission);
     on<UpdateInterval>(_onUpdateInterval);
     on<TimerTick>(_onTimerTick);
   }
@@ -24,6 +27,7 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     StartPeriodicEmission event,
     Emitter<PeriodicEmissionState> emit,
   ) {
+    _logger.logDebug('Starting periodic emission');
     if (!necklace.periodicEmissionEnabled) return;
     
     _startTimer();
@@ -37,8 +41,18 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     StopPeriodicEmission event,
     Emitter<PeriodicEmissionState> emit,
   ) {
+    _logger.logDebug('Stopping periodic emission');
     _timer?.cancel();
     emit(PeriodicEmissionStopped());
+  }
+
+  void _onInitializePeriodicEmission(
+    InitializePeriodicEmission event,
+    Emitter<PeriodicEmissionState> emit,
+  ) {
+    if (necklace.periodicEmissionEnabled) {
+      add(const StartPeriodicEmission());
+    }
   }
 
   void _onUpdateInterval(
@@ -59,8 +73,11 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     if (state is PeriodicEmissionRunning) {
       final currentState = state as PeriodicEmissionRunning;
       final newSecondsLeft = currentState.intervalSecondsLeft - 1;
+      _logger.logDebug('Periodic emission timer tick: $newSecondsLeft seconds left');
       
       if (newSecondsLeft <= 0) {
+        _logger.logDebug('Periodic emission timer reached zero, triggering emission');
+        repository.triggerPeriodicEmission();
         emit(PeriodicEmissionRunning(
           intervalSecondsLeft: currentState.totalInterval,
           totalInterval: currentState.totalInterval,

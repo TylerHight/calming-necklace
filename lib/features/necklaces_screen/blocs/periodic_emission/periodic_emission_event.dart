@@ -27,3 +27,7 @@ class UpdateInterval extends PeriodicEmissionEvent {
 class TimerTick extends PeriodicEmissionEvent {
   const TimerTick();
 }
+
+class InitializePeriodicEmission extends PeriodicEmissionEvent {
+  const InitializePeriodicEmission();
+}

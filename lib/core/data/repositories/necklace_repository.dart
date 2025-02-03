@@ -1,21 +1,26 @@
 import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'package:calming_necklace/core/services/logging_service.dart';
 import 'package:calming_necklace/core/services/database_service.dart';
+import 'dart:async';
 
 abstract class NecklaceRepository {
   Future<void> toggleLight(Necklace necklace, bool isOn);
   Future<void> setAutoTurnOff(Necklace necklace, Duration duration);
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
-  Future<void> addNecklace(String name, String bleDevice);
+  Stream<bool> get periodicEmissionStream;
+  void triggerPeriodicEmission();
   Future<List<Necklace>> getNecklaces();
   Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
+  Future<void> addNecklace(String name, String bleDevice);
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
   final LoggingService _logger = LoggingService();
   final List<Necklace> _necklaces = [];
   final DatabaseService _dbService = DatabaseService();
+  final _periodicEmissionController = StreamController<bool>.broadcast();
+  Timer? _periodicEmissionTimer;
 
   @override
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
@@ -59,7 +64,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
         releaseInterval1: Duration(seconds: 20),
         isArchived: false,
       );
-      
+
       await _dbService.insertNecklace(necklace);
       _logger.logInfo('Successfully added necklace: $name with Bluetooth Low Energy device: $bleDevice');
     } catch (e) {
@@ -94,5 +99,19 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
     } catch (e) {
       return 'Unknown Device';
     }
+  }
+
+  @override
+  Stream<bool> get periodicEmissionStream => _periodicEmissionController.stream;
+
+  @override
+  void triggerPeriodicEmission() {
+    _logger.logDebug('Triggering periodic emission');
+    _periodicEmissionController.add(true);
+  }
+
+  void dispose() {
+    _periodicEmissionController.close();
+    _periodicEmissionTimer?.cancel();
   }
 }

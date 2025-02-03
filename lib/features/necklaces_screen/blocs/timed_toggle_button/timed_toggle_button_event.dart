@@ -30,3 +30,7 @@ class _PeriodicEmissionTicked extends TimedToggleButtonEvent {
   @override
   List<Object> get props => [duration];
 }
+
+class _PeriodicEmissionTriggered extends TimedToggleButtonEvent {
+  const _PeriodicEmissionTriggered();
+}

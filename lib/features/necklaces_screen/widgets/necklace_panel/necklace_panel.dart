@@ -39,6 +39,11 @@ class NecklacePanel extends StatefulWidget {
 class _NecklacePanelState extends State<NecklacePanel> {
   bool isRelease1Active = false;
 
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void _showOptions(BuildContext context, Offset tapPosition) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
@@ -76,7 +81,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
             builder: (context) => SettingsScreen(
               necklace: widget.necklace,
               repository: widget.repository,
-              databaseService: widget.databaseService, // Pass DatabaseService
+              databaseService: widget.databaseService,
             ),
           ),
         );
@@ -109,7 +114,8 @@ class _NecklacePanelState extends State<NecklacePanel> {
         BlocProvider(
           create: (context) => PeriodicEmissionBloc(
             necklace: widget.necklace,
-          ),
+            repository: widget.repository,
+          )..add(const InitializePeriodicEmission()),
         ),
       ],
       child: Card(
@@ -140,7 +146,10 @@ class _NecklacePanelState extends State<NecklacePanel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(context),
-              if (widget.necklace.periodicEmissionEnabled) const PeriodicEmissionTimer(),
+              if (widget.necklace.periodicEmissionEnabled) 
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: PeriodicEmissionTimer()),
               const SizedBox(height: 16),
               _buildControls(),
             ],

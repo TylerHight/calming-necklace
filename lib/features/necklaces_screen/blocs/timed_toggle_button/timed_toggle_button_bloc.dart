@@ -5,6 +5,7 @@ import 'package:calming_necklace/core/services/logging_service.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
 import 'ticker.dart';
+import '../periodic_emission/periodic_emission_bloc.dart';
 
 part 'timed_toggle_button_event.dart';
 part 'timed_toggle_button_state.dart';
@@ -17,6 +18,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
   final LoggingService _logger = LoggingService();
+  StreamSubscription? _periodicEmissionSubscription;
 
   TimedToggleButtonBloc({
     required NecklaceRepository repository,
@@ -26,6 +28,19 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
        super(TimedToggleButtonInitial()) {
     on<ToggleLightEvent>(_onToggleLight);
     on<_TimerTicked>(_onTimerTicked);
+    on<_PeriodicEmissionTriggered>(_onPeriodicEmissionTriggered);
+    
+    // Listen to periodic emission state changes
+    if (necklace.periodicEmissionEnabled) {
+      _periodicEmissionSubscription = _repository
+          .periodicEmissionStream
+          .listen((triggered) {
+        _logger.logDebug('Received periodic emission trigger: $triggered');
+        if (triggered) {
+          add(_PeriodicEmissionTriggered());
+        }
+      });
+    }
     _logger.logInfo('TimedToggleButtonBloc initialized');
   }
 
@@ -39,9 +54,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         await _repository.toggleLight(necklace, true);
         emit(LightOnState(necklace.emission1Duration.inSeconds));
         _startTimer(necklace.emission1Duration.inSeconds);
-        _logger.logDebug('Light turned on, timer started');
       } else {
-        await _repository.toggleLight(necklace, false);
+        if (necklace.periodicEmissionEnabled) {
+          await _repository.toggleLight(necklace, false);
+        }
         _stopTimer(emit);
       }
       _logger.logDebug('Toggle light completed successfully');
@@ -57,6 +73,21 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
           ? LightOnState(event.duration)
           : LightOffState(),
     );
+  }
+
+  Future<void> _onPeriodicEmissionTriggered(
+    _PeriodicEmissionTriggered event,
+    Emitter<TimedToggleButtonState> emit,
+  ) async {
+    _logger.logDebug('Handling periodic emission trigger');
+    try {
+      await _repository.toggleLight(necklace, true);
+      emit(LightOnState(necklace.emission1Duration.inSeconds));
+      _startTimer(necklace.emission1Duration.inSeconds);
+    } catch (e) {
+      _logger.logError('Error handling periodic emission trigger: $e');
+      emit(TimedToggleButtonError(e.toString()));
+    }
   }
 
   void _startTimer(int duration) {
@@ -75,6 +106,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   @override
   Future<void> close() {
     _tickerSubscription?.cancel();
+    _periodicEmissionSubscription?.cancel();
     return super.close();
   }
 }
