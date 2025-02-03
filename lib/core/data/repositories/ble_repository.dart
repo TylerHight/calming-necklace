@@ -21,6 +21,7 @@ class BleRepository {
     try {
       _logger.logDebug('Starting Bluetooth Low Energy scan');
       await FlutterBluePlus.turnOn();
+      _devicesController.add([]); // Clear previous devices
       _discoveredDevices.clear();
 
       await FlutterBluePlus.startScan(
@@ -32,7 +33,7 @@ class BleRepository {
       _scanSubscription?.cancel();
       
       _scanSubscription = FlutterBluePlus.scanResults.listen((results) {
-        for (ScanResult scanResult in results) {
+        for (final ScanResult scanResult in results) {
           if (scanResult.device.name.startsWith('CN_')) {  // Filter for our device prefix
             final device = BleDevice(
               id: scanResult.device.id.id,

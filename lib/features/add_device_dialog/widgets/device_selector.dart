@@ -36,7 +36,7 @@ class DeviceSelector extends StatelessWidget {
                 ),
                 if (state.isScanning)
                   const SizedBox(
-                    width: 20,
+                    width: 16,
                     height: 20,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
@@ -81,7 +81,12 @@ class DeviceSelector extends StatelessWidget {
         filled: true,
         fillColor: Colors.grey[50],
       ),
-      hint: const Text('No device selected'),
+      hint: Text(
+        state.isScanning 
+          ? 'Scanning for devices...' 
+          : state.devices.isEmpty 
+            ? 'No devices found - tap refresh to scan' 
+            : 'Select a device (optional)'),
       items: [
         ...state.devices.map((device) {
           return DropdownMenuItem<BleDevice>(

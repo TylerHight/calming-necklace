@@ -9,7 +9,7 @@ abstract class AddDeviceDialogEvent extends Equatable {
 
 class SubmitAddDeviceEvent extends AddDeviceDialogEvent {
   final String name;
-  final BleDevice device;
+  final BleDevice? device;
 
   const SubmitAddDeviceEvent(this.name, this.device);
 }

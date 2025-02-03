@@ -149,16 +149,16 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
                   ? null
                   : () {
                       final name = _nameController.text;
-                      if (name.isEmpty || _selectedDevice == null) {
+                      if (name.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Please enter a name and select a device'),
+                            content: Text('Please enter a name for the device'),
                           ),
                         );
                         return;
                       }
                       context.read<AddDeviceDialogBloc>().add(
-                            SubmitAddDeviceEvent(name, _selectedDevice!),
+                            SubmitAddDeviceEvent(name, _selectedDevice),
                           );
                     },
               child: const Text('Add'),
