@@ -168,7 +168,7 @@ class _SettingsContentState extends State<SettingsContent> {
     return TextFormField(
       initialValue: state.necklace.name,
       decoration: const InputDecoration(
-        labelText: 'Device Name',
+        labelText: 'Rename Necklace',
         border: OutlineInputBorder(),
       ),
       onChanged: (value) {
