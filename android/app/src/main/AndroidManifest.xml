@@ -37,7 +37,7 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
-    <!-- Add the required Bluetooth permissions -->
+    <!-- Required Bluetooth permissions -->
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
