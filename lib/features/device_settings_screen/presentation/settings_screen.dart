@@ -149,7 +149,7 @@ class _SettingsContentState extends State<SettingsContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Device Information',
+              'Necklace Name',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -158,8 +158,6 @@ class _SettingsContentState extends State<SettingsContent> {
             const SizedBox(height: 16),
             _buildNameField(context, state),
             const SizedBox(height: 8),
-            Text('Device ID: ${state.necklace.id}'),
-            Text('BLE Address: ${state.necklace.bleDevice}'),
           ],
         ),
       ),
