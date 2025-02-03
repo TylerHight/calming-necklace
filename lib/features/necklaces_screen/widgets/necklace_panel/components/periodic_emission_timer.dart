@@ -11,7 +11,7 @@ class PeriodicEmissionTimer extends StatelessWidget {
     return BlocBuilder<PeriodicEmissionBloc, PeriodicEmissionState>(
       builder: (context, state) {
         if (state is PeriodicEmissionRunning) {
-          final progress = state.intervalSecondsLeft / state.totalInterval;
+          final progress = 1 - (state.intervalSecondsLeft / state.totalInterval);
           return Container(
             padding: const EdgeInsets.all(16.0),
             child: Stack(
@@ -22,7 +22,7 @@ class PeriodicEmissionTimer extends StatelessWidget {
                   height: 120,
                   child: CircularProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.grey[200],
+                    backgroundColor: Colors.blue.withOpacity(0.2),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       state.isPaused ? Colors.orange : Colors.blue,
                     ),

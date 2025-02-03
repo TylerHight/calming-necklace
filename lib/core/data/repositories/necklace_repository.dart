@@ -8,6 +8,7 @@ abstract class NecklaceRepository {
   Future<void> setAutoTurnOff(Necklace necklace, Duration duration);
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
   Stream<bool> get periodicEmissionStream;
+  void emissionComplete();
   void triggerPeriodicEmission();
   Future<List<Necklace>> getNecklaces();
   Future<void> archiveNecklace(String id);
@@ -108,6 +109,12 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   void triggerPeriodicEmission() {
     _logger.logDebug('Triggering periodic emission');
     _periodicEmissionController.add(true);
+  }
+
+  @override
+  void emissionComplete() {
+    _logger.logDebug('Emission complete');
+    _periodicEmissionController.add(false);
   }
 
   void dispose() {

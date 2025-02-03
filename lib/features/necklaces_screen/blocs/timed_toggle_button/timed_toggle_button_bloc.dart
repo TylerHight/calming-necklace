@@ -78,11 +78,12 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   }
 
   void _onTimerTicked(_TimerTicked event, Emitter<TimedToggleButtonState> emit) {
-    emit(
-      event.duration > 0
-          ? LightOnState(event.duration)
-          : LightOffState(),
-    );
+    if (event.duration > 0) {
+      emit(LightOnState(event.duration));
+    } else {
+      _repository.emissionComplete();
+      emit(LightOffState());
+    }
   }
 
   Future<void> _onPeriodicEmissionTriggered(
