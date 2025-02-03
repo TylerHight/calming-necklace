@@ -91,6 +91,7 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
         repository.triggerPeriodicEmission();
         emit(PeriodicEmissionRunning(
           intervalSecondsLeft: currentState.totalInterval,
+          isPaused: false,
           totalInterval: currentState.totalInterval,
         ));
       } else {
