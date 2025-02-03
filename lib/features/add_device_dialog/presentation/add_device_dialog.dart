@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/data/models/ble_device.dart';
+import '../../../core/data/repositories/ble_repository.dart';
 import '../blocs/add_device_dialog/add_device_dialog_state.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
+import '../blocs/device_selector/device_selector_event.dart';
 import '../widgets/device_selector.dart';
-import '../../../../core/data/models/ble_device.dart';
 
 // Dummy devices for testing
 final List<BleDevice> dummyDevices = [
@@ -44,17 +46,21 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AddDeviceDialogBloc, AddDeviceDialogState>(
-      listener: (context, state) {
-        if (state is AddDeviceDialogSuccess) {
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Device added successfully')),
-          );
-        }
-      },
-      child: BlocProvider(
-        create: (context) => DeviceSelectorBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => DeviceSelectorBloc(bleRepository: BleRepository()),
+        ),
+      ],
+      child: BlocListener<AddDeviceDialogBloc, AddDeviceDialogState>(
+        listener: (context, state) {
+          if (state is AddDeviceDialogSuccess) {
+            Navigator.of(context).pop();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Device added successfully')),
+            );
+          }
+        },
         child: Dialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
@@ -120,17 +126,11 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
   }
 
   Widget _buildDeviceSelector(BuildContext context) {
-    return BlocProvider(
-      create: (context) => DeviceSelectorBloc(),
-      child: DeviceSelector(
-        devices: dummyDevices.where((d) => d.deviceType == BleDeviceType.necklace).toList(),
-        selectedDevice: _selectedDevice,
-        onDeviceSelected: (device) {
-          setState(() {
-            _selectedDevice = device;
-          });
-        },
-      ),
+    return DeviceSelector(
+      deviceType: BleDeviceType.necklace,
+      onDeviceSelected: (device) {
+        context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+      },
     );
   }
 

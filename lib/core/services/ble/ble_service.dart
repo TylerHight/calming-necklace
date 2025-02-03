@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import '../../data/models/necklace.dart';
 import '../logging_service.dart';
 import 'managers/ble_connection_manager.dart';
 import 'ble_types.dart';
@@ -176,7 +177,7 @@ class BleService {
       if (command < 0 || command > BleCommand.periodic1.value) {
         throw BleException('Invalid LED command');
       }
-      await _writeCommand(command);
+      await _writeCommand(command, 0); // TODO: Provide correct second parameter (currently dummy value)
     } catch (e) {
       _loggingService.logBleError('Failed to set LED color: $e');
       rethrow;
@@ -252,8 +253,9 @@ class BleService {
     }
   }
 
-  Future<void> connectToDeviceWithFeedback(BuildContext context, Device device, {VoidCallback? onConnected}) async {
-    if (device.bluetoothDevice == null) {
+  /** TODO: Adapt this method to work with this app
+  Future<void> connectToDeviceWithFeedback(BuildContext context, Necklace necklace, {VoidCallback? onConnected}) async {
+    if (necklace.bleDevice == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('No Bluetooth device available')),
       );
@@ -261,7 +263,7 @@ class BleService {
     }
 
     try {
-      await connectToDevice(device.bluetoothDevice!);
+      await connectToDevice(necklace.bleDevice!);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Connected successfully')),
@@ -276,6 +278,7 @@ class BleService {
       }
     }
   }
+   **/
 
   void dispose() {
     _connectionManager.dispose();

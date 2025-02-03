@@ -9,6 +9,8 @@ class BleRepository {
 
   final LoggingService _logger = LoggingService();
   final StreamController<List<BleDevice>> _devicesController = StreamController<List<BleDevice>>.broadcast();
+  StreamSubscription<List<BleDevice>>? _deviceSubscription;
+  StreamSubscription<List<ScanResult>>? _scanSubscription;
 
   Stream<List<BleDevice>> get devices => _devicesController.stream;
   List<BleDevice> _discoveredDevices = [];
@@ -18,25 +20,32 @@ class BleRepository {
   Future<void> startScanning() async {
     try {
       _logger.logDebug('Starting Bluetooth Low Energy scan');
+      await FlutterBluePlus.turnOn();
       _discoveredDevices.clear();
 
-      // Start scanning
-      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 4));
+      await FlutterBluePlus.startScan(
+        timeout: const Duration(seconds: 4),
+        androidScanMode: AndroidScanMode.lowLatency,
+      );
 
-      // Listen to scan results
-      FlutterBluePlus.scanResults.listen((results) {
+      // Cancel any existing subscription
+      _scanSubscription?.cancel();
+      
+      _scanSubscription = FlutterBluePlus.scanResults.listen((results) {
         for (ScanResult scanResult in results) {
-          final device = BleDevice(
-            id: scanResult.device.id.id,
-            name: scanResult.device.name.isEmpty ? 'Unknown Device' : scanResult.device.name,
-            address: scanResult.device.id.id,
-            rssi: scanResult.rssi,
-            deviceType: _determineDeviceType(scanResult.device.name),
-          );
+          if (scanResult.device.name.startsWith('CN_')) {  // Filter for our device prefix
+            final device = BleDevice(
+              id: scanResult.device.id.id,
+              name: scanResult.device.name.isEmpty ? 'Unknown Device' : scanResult.device.name,
+              address: scanResult.device.id.id,
+              rssi: scanResult.rssi,
+              deviceType: _determineDeviceType(scanResult.device.name),
+            );
 
-          if (!_discoveredDevices.any((discoveredDevice) => discoveredDevice.id == device.id)) {
-            _discoveredDevices.add(device);
-            _devicesController.add(_discoveredDevices);
+            if (!_discoveredDevices.any((discoveredDevice) => discoveredDevice.id == device.id)) {
+              _discoveredDevices.add(device);
+              _devicesController.add(_discoveredDevices);
+            }
           }
         }
       });
@@ -66,5 +75,7 @@ class BleRepository {
 
   void dispose() {
     _devicesController.close();
+    _scanSubscription?.cancel();
+    FlutterBluePlus.stopScan();
   }
 }
