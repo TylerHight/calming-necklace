@@ -10,6 +10,7 @@ import 'features/notes/presentation/notes_screen.dart';
 import 'features/notes/bloc/notes_bloc.dart';
 import 'features/device_settings_screen/blocs/duration_picker/duration_picker_bloc.dart';
 import 'app_bloc_observer.dart';
+import 'core/utils/ble/ble_permissions.dart';
 
 void main() {
   Bloc.observer = AppBlocObserver();
@@ -97,6 +98,20 @@ class _MainScreenState extends State<MainScreen> {
     NecklacesScreen(),
     NotesScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _requestBlePermissions();
+  }
+
+  Future<void> _requestBlePermissions() async {
+    bool granted = await BlePermissions.requestPermissions();
+    if (!granted) {
+      // Handle the case when permissions are not granted
+      print('BLE permissions not granted');
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
