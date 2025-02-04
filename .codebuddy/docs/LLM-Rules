@@ -1,2 +1,2 @@
-- Adhere to bloc architechture, with usage of bloc, repository, utility, and service files as needed.
+- Adhere to bloc architecture, with usage of bloc, repository, utility, and service files as needed.
 - Avoid direct bloc-to-bloc communication.

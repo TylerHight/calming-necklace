@@ -21,18 +21,26 @@ class DeviceSelector extends StatefulWidget {
 }
 
 class _DeviceSelectorState extends State<DeviceSelector> {
+  late DeviceSelectorBloc _deviceSelectorBloc;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _deviceSelectorBloc = context.read<DeviceSelectorBloc>();
+  }
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Start scanning when the widget is first built
-      context.read<DeviceSelectorBloc>().add(StartScanning());
+      _deviceSelectorBloc.add(StartScanning());
     });
   }
 
   @override
   void dispose() {
-    context.read<DeviceSelectorBloc>().add(StopScanning());
+    _deviceSelectorBloc.add(StopScanning());
     super.dispose();
   }
 
@@ -65,7 +73,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
       label: Text(state.isScanning ? 'Scanning...' : 'Rescan for Devices'),
       onPressed: () {
         if (!state.isScanning) {
-          context.read<DeviceSelectorBloc>().add(StartScanning());
+          _deviceSelectorBloc.add(StartScanning());
         }
       },
       style: ElevatedButton.styleFrom(
@@ -130,7 +138,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
             ),
             onTap: () {
               if (state.selectedDevice?.id != device.id) {
-                context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+                _deviceSelectorBloc.add(SelectDevice(device));
                 widget.onDeviceSelected(device);
               }
             },
