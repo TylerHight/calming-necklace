@@ -9,6 +9,7 @@ import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
+import '../widgets/settings_help_dialog.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/ui/ui_constants.dart';
 
@@ -74,6 +75,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.help_outline, color: Colors.black87),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => const SettingsHelpDialog(),
+              ),
+            ),
+          ],
           backgroundColor: Colors.transparent,
         ),
         body: SettingsContent(
