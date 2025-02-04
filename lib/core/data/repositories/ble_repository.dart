@@ -17,12 +17,17 @@ class BleRepository {
 
   BleRepository._internal();
 
+  Future<void> clearDevices() async {
+    _discoveredDevices.clear();
+    _devicesController.add([]);
+    _logger.logDebug('Cleared discovered devices');
+  }
+
   Future<void> startScanning() async {
     try {
       _logger.logDebug('Starting Bluetooth Low Energy scan');
       await FlutterBluePlus.turnOn();
-      _devicesController.add([]); // Clear previous devices
-      _discoveredDevices.clear();
+      await clearDevices();
 
       await FlutterBluePlus.startScan(
         timeout: const Duration(seconds: 4),
@@ -34,7 +39,7 @@ class BleRepository {
       
       _scanSubscription = FlutterBluePlus.scanResults.listen((results) {
         for (final ScanResult scanResult in results) {
-          if (scanResult.device.name.startsWith('CN_')) {  // Filter for our device prefix
+          if (scanResult.device.name.isNotEmpty) {  // Only filter out unnamed devices
             final device = BleDevice(
               id: scanResult.device.id.id,
               name: scanResult.device.name.isEmpty ? 'Unknown Device' : scanResult.device.name,
@@ -67,8 +72,10 @@ class BleRepository {
   }
 
   BleDeviceType _determineDeviceType(String name) {
-    // Add logic to determine device type based on name or other characteristics
-    if (name.toLowerCase().contains('necklace')) {
+    final lowercaseName = name.toLowerCase();
+    if (lowercaseName.contains('necklace') || 
+        lowercaseName.contains('cn_') || 
+        lowercaseName.contains('calm')) {
       return BleDeviceType.necklace;
     }
     return BleDeviceType.heartRateMonitor;
@@ -77,6 +84,7 @@ class BleRepository {
   void dispose() {
     _devicesController.close();
     _scanSubscription?.cancel();
+    _deviceSubscription?.cancel();
     FlutterBluePlus.stopScan();
   }
 }

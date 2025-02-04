@@ -24,7 +24,16 @@ class _DeviceSelectorState extends State<DeviceSelector> {
   @override
   void initState() {
     super.initState();
-    context.read<DeviceSelectorBloc>().add(StartScanning());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Start scanning when the widget is first built
+      context.read<DeviceSelectorBloc>().add(StartScanning());
+    });
+  }
+
+  @override
+  void dispose() {
+    context.read<DeviceSelectorBloc>().add(StopScanning());
+    super.dispose();
   }
 
   @override
@@ -34,9 +43,9 @@ class _DeviceSelectorState extends State<DeviceSelector> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildScanButton(context, state),
-            const SizedBox(height: 16),
             _buildDeviceList(state),
+            const SizedBox(height: 16),
+            _buildScanButton(context, state),
           ],
         );
       },
@@ -52,7 +61,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
         child: CircularProgressIndicator(strokeWidth: 2),
       )
           : const Icon(Icons.bluetooth_searching, size: 20),
-      label: Text(state.isScanning ? 'Scanning...' : 'Scan for Devices'),
+      label: Text(state.isScanning ? 'Scanning...' : 'Rescan for Devices'),
       onPressed: () {
         if (!state.isScanning) {
           context.read<DeviceSelectorBloc>().add(StartScanning());
