@@ -217,7 +217,7 @@ class _SettingsContentState extends State<SettingsContent> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Scent 1 Settings',
+                'Scent Release Settings',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -225,14 +225,14 @@ class _SettingsContentState extends State<SettingsContent> {
               ),
               const SizedBox(height: 16),
               ListTile(
-                title: const Text('Emission Duration'),
+                title: const Text('Release Duration'),
                 subtitle: Text(
                   formatDuration(state.necklace.emission1Duration),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(
                   context,
-                  'Scent 1 Emission Duration',
+                  'Scent Release Duration',
                   state.necklace.emission1Duration,
                   databaseService: widget.databaseService,
                   onDurationSelected: (duration) {
@@ -243,7 +243,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 ),
               ),
               SwitchListTile(
-                title: const Text('Enable Periodic Emission'),
+                title: const Text('Enable Repeated Release'),
                 value: state.necklace.periodicEmissionEnabled,
                 onChanged: (value) {
                   context.read<SettingsBloc>().add(
@@ -259,7 +259,7 @@ class _SettingsContentState extends State<SettingsContent> {
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(
                   context,
-                  'Scent 1 Release Interval',
+                  'Scent Release Interval',
                   state.necklace.releaseInterval1,
                   databaseService: widget.databaseService,
                   onDurationSelected: (duration) {
