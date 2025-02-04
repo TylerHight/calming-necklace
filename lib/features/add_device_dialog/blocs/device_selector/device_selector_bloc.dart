@@ -6,6 +6,7 @@ import '../../../../core/data/repositories/ble_repository.dart';
 import '../../../../core/services/logging_service.dart';
 import 'device_selector_event.dart';
 import 'device_selector_state.dart';
+import 'package:equatable/equatable.dart';
 
 class DeviceSelectorBloc extends Bloc<DeviceSelectorEvent, DeviceSelectorState> {
   final BleRepository _bleRepository;

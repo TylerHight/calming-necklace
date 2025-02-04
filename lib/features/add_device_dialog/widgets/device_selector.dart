@@ -1,112 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/data/models/ble_device.dart';
-import '../../../core/ui/components/signal_strength_icon.dart';
+import 'package:calming_necklace/core/data/models/ble_device.dart';
+import 'package:calming_necklace/core/ui/components/signal_strength_icon.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/device_selector/device_selector_event.dart';
 import '../blocs/device_selector/device_selector_state.dart';
 
-class DeviceSelector extends StatelessWidget {
+class DeviceSelector extends StatefulWidget {
   final BleDeviceType deviceType;
-  final Function(BleDevice?) onDeviceSelected;
+  final Function(BleDevice) onDeviceSelected;
 
   const DeviceSelector({
-    Key? key,
+    super.key,
     required this.deviceType,
     required this.onDeviceSelected,
-  }) : super(key: key);
+  });
+
+  @override
+  State<DeviceSelector> createState() => _DeviceSelectorState();
+}
+
+class _DeviceSelectorState extends State<DeviceSelector> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<DeviceSelectorBloc>().add(StartScanning());
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
       builder: (context, state) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Select Device (Optional)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                if (state.isScanning)
-                  const SizedBox(
-                    width: 16,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                else
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    onPressed: () {
-                      context.read<DeviceSelectorBloc>().add(StartScanning());
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            _buildDeviceList(context, state),
-            if (state.error != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(
-                  state.error!,
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
+            _buildScanButton(context, state),
+            const SizedBox(height: 16),
+            _buildDeviceList(state),
           ],
         );
       },
     );
   }
 
-  Widget _buildDeviceList(BuildContext context, DeviceSelectorState state) {
-    return DropdownButtonFormField<BleDevice>(
-      value: state.selectedDevice,
-      isExpanded: true,
-      icon: const Icon(Icons.arrow_drop_down),
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
+  Widget _buildScanButton(BuildContext context, DeviceSelectorState state) {
+    return ElevatedButton.icon(
+      icon: state.isScanning
+          ? const SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(strokeWidth: 2),
+      )
+          : const Icon(Icons.bluetooth_searching, size: 20),
+      label: Text(state.isScanning ? 'Scanning...' : 'Scan for Devices'),
+      onPressed: () {
+        if (!state.isScanning) {
+          context.read<DeviceSelectorBloc>().add(StartScanning());
+        }
+      },
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+      ),
+    );
+  }
+
+  Widget _buildDeviceList(DeviceSelectorState state) {
+    if (state.devices.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
           borderRadius: BorderRadius.circular(12),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+        child: Text(
+          state.isScanning ? 'Searching for devices...' : 'No devices found',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Colors.grey[600],
+          ),
         ),
-        filled: true,
-        fillColor: Colors.grey[50],
+      );
+    }
+
+    return Container(
+      constraints: const BoxConstraints(maxHeight: 200),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(12),
       ),
-      hint: Text(
-        state.isScanning 
-          ? 'Scanning for devices...' 
-          : state.devices.isEmpty 
-            ? 'No devices found - tap refresh to scan' 
-            : 'Select a device (optional)'),
-      items: [
-        ...state.devices.map((device) {
-          return DropdownMenuItem<BleDevice>(
-            value: device,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: state.devices.length,
+        itemBuilder: (context, index) {
+          final device = state.devices[index];
+          return ListTile(
+            title: Text(device.name),
+            subtitle: Text(device.address),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 SignalStrengthIcon(rssi: device.rssi),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(device.name),
-                ),
+                if (state.selectedDevice?.id == device.id)
+                  const Icon(Icons.check_circle, color: Colors.blue),
               ],
             ),
+            onTap: () {
+              widget.onDeviceSelected(device);
+              context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+            },
           );
-        }).toList(),
-      ],
-      onChanged: (BleDevice? device) {
-        onDeviceSelected(device);
-      },
+        },
+      ),
     );
   }
 }

@@ -1,5 +1,5 @@
+import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:equatable/equatable.dart';
-import '../../../../core/data/models/ble_device.dart';
 
 abstract class DeviceSelectorEvent extends Equatable {
   const DeviceSelectorEvent();
@@ -22,7 +22,7 @@ class DevicesUpdated extends DeviceSelectorEvent {
 }
 
 class SelectDevice extends DeviceSelectorEvent {
-  final BleDevice? device;
+  final BleDevice device;
 
   const SelectDevice(this.device);
 

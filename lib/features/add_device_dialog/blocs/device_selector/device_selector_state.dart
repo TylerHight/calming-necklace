@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../../../core/data/models/ble_device.dart';
+import 'package:calming_necklace/core/data/models/ble_device.dart';
 
 class DeviceSelectorState extends Equatable {
   final List<BleDevice> devices;
@@ -9,8 +9,8 @@ class DeviceSelectorState extends Equatable {
 
   const DeviceSelectorState({
     this.devices = const [],
-    this.selectedDevice,
     this.isScanning = false,
+    this.selectedDevice,
     this.error,
   });
 
@@ -24,7 +24,7 @@ class DeviceSelectorState extends Equatable {
       devices: devices ?? this.devices,
       selectedDevice: selectedDevice ?? this.selectedDevice,
       isScanning: isScanning ?? this.isScanning,
-      error: error,
+      error: error ?? this.error,
     );
   }
 

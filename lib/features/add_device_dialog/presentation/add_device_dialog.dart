@@ -1,37 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
+import '../../../core/data/repositories/necklace_repository.dart';
 import '../blocs/add_device_dialog/add_device_dialog_state.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../blocs/device_selector/device_selector_event.dart';
 import '../widgets/device_selector.dart';
-
-// Dummy devices for testing
-final List<BleDevice> dummyDevices = [
-  BleDevice(
-    id: '1',
-    name: 'Necklace Device 1',
-    address: '00:11:22:33:44:55',
-    rssi: -65,
-    deviceType: BleDeviceType.necklace,
-  ),
-  BleDevice(
-    id: '2',
-    name: 'Necklace Device 2',
-    address: '66:77:88:99:AA:BB',
-    rssi: -50,
-    deviceType: BleDeviceType.necklace,
-  ),
-  BleDevice(
-    id: '3',
-    name: 'Heart Rate Monitor',
-    address: 'CC:DD:EE:FF:00:11',
-    rssi: -58,
-    deviceType: BleDeviceType.heartRateMonitor,
-  ),
-];
 
 class AddDeviceDialog extends StatefulWidget {
   const AddDeviceDialog({super.key});
@@ -41,6 +18,7 @@ class AddDeviceDialog extends StatefulWidget {
 }
 
 class _AddDeviceDialogState extends State<AddDeviceDialog> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   BleDevice? _selectedDevice;
 
@@ -48,6 +26,9 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(
+          create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>(), context.read<NecklacesBloc>()),
+        ),
         BlocProvider(
           create: (context) => DeviceSelectorBloc(bleRepository: BleRepository()),
         ),
@@ -65,6 +46,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+          insetPadding: const EdgeInsets.all(20),
           child: Container(
             constraints: const BoxConstraints(
               maxWidth: 400,
@@ -113,14 +95,20 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
   }
 
   Widget _buildNameField() {
-    return TextField(
-      controller: _nameController,
-      decoration: InputDecoration(
-        labelText: 'Necklace Name',
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+    return Form(
+      key: _formKey,
+      child: TextFormField(
+        controller: _nameController,
+        decoration: InputDecoration(
+          labelText: 'Necklace Name',
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          prefixIcon: const Icon(Icons.spa),
         ),
-        prefixIcon: const Icon(Icons.spa),
+        validator: (value) {
+          return value?.isEmpty ?? true ? 'Please enter a name' : null;
+        },
       ),
     );
   }
@@ -129,7 +117,8 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     return DeviceSelector(
       deviceType: BleDeviceType.necklace,
       onDeviceSelected: (device) {
-        context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+        setState(() => _selectedDevice = device);
+        context.read<DeviceSelectorBloc>().add(SelectDevice(device!));
       },
     );
   }
@@ -145,22 +134,19 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
         BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
           builder: (context, state) {
             return TextButton(
-              onPressed: state is AddDeviceDialogLoading
-                  ? null
-                  : () {
-                      final name = _nameController.text;
-                      if (name.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please enter a name for the device'),
-                          ),
-                        );
-                        return;
-                      }
-                      context.read<AddDeviceDialogBloc>().add(
-                            SubmitAddDeviceEvent(name, _selectedDevice),
-                          );
-                    },
+              onPressed: state is AddDeviceDialogLoading ? null : () {
+                if (_formKey.currentState?.validate() ?? false) {
+                  if (_selectedDevice == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a device')),
+                    );
+                    return;
+                  }
+                  context.read<AddDeviceDialogBloc>().add(
+                        SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
+                      );
+                }
+              },
               child: const Text('Add'),
             );
           },
