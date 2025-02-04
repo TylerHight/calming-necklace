@@ -50,6 +50,19 @@ class UIConstants {
   static const double connectionStatusDotSpacing = 6.0;
   static const double connectionStatusSpacing = 8.0;
 
+  // Periodic Emission Timer
+  static const double periodicTimerSize = 120.0;
+  static const double periodicTimerPadding = 16.0;
+  static const double periodicTimerStrokeWidth = 8.0;
+  static const double periodicTimerTimeTextSize = 24.0;
+  static const double periodicTimerStatusTextSize = 12.0;
+  static const double periodicTimerSpacing = 4.0;
+  static const Color periodicTimerActiveColor = Colors.blue;
+  static const Color periodicTimerPausedColor = Colors.orange;
+  static const Color periodicTimerBackgroundColor = Color(0x332196F3);
+  static const FontWeight periodicTimerTimeFontWeight = FontWeight.bold;
+  static const Color periodicTimerStatusColor = Color(0xFF757575);
+
   // Timed Toggle Button
   static const double timedToggleButtonWidth = 160.0;  // Width of buttons
   static const double timedToggleButtonHeight = 55.0;

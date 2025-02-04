@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../blocs/periodic_emission/periodic_emission_bloc.dart';
+import '../../../../../core/ui/ui_constants.dart';
 import '../../../../../core/ui/formatters.dart';
 
 class PeriodicEmissionTimer extends StatelessWidget {
@@ -13,20 +14,20 @@ class PeriodicEmissionTimer extends StatelessWidget {
         if (state is PeriodicEmissionRunning) {
           final progress = 1 - (state.intervalSecondsLeft / state.totalInterval);
           return Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(UIConstants.periodicTimerPadding),
             child: Stack(
               alignment: Alignment.center,
               children: <Widget>[
                 SizedBox(
-                  width: 120,
-                  height: 120,
+                  width: UIConstants.periodicTimerSize,
+                  height: UIConstants.periodicTimerSize,
                   child: CircularProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.blue.withOpacity(0.2),
+                    backgroundColor: UIConstants.periodicTimerBackgroundColor,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      state.isPaused ? Colors.orange : Colors.blue,
+                      state.isPaused ? UIConstants.periodicTimerPausedColor : UIConstants.periodicTimerActiveColor,
                     ),
-                    strokeWidth: 8,
+                    strokeWidth: UIConstants.periodicTimerStrokeWidth,
                   ),
                 ),
                 Column(
@@ -35,17 +36,17 @@ class PeriodicEmissionTimer extends StatelessWidget {
                     Text(
                       formatDuration(Duration(seconds: state.intervalSecondsLeft)),
                       style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: state.isPaused ? Colors.orange : Colors.blue,
+                        fontSize: UIConstants.periodicTimerTimeTextSize,
+                        fontWeight: UIConstants.periodicTimerTimeFontWeight,
+                        color: state.isPaused ? UIConstants.periodicTimerPausedColor : UIConstants.periodicTimerActiveColor,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: UIConstants.periodicTimerSpacing),
                     Text(
                       state.isPaused ? 'Paused' : 'Until Next',
                       style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
+                        fontSize: UIConstants.periodicTimerStatusTextSize,
+                        color: UIConstants.periodicTimerStatusColor,
                       ),
                     ),
                   ],
