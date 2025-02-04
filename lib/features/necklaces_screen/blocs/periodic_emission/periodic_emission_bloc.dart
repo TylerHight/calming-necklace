@@ -4,6 +4,7 @@ import 'dart:async';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
+import '../timed_toggle_button/timed_toggle_button_bloc.dart';
 
 part 'periodic_emission_event.dart';
 part 'periodic_emission_state.dart';
@@ -13,6 +14,7 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
   Timer? _timer;
   final Necklace necklace;
   final NecklaceRepository repository;
+  late final StreamSubscription<bool> _emissionSubscription;
 
   PeriodicEmissionBloc({required this.necklace, required this.repository}) 
       : super(PeriodicEmissionInitial()) {
@@ -22,6 +24,8 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     on<UpdateInterval>(_onUpdateInterval);
     on<TimerTick>(_onTimerTick);
     on<EmissionComplete>(_onEmissionComplete);
+    
+    _emissionSubscription = repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
   }
 
   void _onStartPeriodicEmission(
@@ -115,9 +119,20 @@ class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionS
     }
   }
 
+  void _handleEmissionTrigger(bool isTriggered) {
+    if (isTriggered) {
+      _timer?.cancel();
+    } else {
+      if (necklace.periodicEmissionEnabled) {
+        _startTimer();
+      }
+    }
+  }
+
   @override
   Future<void> close() {
     _timer?.cancel();
+    _emissionSubscription.cancel();
     return super.close();
   }
 }

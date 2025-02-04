@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:calming_necklace/core/services/logging_service.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
+import 'package:stream_transform/stream_transform.dart';
 import 'ticker.dart';
 import '../periodic_emission/periodic_emission_bloc.dart';
 
@@ -17,20 +18,23 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
-  bool _isPeriodicEmission = false; // Define the variable here
+  bool _isPeriodicEmission = false;
+  late final StreamSubscription<bool> _emissionSubscription;
   final LoggingService _logger = LoggingService();
 
   TimedToggleButtonBloc({
     required NecklaceRepository repository,
     required this.necklace,
   }) : _repository = repository,
-        _ticker = const Ticker(),
-        super(TimedToggleButtonInitial()) {
+       _ticker = const Ticker(),
+       super(TimedToggleButtonInitial()) {
     on<StartPeriodicEmission>(_onStartPeriodicEmission);
     on<StopPeriodicEmission>(_onStopPeriodicEmission);
     on<ToggleLightEvent>(_onToggleLight);
     on<_TimerTicked>(_onTimerTicked);
     on<_PeriodicEmissionTriggered>(_onPeriodicEmissionTriggered);
+
+    _emissionSubscription = _repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
   }
 
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
@@ -124,9 +128,16 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _isPeriodicEmission = false;
   }
 
+  void _handleEmissionTrigger(bool isTriggered) {
+    if (isTriggered) {
+      add(const _PeriodicEmissionTriggered());
+    }
+  }
+
   @override
   Future<void> close() {
     _tickerSubscription?.cancel();
+    _emissionSubscription.cancel();
     return super.close();
   }
 }

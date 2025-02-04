@@ -13,13 +13,23 @@ abstract class NecklaceRepository {
   Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
   Future<void> addNecklace(String name, String bleDevice);
+  Stream<bool> getEmissionStream(String necklaceId);
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
   final LoggingService _logger = LoggingService();
   final List<Necklace> _necklaces = [];
   final DatabaseService _dbService = DatabaseService();
-  Timer? _periodicEmissionTimer;
+  final Map<String, Timer> _periodicEmissionTimers = {};
+  final Map<String, bool> _emissionStates = {};
+  final Map<String, StreamController<bool>> _emissionControllers = {};
+
+  StreamController<bool> _getOrCreateController(String necklaceId) {
+    return _emissionControllers.putIfAbsent(
+      necklaceId,
+      () => StreamController<bool>.broadcast(),
+    );
+  }
 
   @override
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
@@ -100,17 +110,28 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
     }
   }
 
-  Future<void> triggerEmission(String necklaceId) async {
-    _logger.logDebug('Triggering emission for necklace: $necklaceId');
-    // Implementation for triggering emission
+  Stream<bool> getEmissionStream(String necklaceId) {
+    return _getOrCreateController(necklaceId).stream;
   }
 
+  @override
+  Future<void> triggerEmission(String necklaceId) async {
+    _logger.logDebug('Triggering emission for necklace: $necklaceId');
+    _emissionStates[necklaceId] = true;
+    _getOrCreateController(necklaceId).add(true);
+  }
+
+  @override
   Future<void> completeEmission(String necklaceId) async {
     _logger.logDebug('Completing emission for necklace: $necklaceId');
-    // Implementation for completing emission
+    _emissionStates[necklaceId] = false;
+    _getOrCreateController(necklaceId).add(false);
   }
 
   void dispose() {
-    _periodicEmissionTimer?.cancel();
+    for (var controller in _emissionControllers.values) {
+      controller.close();
+    }
+    _emissionControllers.clear();
   }
 }
