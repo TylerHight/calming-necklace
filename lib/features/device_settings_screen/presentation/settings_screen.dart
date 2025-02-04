@@ -75,15 +75,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: () async {
-                // Save settings implementation
-                Navigator.pop(context);
-              },
-            ),
-          ],
         ),
         body: SettingsContent(
           databaseService: widget.databaseService,
@@ -158,6 +149,35 @@ class _SettingsContentState extends State<SettingsContent> {
             const SizedBox(height: 16),
             _buildNameField(context, state),
             const SizedBox(height: 8),
+            if (state.necklace.bleDevice != null) ...[
+              Row(
+                children: [
+                  Text(
+                    'Connected Device:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    state.necklace.bleDevice!.toString(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              Text(
+                'No device connected',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
           ],
         ),
       ),
