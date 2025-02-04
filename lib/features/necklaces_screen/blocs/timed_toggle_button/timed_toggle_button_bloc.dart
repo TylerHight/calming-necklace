@@ -17,32 +17,20 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
+  bool _isPeriodicEmission = false; // Define the variable here
   final LoggingService _logger = LoggingService();
-  bool _isPeriodicEmission = false;
-  StreamSubscription? _periodicEmissionSubscription;
 
   TimedToggleButtonBloc({
     required NecklaceRepository repository,
     required this.necklace,
   }) : _repository = repository,
-       _ticker = const Ticker(),
-       super(TimedToggleButtonInitial()) {
+        _ticker = const Ticker(),
+        super(TimedToggleButtonInitial()) {
+    on<StartPeriodicEmission>(_onStartPeriodicEmission);
+    on<StopPeriodicEmission>(_onStopPeriodicEmission);
     on<ToggleLightEvent>(_onToggleLight);
     on<_TimerTicked>(_onTimerTicked);
     on<_PeriodicEmissionTriggered>(_onPeriodicEmissionTriggered);
-    
-    // Listen to periodic emission state changes
-    if (necklace.periodicEmissionEnabled) {
-      _periodicEmissionSubscription = _repository
-          .periodicEmissionStream
-          .listen((triggered) {
-        _logger.logDebug('Received periodic emission trigger: $triggered');
-        if (triggered) {
-          add(_PeriodicEmissionTriggered());
-        }
-      });
-    }
-    _logger.logInfo('TimedToggleButtonBloc initialized');
   }
 
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
@@ -81,7 +69,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     if (event.duration > 0) {
       emit(LightOnState(event.duration));
     } else {
-      _repository.emissionComplete();
+      _repository.completeEmission(necklace.id);
       emit(LightOffState());
     }
   }
@@ -117,10 +105,28 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _logger.logInfo('Timer stopped and light turned off');
   }
 
+  Future<void> _onStartPeriodicEmission(
+    StartPeriodicEmission event,
+    Emitter<TimedToggleButtonState> emit,
+  ) async {
+    try {
+      _isPeriodicEmission = true;
+      await _repository.toggleLight(necklace, true);
+      _startTimer(event.duration);
+      emit(LightOnState(event.duration));
+    } catch (e) {
+      emit(TimedToggleButtonError(e.toString()));
+    }
+  }
+
+  void _onStopPeriodicEmission(StopPeriodicEmission event, Emitter<TimedToggleButtonState> emit) {
+    _stopTimer(emit);
+    _isPeriodicEmission = false;
+  }
+
   @override
   Future<void> close() {
     _tickerSubscription?.cancel();
-    _periodicEmissionSubscription?.cancel();
     return super.close();
   }
 }

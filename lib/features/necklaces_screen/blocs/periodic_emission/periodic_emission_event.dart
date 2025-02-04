@@ -31,3 +31,7 @@ class TimerTick extends PeriodicEmissionEvent {
 class InitializePeriodicEmission extends PeriodicEmissionEvent {
   const InitializePeriodicEmission();
 }
+
+class EmissionComplete extends PeriodicEmissionEvent {
+  const EmissionComplete();
+}

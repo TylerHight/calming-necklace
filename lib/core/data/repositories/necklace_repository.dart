@@ -7,9 +7,8 @@ abstract class NecklaceRepository {
   Future<void> toggleLight(Necklace necklace, bool isOn);
   Future<void> setAutoTurnOff(Necklace necklace, Duration duration);
   Future<void> setPeriodicEmission(Necklace necklace, Duration interval);
-  Stream<bool> get periodicEmissionStream;
-  void emissionComplete();
-  void triggerPeriodicEmission();
+  Future<void> triggerEmission(String necklaceId);
+  Future<void> completeEmission(String necklaceId);
   Future<List<Necklace>> getNecklaces();
   Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
@@ -20,7 +19,6 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   final LoggingService _logger = LoggingService();
   final List<Necklace> _necklaces = [];
   final DatabaseService _dbService = DatabaseService();
-  final _periodicEmissionController = StreamController<bool>.broadcast();
   Timer? _periodicEmissionTimer;
 
   @override
@@ -102,23 +100,17 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
     }
   }
 
-  @override
-  Stream<bool> get periodicEmissionStream => _periodicEmissionController.stream;
-
-  @override
-  void triggerPeriodicEmission() {
-    _logger.logDebug('Triggering periodic emission');
-    _periodicEmissionController.add(true);
+  Future<void> triggerEmission(String necklaceId) async {
+    _logger.logDebug('Triggering emission for necklace: $necklaceId');
+    // Implementation for triggering emission
   }
 
-  @override
-  void emissionComplete() {
-    _logger.logDebug('Emission complete');
-    _periodicEmissionController.add(false);
+  Future<void> completeEmission(String necklaceId) async {
+    _logger.logDebug('Completing emission for necklace: $necklaceId');
+    // Implementation for completing emission
   }
 
   void dispose() {
-    _periodicEmissionController.close();
     _periodicEmissionTimer?.cancel();
   }
 }

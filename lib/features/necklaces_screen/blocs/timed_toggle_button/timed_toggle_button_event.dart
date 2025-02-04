@@ -11,6 +11,18 @@ abstract class TimedToggleButtonEvent extends Equatable {
 
 class ToggleLightEvent extends TimedToggleButtonEvent {}
 
+class StartPeriodicEmission extends TimedToggleButtonEvent {
+  final int duration;
+  const StartPeriodicEmission({required this.duration});
+  
+  @override
+  List<Object> get props => [duration];
+}
+
+class StopPeriodicEmission extends TimedToggleButtonEvent {
+  const StopPeriodicEmission();
+}
+
 class _TimerTicked extends TimedToggleButtonEvent {
   final int duration;
   final bool isPeriodicEmission;
