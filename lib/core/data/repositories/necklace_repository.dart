@@ -17,12 +17,16 @@ abstract class NecklaceRepository {
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger;
+  final DatabaseService _dbService;
   final List<Necklace> _necklaces = [];
-  final DatabaseService _dbService = DatabaseService();
   final Map<String, Timer> _periodicEmissionTimers = {};
   final Map<String, bool> _emissionStates = {};
   final Map<String, StreamController<bool>> _emissionControllers = {};
+
+  NecklaceRepositoryImpl({required DatabaseService databaseService})
+      : _logger = LoggingService(),
+        _dbService = databaseService;
 
   StreamController<bool> _getOrCreateController(String necklaceId) {
     return _emissionControllers.putIfAbsent(

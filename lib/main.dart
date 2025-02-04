@@ -25,12 +25,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<NecklaceRepository>(
-          create: (context) => NecklaceRepositoryImpl(),
-          lazy: true,
-        ),
         Provider<DatabaseService>(
           create: (context) => DatabaseService(),
+          lazy: true,
+        ),
+        Provider<NecklaceRepository>(
+          create: (context) => NecklaceRepositoryImpl(
+            databaseService: context.read<DatabaseService>(),
+          ),
           lazy: true,
         ),
       ],
