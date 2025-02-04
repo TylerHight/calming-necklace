@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/necklace.dart';
+import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
 import '../../../core/services/database_service.dart';
 import '../../add_device_dialog/blocs/add_device_dialog/add_device_dialog_bloc.dart';
+import '../../add_device_dialog/blocs/device_selector/device_selector_bloc.dart';
 import '../widgets/necklace_panel/necklace_panel.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../add_device_dialog/presentation/add_device_dialog.dart';
@@ -41,11 +43,20 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
   Future<void> _showAddNecklaceDialog() async {
     await showDialog(
       context: context,
-      builder: (context) => BlocProvider(
-        create: (context) => AddDeviceDialogBloc(
-          _repository,
-          context.read<NecklacesBloc>(),
-        ),
+      builder: (context) => MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AddDeviceDialogBloc(
+              _repository,
+              context.read<NecklacesBloc>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => DeviceSelectorBloc(
+              bleRepository: context.read<BleRepository>(),
+            ),
+          ),
+        ],
         child: AddDeviceDialog(),
       ),
     );

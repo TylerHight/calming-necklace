@@ -29,9 +29,6 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
         BlocProvider(
           create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>(), context.read<NecklacesBloc>()),
         ),
-        BlocProvider(
-          create: (context) => DeviceSelectorBloc(bleRepository: BleRepository()),
-        ),
       ],
       child: BlocListener<AddDeviceDialogBloc, AddDeviceDialogState>(
         listener: (context, state) {

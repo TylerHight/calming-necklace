@@ -38,12 +38,13 @@ class _DeviceSelectorState extends State<DeviceSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
       builder: (context, state) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildDeviceList(state),
+            _buildDeviceList(state, theme),
             const SizedBox(height: 16),
             _buildScanButton(context, state),
           ],
@@ -73,7 +74,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     );
   }
 
-  Widget _buildDeviceList(DeviceSelectorState state) {
+  Widget _buildDeviceList(DeviceSelectorState state, ThemeData theme) {
     if (state.devices.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -83,7 +84,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
         ),
         child: Text(
           state.isScanning ? 'Searching for devices...' : 'No devices found',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          style: theme.textTheme.bodyMedium?.copyWith(
             color: Colors.grey[600],
           ),
         ),
@@ -103,19 +104,35 @@ class _DeviceSelectorState extends State<DeviceSelector> {
           final device = state.devices[index];
           return ListTile(
             title: Text(device.name),
-            subtitle: Text(device.address),
+            subtitle: Row(
+              children: [
+                Text(device.address),
+                const SizedBox(width: 8),
+                Text(
+                  '${device.rssi} dBm',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SignalStrengthIcon(rssi: device.rssi),
                 const SizedBox(width: 8),
                 if (state.selectedDevice?.id == device.id)
-                  const Icon(Icons.check_circle, color: Colors.blue),
+                  Icon(Icons.check_circle, color: theme.colorScheme.primary),
               ],
             ),
+            selected: state.selectedDevice?.id == device.id,
+            selectedTileColor: theme.colorScheme.primary.withOpacity(0.1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             onTap: () {
-              widget.onDeviceSelected(device);
-              context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+              if (state.selectedDevice?.id != device.id) {
+                context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+                widget.onDeviceSelected(device);
+              }
             },
           );
         },

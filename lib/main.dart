@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'core/data/models/necklace.dart';
+import 'core/data/repositories/ble_repository.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'core/services/database_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
@@ -33,7 +34,10 @@ class MyApp extends StatelessWidget {
           create: (context) => NecklaceRepositoryImpl(
             databaseService: context.read<DatabaseService>(),
           ),
-          lazy: true,
+        ),
+        Provider<BleRepository>(
+          create: (context) => BleRepository(),
+          lazy: false,
         ),
       ],
       child: MultiBlocProvider(
