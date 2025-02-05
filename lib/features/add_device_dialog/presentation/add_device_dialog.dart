@@ -9,6 +9,7 @@ import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../blocs/device_selector/device_selector_event.dart';
 import '../widgets/device_selector.dart';
+import '../widgets/device_selector_dialog.dart';
 
 class AddDeviceDialog extends StatefulWidget {
   const AddDeviceDialog({super.key});
@@ -28,6 +29,11 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
       providers: [
         BlocProvider(
           create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>(), context.read<NecklacesBloc>()),
+        ),
+        BlocProvider(
+          create: (context) => DeviceSelectorBloc(
+            bleRepository: context.read<BleRepository>(),
+          ),
         ),
       ],
       child: BlocListener<AddDeviceDialogBloc, AddDeviceDialogState>(
@@ -111,13 +117,32 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
   }
 
   Widget _buildDeviceSelector(BuildContext context) {
-    return DeviceSelector(
-      deviceType: BleDeviceType.necklace,
-      onDeviceSelected: (device) {
-        setState(() => _selectedDevice = device);
-        context.read<DeviceSelectorBloc>().add(SelectDevice(device!));
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Selected Device: ${_selectedDevice?.name ?? 'None'}',
+          style: TextStyle(color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 8),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.bluetooth_searching),
+          label: const Text('Select Device'),
+          onPressed: () => _showDeviceSelectorDialog(context),
+        ),
+      ],
     );
+  }
+
+  Future<void> _showDeviceSelectorDialog(BuildContext context) async {
+    final device = await showDialog<BleDevice>(
+      context: context,
+      builder: (context) => const DeviceSelectorDialog(),
+    );
+    if (device != null) {
+      setState(() => _selectedDevice = device);
+      context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+    }
   }
 
   Widget _buildButtons(BuildContext context) {
@@ -140,8 +165,8 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
                     return;
                   }
                   context.read<AddDeviceDialogBloc>().add(
-                        SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
-                      );
+                    SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
+                  );
                 }
               },
               child: const Text('Add'),

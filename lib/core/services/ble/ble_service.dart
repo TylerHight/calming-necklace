@@ -15,6 +15,7 @@ class BleService {
   final _bleUtils = BleUtils();
   final _deviceStateController = StreamController<String>.broadcast();
   final _connectionStatusController = StreamController<bool>.broadcast();
+  final _rssiController = StreamController<int>.broadcast();
   final _reconnectionAttemptsController = StreamController<int>.broadcast();
   late final BleConnectionManager _connectionManager;
   final _loggingService = LoggingService();
@@ -22,9 +23,11 @@ class BleService {
   BluetoothDevice? _connectedDevice;
   BluetoothCharacteristic? _switchCharacteristic;
   bool _isInitialized = false;
+  Timer? _rssiTimer;
 
   Stream<String> get deviceStateStream => _deviceStateController.stream;
   Stream<bool> get connectionStatusStream => _connectionStatusController.stream;
+  Stream<int> get rssiStream => _rssiController.stream;
   Stream<int> get reconnectionAttemptsStream => _reconnectionAttemptsController.stream;
   BluetoothDevice? get connectedDevice => _connectedDevice;
 
@@ -48,11 +51,13 @@ class BleService {
     switch (state) {
       case BleConnectionState.connected:
         _deviceStateController.add('Connected');
+        _startRssiUpdates();
         break;
       case BleConnectionState.disconnected:
         _connectedDevice = null;
         _switchCharacteristic = null;
         _deviceStateController.add('Disconnected');
+        _stopRssiUpdates();
         break;
       case BleConnectionState.connecting:
         _deviceStateController.add('Connecting...');
@@ -83,13 +88,13 @@ class BleService {
       if (connected) {
         _loggingService.logBleInfo('Successfully connected to ${device.platformName}');
         _connectedDevice = device;
-        
+
         // Wait for characteristics initialization
         await _initializeCharacteristics(device, forceRediscovery: true);
-        
+
         // Only maintain connection after successful initialization
         await _connectionManager.maintainConnection(device);
-        
+
         // Signal that device is ready for commands
         _deviceStateController.add('Ready for commands');
       } else {
@@ -103,6 +108,24 @@ class BleService {
     }
   }
 
+  void _startRssiUpdates() {
+    _rssiTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      if (_connectedDevice != null) {
+        try {
+          final rssi = await _connectedDevice!.readRssi();
+          _rssiController.add(rssi);
+        } catch (e) {
+          _loggingService.logBleError('Failed to read RSSI', e);
+        }
+      }
+    });
+  }
+
+  void _stopRssiUpdates() {
+    _rssiTimer?.cancel();
+    _rssiTimer = null;
+  }
+
   Future<void> disconnectFromDevice() async {
     if (_connectedDevice != null) {
       try {
@@ -110,6 +133,7 @@ class BleService {
         _connectedDevice = null;
         _switchCharacteristic = null;
         _isInitialized = false; // Ensure characteristics can be re-initialized
+        _stopRssiUpdates();
       } catch (e) {
         _loggingService.logBleError('Disconnect error', e);
         _deviceStateController.add('Disconnect error: $e');
@@ -254,36 +278,38 @@ class BleService {
   }
 
   /** TODO: Adapt this method to work with this app
-  Future<void> connectToDeviceWithFeedback(BuildContext context, Necklace necklace, {VoidCallback? onConnected}) async {
-    if (necklace.bleDevice == null) {
+      Future<void> connectToDeviceWithFeedback(BuildContext context, Necklace necklace, {VoidCallback? onConnected}) async {
+      if (necklace.bleDevice == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No Bluetooth device available')),
+      const SnackBar(content: Text('No Bluetooth device available')),
       );
       return;
-    }
+      }
 
-    try {
+      try {
       await connectToDevice(necklace.bleDevice!);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Connected successfully')),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Connected successfully')),
+      );
       }
       onConnected?.call();
-    } catch (e) {
+      } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Connection failed: $e')),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Connection failed: $e')),
+      );
       }
-    }
-  }
+      }
+      }
    **/
 
   void dispose() {
     _connectionManager.dispose();
     _deviceStateController.close();
     _connectionStatusController.close();
+    _rssiController.close();
     _reconnectionAttemptsController.close();
+    _stopRssiUpdates();
   }
 }

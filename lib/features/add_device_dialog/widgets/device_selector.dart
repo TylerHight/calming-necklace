@@ -50,53 +50,42 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
       builder: (context, state) {
         return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildDeviceList(state, theme),
-            const SizedBox(height: 16),
-            _buildScanButton(context, state),
+            if (state.devices.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(16),
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (state.isScanning)
+                      const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.isScanning ? 'Searching for devices...' : 'No devices found',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                    if (!state.isScanning)
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Scan for Devices'),
+                        onPressed: () => context.read<DeviceSelectorBloc>().add(StartScanning()),
+                      ),
+                  ],
+                ),
+              ),
           ],
         );
       },
     );
   }
 
-  Widget _buildScanButton(BuildContext context, DeviceSelectorState state) {
-    return ElevatedButton.icon(
-      icon: state.isScanning
-          ? const SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(strokeWidth: 2),
-      )
-          : const Icon(Icons.bluetooth_searching, size: 20),
-      label: Text(state.isScanning ? 'Scanning...' : 'Rescan for Devices'),
-      onPressed: () {
-        if (!state.isScanning) {
-          _deviceSelectorBloc.add(StartScanning());
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-      ),
-    );
-  }
-
   Widget _buildDeviceList(DeviceSelectorState state, ThemeData theme) {
     if (state.devices.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          state.isScanning ? 'Searching for devices...' : 'No devices found',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.grey[600],
-          ),
-        ),
-      );
+      return Container();
     }
 
     return Container(

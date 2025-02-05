@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/ui/ui_constants.dart';
+import '../../../../../core/ui/components/signal_strength_icon.dart';
 
+/// Displays the connection status and signal strength for a necklace device
 class ConnectionStatus extends StatelessWidget {
   final bool isConnected;
+  final int? rssi;
 
   const ConnectionStatus({
     Key? key,
     required this.isConnected,
+    this.rssi,
   }) : super(key: key);
 
   @override
@@ -25,6 +29,8 @@ class ConnectionStatus extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (rssi != null) SignalStrengthIcon(rssi: rssi!),
+          if (rssi != null) const SizedBox(width: 4),
           Container(
             width: UIConstants.connectionStatusDotSize,
             height: UIConstants.connectionStatusDotSize,
@@ -40,6 +46,17 @@ class ConnectionStatus extends StatelessWidget {
               fontSize: UIConstants.connectionStatusTextSize,
               fontWeight: UIConstants.connectionStatusFontWeight,
               color: isConnected ? Colors.green[700] : Colors.red[700],
+            ),
+          ),
+          if (rssi != null) Tooltip(
+            message: 'Signal Strength: ${rssi}dBm',
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Icon(
+                Icons.info_outline,
+                size: 16,
+                color: isConnected ? Colors.green[700] : Colors.red[700],
+              ),
             ),
           ),
         ],

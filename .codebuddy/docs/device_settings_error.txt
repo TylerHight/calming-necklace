@@ -1,0 +1,55 @@
+[ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: Error: Could not find the correct Provider<SettingsBloc> above this SettingsScreen Widget
+E/flutter (11419):
+E/flutter (11419): This happens because you used a `BuildContext` that does not include the provider
+E/flutter (11419): of your choice. There are a few common scenarios:
+E/flutter (11419):
+E/flutter (11419): - You added a new provider in your `main.dart` and performed a hot-reload.
+E/flutter (11419):   To fix, perform a hot-restart.
+E/flutter (11419):
+E/flutter (11419): - The provider you are trying to read is in a different route.
+E/flutter (11419):
+E/flutter (11419):   Providers are "scoped". So if you insert of provider inside a route, then
+E/flutter (11419):   other routes will not be able to access that provider.
+E/flutter (11419):
+E/flutter (11419): - You used a `BuildContext` that is an ancestor of the provider you are trying to read.
+E/flutter (11419):
+E/flutter (11419):   Make sure that SettingsScreen is under your MultiProvider/Provider<SettingsBloc>.
+E/flutter (11419):   This usually happens when you are creating a provider and trying to read it immediately.
+E/flutter (11419):
+E/flutter (11419):   For example, instead of:
+E/flutter (11419):
+E/flutter (11419):   ```
+E/flutter (11419):   Widget build(BuildContext context) {
+E/flutter (11419):     return Provider<Example>(
+E/flutter (11419):       create: (_) => Example(),
+E/flutter (11419):       // Will throw a ProviderNotFoundError, because `context` is associated
+E/flutter (11419):       // to the widget that is the parent of `Provider<Example>`
+E/flutter (11419):       child: Text(context.watch<Example>().toString()),
+E/flutter (11419):     );
+E/flutter (11419):   }
+E/flutter (11419):   ```
+E/flutter (11419):
+E/flutter (11419):   consider using `builder` like so:
+E/flutter (11419):
+E/flutter (11419):   ```
+E/flutter (11419):   Widget build(BuildContext context) {
+E/flutter (11419):     return Provider<Example>(
+E/flutter (11419):       create: (_) => Example(),
+E/flutter (11419):       // we use `builder` to obtain a new `BuildContext` that has access to the provider
+E/flutter (11419):       builder: (context, child) {
+E/flutter (11419):         // No longer throws
+E/flutter (11419):         return Text(context.watch<Example>().toString());
+E/flutter (11419):       }
+E/flutter (11419):     );
+E/flutter (11419):   }
+E/flutter (11419):   ```
+E/flutter (11419):
+E/flutter (11419): If none of these solutions work, consider asking for help on StackOverflow:
+E/flutter (11419): https://stackoverflow.com/questions/tagged/flutter
+E/flutter (11419):
+E/flutter (11419): #0      Provider._inheritedElementOf (package:provider/src/provider.dart:343:7)
+E/flutter (11419): #1      Provider.of (package:provider/src/provider.dart:293:30)
+E/flutter (11419): #2      ReadContext.read (package:provider/src/provider.dart:649:21)
+E/flutter (11419): #3      _SettingsScreenState._loadLatestSettings (package:calming_necklace/features/device_settings_screen/presentation/settings_screen.dart:44:15)
+E/flutter (11419): <asynchronous suspension>
+E/flutter (11419):

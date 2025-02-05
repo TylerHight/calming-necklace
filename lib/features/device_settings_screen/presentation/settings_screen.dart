@@ -18,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
   final NecklaceRepository repository;
   final DatabaseService databaseService;
 
-  SettingsScreen({
+  const SettingsScreen({
     Key? key,
     required this.necklace,
     required this.repository,
@@ -59,11 +59,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
+      lazy: false,
       create: (context) => SettingsBloc(
         widget.necklace,
         widget.repository,
-        widget.databaseService
-      ),
+        widget.databaseService,
+      )..add(RefreshSettings(widget.necklace)),
       child: Scaffold(
         appBar: AppBar(
           title: const Text(

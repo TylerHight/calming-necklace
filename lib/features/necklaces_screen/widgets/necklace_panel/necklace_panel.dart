@@ -19,6 +19,7 @@ class NecklacePanel extends StatefulWidget {
   final String name;
   final bool isConnected;
   final Necklace necklace;
+  final int? rssi;
   final NecklaceRepository repository;
   final DatabaseService databaseService;
 
@@ -27,6 +28,7 @@ class NecklacePanel extends StatefulWidget {
     required this.index,
     required this.name,
     required this.isConnected,
+    this.rssi,
     required this.necklace,
     required this.repository,
     required this.databaseService,
@@ -183,7 +185,10 @@ class _NecklacePanelState extends State<NecklacePanel> {
   Widget _buildConnectionIndicator() {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
-      child: ConnectionStatus(isConnected: widget.isConnected),
+      child: ConnectionStatus(
+        isConnected: widget.isConnected,
+        rssi: widget.rssi,
+      ),
     );
   }
 
