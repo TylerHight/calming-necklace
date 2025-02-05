@@ -13,25 +13,27 @@ import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
 import '../../../../features/notes/widgets/add_note_dialog.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_state.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
   final String name;
-  final bool isConnected;
   final Necklace necklace;
-  final int? rssi;
   final NecklaceRepository repository;
   final DatabaseService databaseService;
+  final bool isConnected;
+  final int rssi;
 
   const NecklacePanel({
     Key? key,
     required this.index,
     required this.name,
-    required this.isConnected,
-    this.rssi,
     required this.necklace,
     required this.repository,
     required this.databaseService,
+    required this.isConnected,
+    required this.rssi,
   }) : super(key: key);
 
   @override
@@ -105,63 +107,72 @@ class _NecklacePanelState extends State<NecklacePanel> {
     logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
     final repository = widget.repository; // TODO: handle with bloc instead of directly accessing repository
 
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (context) => TimedToggleButtonBloc(
-            repository: widget.repository,
-            necklace: widget.necklace,
-          ),
-        ),
-        BlocProvider(
-          create: (context) => PeriodicEmissionBloc(
-            necklace: widget.necklace,
-            repository: widget.repository,
-          )..add(const InitializePeriodicEmission()),
-        ),
-      ],
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-        elevation: 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        color: Colors.white,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.white, Colors.grey.shade200],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: Offset(0, 4),
+    return BlocBuilder<BleBloc, BleState>(
+      builder: (context, bleState) {
+        final isConnected = widget.necklace.bleDevice != null &&
+            (bleState.deviceConnectionStates[widget.necklace.bleDevice] ?? false);
+
+        final rssi = isConnected ? (bleState.rssi ?? 0) : 0;
+
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => TimedToggleButtonBloc(
+                repository: widget.repository,
+                necklace: widget.necklace,
               ),
-            ],
+            ),
+            BlocProvider(
+              create: (context) => PeriodicEmissionBloc(
+                necklace: widget.necklace,
+                repository: widget.repository,
+              )..add(const InitializePeriodicEmission()),
+            ),
+          ],
+          child: Card(
+            margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            color: Colors.white,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white, Colors.grey.shade200],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context, isConnected, rssi),
+                  if (widget.necklace.periodicEmissionEnabled)
+                    const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: PeriodicEmissionTimer()),
+                  const SizedBox(height: 16),
+                  _buildControls(isConnected),
+                ],
+              ),
+            ),
           ),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              if (widget.necklace.periodicEmissionEnabled) 
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: PeriodicEmissionTimer()),
-              const SizedBox(height: 16),
-              _buildControls(),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, bool isConnected, int rssi) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: UIConstants.necklacePanelHeaderHorizontalPadding),
       child: Row(
@@ -176,23 +187,23 @@ class _NecklacePanelState extends State<NecklacePanel> {
               color: Colors.black87,
             ),
           ),
-          _buildConnectionIndicator(),
+          _buildConnectionIndicator(isConnected, rssi),
         ],
       ),
     );
   }
 
-  Widget _buildConnectionIndicator() {
+  Widget _buildConnectionIndicator(bool isConnected, int rssi) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: ConnectionStatus(
-        isConnected: widget.isConnected,
-        rssi: widget.rssi,
+        isConnected: isConnected,
+        rssi: rssi,
       ),
     );
   }
 
-  Widget _buildControls() {
+  Widget _buildControls(bool isConnected) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0), // Add padding around the row
       child: Row(

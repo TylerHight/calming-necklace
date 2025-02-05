@@ -3,36 +3,36 @@ import '../../data/models/ble_device.dart';
 
 class BleState {
   final bool isScanning;
-  final List<BleDevice> devices;
-  final BleDevice? selectedDevice;
-  final int rssi;
+  final String deviceState;
+  final Map<String, bool> deviceConnectionStates;
+  final int? rssi;
 
   BleState({
-    required this.isScanning,
-    required this.devices,
-    this.selectedDevice,
-    required this.rssi,
+    this.isScanning = false,
+    this.deviceState = '',
+    this.deviceConnectionStates = const {},
+    this.rssi,
   });
 
   factory BleState.initial() {
     return BleState(
       isScanning: false,
-      devices: [],
-      selectedDevice: null,
+      deviceState: '',
+      deviceConnectionStates: const {},
       rssi: 0,
     );
   }
 
   BleState copyWith({
     bool? isScanning,
-    List<BleDevice>? devices,
-    BleDevice? selectedDevice,
+    String? deviceState,
+    Map<String, bool>? deviceConnectionStates,
     int? rssi,
   }) {
     return BleState(
       isScanning: isScanning ?? this.isScanning,
-      devices: devices ?? this.devices,
-      selectedDevice: selectedDevice ?? this.selectedDevice,
+      deviceState: deviceState ?? this.deviceState,
+      deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
       rssi: rssi ?? this.rssi,
     );
   }

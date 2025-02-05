@@ -6,6 +6,7 @@ import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'core/data/models/necklace.dart';
 import 'core/data/repositories/ble_repository.dart';
 import 'core/data/repositories/necklace_repository.dart';
+import 'core/services/ble/ble_service.dart';
 import 'core/services/database_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'features/notes/presentation/notes_screen.dart';
@@ -13,6 +14,7 @@ import 'features/notes/bloc/notes_bloc.dart';
 import 'features/device_settings_screen/blocs/duration_picker/duration_picker_bloc.dart';
 import 'app_bloc_observer.dart';
 import 'core/utils/ble/ble_permissions.dart';
+import 'core/blocs/ble/ble_bloc.dart';
 
 void main() {
   Bloc.observer = AppBlocObserver();
@@ -39,6 +41,10 @@ class MyApp extends StatelessWidget {
         Provider<BleRepository>(
           create: (context) => BleRepository(),
           lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => BleBloc(
+            bleService: BleService()),
         ),
       ],
       child: MultiBlocProvider(

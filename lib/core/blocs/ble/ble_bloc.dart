@@ -21,11 +21,18 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   }
 
   void _onDeviceStateChanged(String state) {
-    // Handle device state changes
+    emit(this.state.copyWith(
+      deviceState: state,
+    ));
   }
 
   void _onConnectionStatusChanged(bool isConnected) {
-    // Handle connection status changes
+    if (_bleService.connectedDevice != null) {
+      final deviceId = _bleService.connectedDevice!.id.toString();
+      final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
+      updatedStates[deviceId] = isConnected;
+      emit(state.copyWith(deviceConnectionStates: updatedStates));
+    }
   }
 
   void _onReconnectionAttempt(int attempts) {

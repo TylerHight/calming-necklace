@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/blocs/ble/ble_state.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
@@ -114,9 +115,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
           if (state is NecklacesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NecklacesLoaded) {
-            return state.necklaces.isEmpty
-                ? _buildEmptyState()
-                : _buildNecklaceList(state.necklaces);
+            return _buildNecklaceList(state.necklaces);
           } else if (state is NecklacesError) {
             return Center(child: Text(state.message));
           }
@@ -181,7 +180,8 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             index: index,
             repository: repository,
             name: necklace.name,
-            isConnected: true,
+            isConnected: false,  // Default to false, NecklacePanel will handle actual state
+            rssi: 0,
             necklace: necklace,
             databaseService: _databaseService, // Pass DatabaseService
           ),
