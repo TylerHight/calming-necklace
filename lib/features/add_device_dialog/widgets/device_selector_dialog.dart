@@ -4,6 +4,7 @@ import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/device_selector/device_selector_state.dart';
+import '../../../core/ui/ui_constants.dart';
 import 'device_selector.dart';
 
 class DeviceSelectorDialog extends StatelessWidget {
@@ -52,7 +53,7 @@ class _DialogContent extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(Icons.close, color: UIConstants.deviceSelectorIconColor),
               onPressed: () => Navigator.of(context).pop(),
             ),
           ],

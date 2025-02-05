@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:calming_necklace/core/ui/components/signal_strength_icon.dart';
+import 'package:calming_necklace/core/ui/ui_constants.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/device_selector/device_selector_event.dart';
 import '../blocs/device_selector/device_selector_state.dart';
@@ -70,8 +71,11 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                     ),
                     if (!state.isScanning)
                       ElevatedButton.icon(
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Scan for Devices'),
+                        icon: Icon(Icons.refresh, color: UIConstants.deviceSelectorIconColor),
+                        label: Text(
+                          'Scan for Devices',
+                          style: TextStyle(color: UIConstants.deviceSelectorTextColor),
+                        ),
                         onPressed: () => context.read<DeviceSelectorBloc>().add(StartScanning()),
                       ),
                   ],
@@ -91,7 +95,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     return Container(
       constraints: const BoxConstraints(maxHeight: 200),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: UIConstants.deviceSelectorBorderColor),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListView.builder(
@@ -100,7 +104,10 @@ class _DeviceSelectorState extends State<DeviceSelector> {
         itemBuilder: (context, index) {
           final device = state.devices[index];
           return ListTile(
-            title: Text(device.name),
+            title: Text(
+              device.name,
+              style: TextStyle(color: UIConstants.deviceSelectorTextColor),
+            ),
             subtitle: Expanded(
               child: Row(
                 children: [
@@ -108,6 +115,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                     child: Text(
                       device.address,
                       overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: UIConstants.deviceSelectorTextColor),
                     ),
                   ),
                 ],
@@ -116,7 +124,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SignalStrengthIcon(rssi: device.rssi),
+                SignalStrengthIcon(rssi: device.rssi, color: UIConstants.deviceSelectorIconColor),
                 const SizedBox(width: 8),
                 if (state.selectedDevice?.id == device.id)
                   Icon(Icons.check_circle, color: theme.colorScheme.primary),

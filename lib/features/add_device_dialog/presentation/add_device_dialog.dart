@@ -4,6 +4,7 @@ import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
+import '../../../core/ui/ui_constants.dart';
 import '../blocs/add_device_dialog/add_device_dialog_state.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
@@ -125,20 +126,20 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(color: UIConstants.deviceSelectorBorderColor),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
-                Icon(Icons.bluetooth, color: Colors.grey[600]),
+                Icon(Icons.bluetooth, color: UIConstants.deviceSelectorIconColor),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     _selectedDevice?.name ?? 'Select a device',
-                    style: TextStyle(color: Colors.grey[600]),
+                    style: TextStyle(color: UIConstants.deviceSelectorTextColor),
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[600]),
+                Icon(Icons.arrow_forward_ios, size: 16, color: UIConstants.deviceSelectorIconColor),
               ],
             ),
           ),

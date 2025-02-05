@@ -85,4 +85,9 @@ class UIConstants {
   static const double durationPickerDialogRadius = 20.0;
   static const double durationPickerButtonSpacing = 16.0;
   static const double durationPickerColumnWidth = 80.0;
+
+  // Device Selector
+  static const Color deviceSelectorBorderColor = Color(0xFFB0BEC5); // Darker border color
+  static const Color deviceSelectorTextColor = Color(0xFF455A64); // Darker text color
+  static const Color deviceSelectorIconColor = Color(0xFF455A64); // Darker icon color
 }
