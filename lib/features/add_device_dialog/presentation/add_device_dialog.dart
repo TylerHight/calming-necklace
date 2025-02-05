@@ -134,7 +134,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    _selectedDevice?.name ?? 'Select a device (optional)',
+                    _selectedDevice?.name ?? 'Select a device',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
