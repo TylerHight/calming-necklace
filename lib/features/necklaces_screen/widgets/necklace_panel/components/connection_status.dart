@@ -46,17 +46,6 @@ class ConnectionStatus extends StatelessWidget {
               color: isConnected ? Colors.green[700] : Colors.red[700],
             ),
           ),
-          if (rssi != null) Tooltip(
-            message: 'Signal Strength: ${rssi}dBm',
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Icon(
-                Icons.info_outline,
-                size: 16,
-                color: isConnected ? Colors.green[700] : Colors.red[700],
-              ),
-            ),
-          ),
         ],
       ),
     );
