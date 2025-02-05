@@ -191,9 +191,10 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 borderRadius: BorderRadius.circular(UIConstants.timedToggleButtonBorderRadius),
                 boxShadow: isLightOn ? [
                   BoxShadow(
-                    color: widget.activeColor!.withOpacity(0.4),
-                    blurRadius: UIConstants.timedToggleButtonBoxShadowBlurRadius,
-                    offset: UIConstants.timedToggleButtonBoxShadowOffset,
+                    color: widget.activeColor!.withOpacity(0.3),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                    offset: const Offset(0, 3),
                   ),
                 ] : null,
               ),

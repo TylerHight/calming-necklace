@@ -76,20 +76,33 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
         ),
       ),
       appBar: AppBar(
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Colors.blue.shade300,
+                Colors.blue.shade500,
+              ],
+            ),
+          ),
+        ),
         title: const Text(
           'My Necklaces',
           style: TextStyle(
-            color: Colors.black87,
+            color: Colors.white,
             fontWeight: FontWeight.w500,
             fontSize: 24,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.help_outline),
             tooltip: 'How to use necklaces',
+            color: Colors.white,
             onPressed: () {
               showDialog(
                 context: context,
@@ -105,8 +118,8 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NecklacesLoaded) {
             return state.necklaces.isEmpty
-              ? _buildEmptyState()
-              : _buildNecklaceList(state.necklaces);
+                ? _buildEmptyState()
+                : _buildNecklaceList(state.necklaces);
           } else if (state is NecklacesError) {
             return Center(child: Text(state.message));
           }

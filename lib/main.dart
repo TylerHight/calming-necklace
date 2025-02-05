@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'core/blocs/necklaces/necklaces_bloc.dart';
 import 'core/data/models/necklace.dart';
 import 'core/data/repositories/ble_repository.dart';
@@ -64,10 +65,6 @@ class MyApp extends StatelessWidget {
               seedColor: Colors.blue,
               brightness: Brightness.light,
             ),
-            bottomNavigationBarTheme: BottomNavigationBarThemeData(
-              selectedItemColor: Colors.blue[600],
-              unselectedItemColor: Colors.grey,
-            ),
             useMaterial3: true,
             cardTheme: CardTheme(
               elevation: 4,
@@ -76,10 +73,27 @@ class MyApp extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            scaffoldBackgroundColor: Colors.grey[50],
             appBarTheme: AppBarTheme(
               elevation: 0,
               backgroundColor: Colors.transparent,
+              titleTextStyle: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              iconTheme: IconThemeData(color: Colors.black87),
+              systemOverlayStyle: SystemUiOverlayStyle.dark,
+            ),
+            bottomNavigationBarTheme: BottomNavigationBarThemeData(
+              elevation: 8,
+              backgroundColor: Colors.white,
+              selectedItemColor: Colors.blue[600],
+              unselectedItemColor: Colors.grey[400],
+              selectedIconTheme: IconThemeData(size: 28),
+              unselectedIconTheme: IconThemeData(size: 24),
+              type: BottomNavigationBarType.fixed,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
             ),
           ),
           home: const MainScreen(), // Use MainScreen as the home
@@ -138,22 +152,41 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.spa),
-            label: 'Necklaces',
+      bottomNavigationBar: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(25),
+          child: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.spa),
+                activeIcon: Icon(Icons.spa, size: 28),
+                label: 'Necklaces',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.note),
+                activeIcon: Icon(Icons.note, size: 28),
+                label: 'Notes',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.blue[600],
+            unselectedItemColor: Colors.grey,
+            onTap: _onItemTapped,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.note),
-            label: 'Notes',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue[600],
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+        ),
       ),
     );
   }

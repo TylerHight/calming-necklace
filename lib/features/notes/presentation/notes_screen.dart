@@ -39,20 +39,26 @@ class _NotesScreenState extends State<NotesScreen> {
         ),
       ),
       appBar: AppBar(
-        title: const Text(
-          'Notes',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-            fontSize: 24,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                Colors.blue.shade300,
+                Colors.blue.shade500,
+              ],
+            ),
           ),
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
+        title: const Text(
+          'Notes',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
-            tooltip: 'How to use notes',
+            color: Colors.white,
             onPressed: () {
               showDialog(context: context, builder: (context) => const NotesHelpDialog());
             },

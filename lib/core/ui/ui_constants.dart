@@ -1,6 +1,34 @@
 import 'package:flutter/material.dart';
 
 class UIConstants {
+  // App Bar
+  static const List<Color> appBarGradientColors = [
+    Color(0xFF42A5F5),  // Light blue
+    Color(0xFF1976D2),  // Darker blue
+  ];
+  static const Color appBarTitleColor = Colors.white;
+  static const Color appBarIconColor = Colors.white;
+  static const double appBarElevation = 0.0;
+  static const double appBarHeight = 56.0;
+  static const EdgeInsets appBarPadding = EdgeInsets.symmetric(horizontal: 16.0);
+
+  // Timed Toggle Button Shadows
+  static const List<BoxShadow> timedToggleButtonShadows = [
+    BoxShadow(
+      color: Color(0x29000000),  // 16% opacity black
+      blurRadius: 12.0,
+      spreadRadius: 1.0,
+      offset: Offset(0, 3),
+    ),
+  ];
+  static const List<BoxShadow> timedToggleButtonPressedShadows = [
+    BoxShadow(
+      color: Color(0x40000000),  // 25% opacity black
+      blurRadius: 8.0,
+      offset: Offset(0, 2),
+    ),
+  ];
+
   // General
   static const Color floatingActionButtonColor = Colors.blueAccent; // Blue color for Floating Action Buttons
   
@@ -68,8 +96,8 @@ class UIConstants {
   static const double timedToggleButtonHeight = 55.0;
   static const double timedToggleButtonIconSize = 32.0;
   static const double timedToggleButtonSpacing = 12.0;  // Spacing between buttons
-  static const double timedToggleButtonBorderRadius = 30.0;
-  static const double timedToggleButtonBoxShadowBlurRadius = 8.0;
+  static const double timedToggleButtonBorderRadius = 27.5;  // Half of height for perfect circle
+  static const double timedToggleButtonBoxShadowBlurRadius = 12.0;
   static const Offset timedToggleButtonBoxShadowOffset = Offset(0, 2);
   static const double countdownTimerTextSize = 16.0;
 
@@ -90,4 +118,19 @@ class UIConstants {
   static const Color deviceSelectorBorderColor = Color(0xFFB0BEC5); // Darker border color
   static const Color deviceSelectorTextColor = Color(0xFF455A64); // Darker text color
   static const Color deviceSelectorIconColor = Color(0xFF455A64); // Darker icon color
+
+  // Navigation Bar
+  static const double navigationBarHeight = 60.0;
+  static const double navigationBarElevation = 8.0;
+  static const double navigationBarBorderRadius = 25.0;
+  static const EdgeInsets navigationBarMargin = EdgeInsets.symmetric(
+    horizontal: 16.0,
+    vertical: 8.0,
+  );
+  static const Color navigationBarSelectedColor = Color(0xFF1976D2);  // Blue
+  static const Color navigationBarUnselectedColor = Color(0xFF9E9E9E);  // Grey
+  static const double navigationBarSelectedIconSize = 28.0;
+  static const double navigationBarUnselectedIconSize = 24.0;
+  static const double navigationBarLabelFontSize = 12.0;
+  static const FontWeight navigationBarLabelWeight = FontWeight.w500;
 }
