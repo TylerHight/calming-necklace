@@ -101,15 +101,17 @@ class _DeviceSelectorState extends State<DeviceSelector> {
           final device = state.devices[index];
           return ListTile(
             title: Text(device.name),
-            subtitle: Row(
-              children: [
-                Text(device.address),
-                const SizedBox(width: 8),
-                Text(
-                  '${device.rssi} dBm',
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
+            subtitle: Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      device.address,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

@@ -120,15 +120,28 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Selected Device: ${_selectedDevice?.name ?? 'None'}',
-          style: TextStyle(color: Colors.grey[600]),
-        ),
-        const SizedBox(height: 8),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.bluetooth_searching),
-          label: const Text('Select Device'),
-          onPressed: () => _showDeviceSelectorDialog(context),
+        InkWell(
+          onTap: () => _showDeviceSelectorDialog(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey[300]!),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.bluetooth, color: Colors.grey[600]),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _selectedDevice?.name ?? 'Select a device (optional)',
+                    style: TextStyle(color: Colors.grey[600]),
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[600]),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -158,12 +171,6 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
             return TextButton(
               onPressed: state is AddDeviceDialogLoading ? null : () {
                 if (_formKey.currentState?.validate() ?? false) {
-                  if (_selectedDevice == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a device')),
-                    );
-                    return;
-                  }
                   context.read<AddDeviceDialogBloc>().add(
                     SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
                   );

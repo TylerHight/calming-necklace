@@ -42,11 +42,13 @@ class _DialogContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Select Device',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
+            const Expanded(
+              child: Text(
+                'Select Device',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             IconButton(
