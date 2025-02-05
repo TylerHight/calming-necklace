@@ -105,15 +105,18 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
                             horizontal: 16,
                             vertical: 8,
                           ),
-                          title: Text(device.name),
-                          subtitle: Text(device.address),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
+                          title: Row(
                             children: [
-                              Text('${device.rssi} dBm'),
-                              Icon(Icons.signal_cellular_alt, size: 16),
+                              Text(
+                                device.name,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(device.address),
                             ],
                           ),
+                          subtitle: Text('${device.rssi} dBm'),
+                          trailing: Icon(Icons.signal_cellular_alt, size: 16),
                           onTap: () => Navigator.of(context).pop(device),
                         );
                       },
