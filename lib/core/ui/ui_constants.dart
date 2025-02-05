@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class UIConstants {
   // App Bar
   static const List<Color> appBarGradientColors = [
-    Color(0xFF42A5F5),  // Light blue
+    Colors.white,
     Color(0xFF1976D2),  // Darker blue
   ];
   static const Color appBarTitleColor = Colors.white;

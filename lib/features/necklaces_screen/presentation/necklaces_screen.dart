@@ -77,14 +77,11 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       ),
       appBar: AppBar(
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
-              colors: [
-                Colors.blue.shade300,
-                Colors.blue.shade500,
-              ],
+              colors: UIConstants.appBarGradientColors,
             ),
           ),
         ),
