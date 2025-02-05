@@ -157,7 +157,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tap the "Add Necklace" button above to add your first necklace.',
+            'Tap the plus button at the bottom-right to add your first necklace.',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,

@@ -122,7 +122,7 @@ class _NotesScreenState extends State<NotesScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Tap the "Add Note" button above to create your first note.',
+            'Tap the plus button at the bottom-right to create your first note.',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w400,
