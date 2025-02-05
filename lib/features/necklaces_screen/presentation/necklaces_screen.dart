@@ -88,7 +88,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
         title: const Text(
           'My Necklaces',
           style: TextStyle(
-            color: Colors.white,
+            color: UIConstants.appBarTitleColor,
             fontWeight: FontWeight.w500,
             fontSize: 24,
           ),

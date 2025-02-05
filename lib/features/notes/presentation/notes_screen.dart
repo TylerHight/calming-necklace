@@ -50,7 +50,7 @@ class _NotesScreenState extends State<NotesScreen> {
         ),
         title: const Text(
           'Notes',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: UIConstants.appBarTitleColor),
         ),
         actions: [
           IconButton(
