@@ -19,6 +19,7 @@ class DeviceSelectionDialog extends StatefulWidget {
 class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
   final BleRepository _bleRepository = BleRepository();
   bool _isScanning = false;
+  bool _showLoadingOverlay = false;
 
   @override
   void initState() {
@@ -28,8 +29,10 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
 
   Future<void> _startScan() async {
     setState(() => _isScanning = true);
+    setState(() => _showLoadingOverlay = true);
     await _bleRepository.startScanning();
     await Future.delayed(const Duration(seconds: 4));
+    setState(() => _showLoadingOverlay = false);
     setState(() => _isScanning = false);
   }
 
@@ -52,18 +55,29 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                widget.title,
-                style: Theme.of(context).textTheme.titleLarge,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
+                  IconButton(
+                    onPressed: _isScanning ? null : _startScan,
+                    icon: Icon(Icons.refresh),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              if (_isScanning)
-                const Center(child: CircularProgressIndicator())
-              else
-                ElevatedButton(
-                  onPressed: _startScan,
-                  child: const Text('Scan for Devices'),
-                ),
+              if (_showLoadingOverlay)
+                Container(
+                  color: Colors.black.withOpacity(0.1),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        Text('Scanning for devices...'),
+                      ],
+                    ),
+                  )),
               const SizedBox(height: 16),
               StreamBuilder<List<BleDevice>>(
                 stream: _bleRepository.devices,
@@ -76,8 +90,8 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
                       .where((device) => device.deviceType == widget.deviceType)
                       .toList();
 
-                  return SizedBox(
-                    height: 200,
+                  return Container(
+                    height: 300,
                     child: ListView.builder(
                       itemCount: devices.length,
                       itemBuilder: (context, index) {

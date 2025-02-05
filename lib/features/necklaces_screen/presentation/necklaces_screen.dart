@@ -115,6 +115,9 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
           if (state is NecklacesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NecklacesLoaded) {
+            if (state.necklaces.isEmpty) {
+              return _buildEmptyState();
+            }
             return _buildNecklaceList(state.necklaces);
           } else if (state is NecklacesError) {
             return Center(child: Text(state.message));
