@@ -21,9 +21,7 @@ class ConnectionStatus extends StatelessWidget {
         vertical: UIConstants.connectionStatusPaddingV,
       ),
       decoration: BoxDecoration(
-        color: isConnected
-            ? Colors.green.withOpacity(0.1)
-            : Colors.red.withOpacity(0.1),
+        color: isConnected ? Colors.green.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(UIConstants.connectionStatusBorderRadius),
       ),
       child: Row(
@@ -35,8 +33,8 @@ class ConnectionStatus extends StatelessWidget {
             width: UIConstants.connectionStatusDotSize,
             height: UIConstants.connectionStatusDotSize,
             decoration: BoxDecoration(
+              color: isConnected ? Colors.green : Colors.grey,
               shape: BoxShape.circle,
-              color: isConnected ? Colors.green : Colors.red,
             ),
           ),
           const SizedBox(width: UIConstants.connectionStatusDotSpacing),

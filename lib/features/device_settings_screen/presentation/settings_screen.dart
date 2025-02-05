@@ -238,7 +238,7 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 title: const Text('Release Duration'),
                 subtitle: Text(
-                  formatDuration(state.necklace.emission1Duration),
+                  formatDuration(state.necklace.emission1Duration, useFullWords: true),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(
@@ -265,7 +265,7 @@ class _SettingsContentState extends State<SettingsContent> {
               ListTile(
                 title: const Text('Release Interval'),
                 subtitle: Text(
-                  formatDuration(state.necklace.releaseInterval1),
+                  formatDuration(state.necklace.releaseInterval1, useFullWords: true),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios),
                 onTap: () => _showDurationPicker(

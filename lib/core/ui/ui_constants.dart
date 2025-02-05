@@ -54,7 +54,7 @@ class UIConstants {
   static const double periodicTimerSize = 120.0;
   static const double periodicTimerPadding = 16.0;
   static const double periodicTimerStrokeWidth = 8.0;
-  static const double periodicTimerTimeTextSize = 24.0;
+  static const double periodicTimerTimeTextSize = 20.0;
   static const double periodicTimerStatusTextSize = 12.0;
   static const double periodicTimerSpacing = 4.0;
   static const Color periodicTimerActiveColor = Colors.blue;
