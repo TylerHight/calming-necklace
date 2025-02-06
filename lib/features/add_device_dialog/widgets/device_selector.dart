@@ -108,17 +108,12 @@ class _DeviceSelectorState extends State<DeviceSelector> {
               device.name,
               style: TextStyle(color: UIConstants.deviceSelectorTextColor),
             ),
-            subtitle: Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      device.address,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: UIConstants.deviceSelectorTextColor),
-                    ),
-                  ),
-                ],
+            subtitle: Text(
+              device.address,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: UIConstants.deviceSelectorTextColor,
+                fontSize: 12,
               ),
             ),
             trailing: Row(
