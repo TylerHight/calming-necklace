@@ -5,6 +5,7 @@ import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
 import '../../../core/services/database_service.dart';
 import '../../../core/services/logging_service.dart';
+import '../../../core/services/ble/ble_service.dart';
 import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
@@ -331,20 +332,34 @@ class _SettingsContentState extends State<SettingsContent> {
               title: const Text('Change Necklace Device'),
               trailing: const Icon(Icons.bluetooth),
               onTap: () {
-                showDialog<BleDevice>(
+                final bleService = BleService();
+                showDialog(
                   context: context,
                   builder: (context) => DeviceSelectionDialog(
                     deviceType: BleDeviceType.necklace,
                     title: 'Select Necklace Device',
+                    onDeviceSelected: (device) async {
+                      try {
+                        // Update necklace in database with new device
+                        await widget.databaseService.updateNecklaceSettings(
+                          widget.necklace.id,
+                          {'bleDevice': device.toMap()},
+                        );
+                        
+                        // Notify the necklaces bloc to refresh
+                        context.read<NecklacesBloc>().add(FetchNecklacesEvent());
+                        
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Connected to ${device.name}')),
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error updating device: $e')),
+                        );
+                      }
+                    },
                   ),
-                ).then((device) {
-                  if (device != null) {
-                    // TODO: Implement device change logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Selected device: ${device.name}')),
-                    );
-                  }
-                });
+                );
               },
             ),
             ListTile(

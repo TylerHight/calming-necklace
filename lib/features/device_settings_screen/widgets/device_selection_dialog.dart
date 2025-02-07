@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
+import '../../../core/services/ble/ble_service.dart';
 
 class DeviceSelectionDialog extends StatefulWidget {
   final BleDeviceType deviceType;
   final String title;
+  final Function(BleDevice)? onDeviceSelected;
 
   const DeviceSelectionDialog({
     Key? key,
     required this.deviceType,
     required this.title,
+    this.onDeviceSelected,
   }) : super(key: key);
 
   @override
@@ -20,6 +24,7 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
   final BleRepository _bleRepository = BleRepository();
   bool _isScanning = false;
   bool _showLoadingOverlay = false;
+  bool _isConnecting = false;
 
   @override
   void initState() {
@@ -68,16 +73,16 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
               const SizedBox(height: 16),
               if (_showLoadingOverlay)
                 Container(
-                  color: Colors.black.withOpacity(0.1),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(),
-                        Text('Scanning for devices...'),
-                      ],
-                    ),
-                  )),
+                    color: Colors.black.withOpacity(0.1),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('Scanning for devices...'),
+                        ],
+                      ),
+                    )),
               const SizedBox(height: 16),
               StreamBuilder<List<BleDevice>>(
                 stream: _bleRepository.devices,
@@ -117,7 +122,40 @@ class _DeviceSelectionDialogState extends State<DeviceSelectionDialog> {
                           ),
                           subtitle: Text('${device.rssi} dBm'),
                           trailing: Icon(Icons.signal_cellular_alt, size: 16),
-                          onTap: () => Navigator.of(context).pop(device),
+                          onTap: () async {
+                            setState(() => _isConnecting = true);
+                            try {
+                              final bleService = BleService();
+                              if (device.device == null) {
+                                throw Exception('No BluetoothDevice available');
+                              }
+                              // Use the stored BluetoothDevice instance
+                              await bleService.connectToDevice(device.device!);
+
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Connected to ${device.name}')),
+                                );
+                                if (widget.onDeviceSelected != null) {
+                                  widget.onDeviceSelected!(device);
+                                }
+                                Navigator.of(context).pop(device);
+                              }
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Failed to connect: $e'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isConnecting = false);
+                              }
+                            }
+                          },
                         );
                       },
                     ),

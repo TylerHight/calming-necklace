@@ -197,9 +197,9 @@ class _NecklacePanelState extends State<NecklacePanel> {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: ConnectionStatus(
-        isConnected: isConnected,
-        rssi: rssi,
-      ),
+        isConnected: true,
+        deviceId: 'device_id_123',
+      )
     );
   }
 

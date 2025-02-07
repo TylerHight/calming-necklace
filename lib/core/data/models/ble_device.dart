@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 enum BleDeviceType {
   necklace,
@@ -12,7 +13,8 @@ class BleDevice extends Equatable {
   final int rssi;
   final BleDeviceType deviceType;
   final bool isConnected;
-  final String? necklaceId; // Add this field to associate with a Necklace
+  final String? necklaceId; 
+  final BluetoothDevice? device;  // Add the BluetoothDevice field
 
   const BleDevice({
     required this.id,
@@ -21,10 +23,11 @@ class BleDevice extends Equatable {
     required this.rssi,
     required this.deviceType,
     this.isConnected = false,
-    this.necklaceId, // Initialize the new field
+    this.necklaceId, 
+    this.device,  // Initialize the new field
   });
 
-  @override
+  @override  // Update props to include the device
   List<Object?> get props => [id, name, address, rssi, deviceType, isConnected, necklaceId];
 
   Map<String, dynamic> toMap() {
@@ -35,7 +38,8 @@ class BleDevice extends Equatable {
       'rssi': rssi,
       'deviceType': deviceType.index,
       'isConnected': isConnected ? 1 : 0,
-      'necklaceId': necklaceId, // Include the new field in the map
+      // Note: BluetoothDevice is not serialized in toMap
+      'necklaceId': necklaceId,
     };
   }
 
@@ -47,7 +51,7 @@ class BleDevice extends Equatable {
       rssi: map['rssi'],
       deviceType: BleDeviceType.values[map['deviceType']],
       isConnected: map['isConnected'] == 1,
-      necklaceId: map['necklaceId'], // Initialize the new field from the map
+      necklaceId: map['necklaceId'], 
     );
   }
 
@@ -55,7 +59,8 @@ class BleDevice extends Equatable {
     String? name,
     int? rssi,
     bool? isConnected,
-    String? necklaceId, // Add this parameter to the copyWith method
+    String? necklaceId, 
+    BluetoothDevice? device,  // Add this parameter to the copyWith method
   }) {
     return BleDevice(
       id: id,
@@ -64,7 +69,8 @@ class BleDevice extends Equatable {
       rssi: rssi ?? this.rssi,
       deviceType: deviceType,
       isConnected: isConnected ?? this.isConnected,
-      necklaceId: necklaceId ?? this.necklaceId, // Copy the new field
+      necklaceId: necklaceId ?? this.necklaceId, 
+      device: device ?? this.device,  // Copy the new field
     );
   }
 }

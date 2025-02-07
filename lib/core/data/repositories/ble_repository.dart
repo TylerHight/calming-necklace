@@ -46,6 +46,7 @@ class BleRepository {
               address: scanResult.device.id.id,
               rssi: scanResult.rssi,
               deviceType: _determineDeviceType(scanResult.device.name),
+              device: scanResult.device,  // Store the BluetoothDevice instance
             );
 
             if (!_discoveredDevices.any((discoveredDevice) => discoveredDevice.id == device.id)) {
