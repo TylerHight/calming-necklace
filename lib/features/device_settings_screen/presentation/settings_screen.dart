@@ -158,7 +158,32 @@ class _SettingsContentState extends State<SettingsContent> {
               ),
             ),
             const SizedBox(height: 16),
-            _buildNameField(context, state),
+            ListTile(
+              title: const Text('Device Name'),
+              subtitle: TextFormField(
+                initialValue: state.necklace.name,
+                decoration: const InputDecoration(
+                  hintText: 'Enter device name',
+                  border: UnderlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  if (value.isNotEmpty) {
+                    context.read<SettingsBloc>().add(UpdateNecklaceName(value));
+                  }
+                },
+              ),
+            ),
+            if (state.isSaved)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: const Text(
+                  'Changes saved',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
             const SizedBox(height: 8),
             if (state.necklace.bleDevice != null) ...[
               Row(

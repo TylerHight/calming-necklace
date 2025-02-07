@@ -66,11 +66,6 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                 ),
               ),
             const SizedBox(height: 8),
-            if (state.isScanning && state.devices.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.0),
-                child: CircularProgressIndicator(),
-              ),
             const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
             _buildDeviceList(state, theme),
             if (state.devices.isEmpty && !state.isInitialLoading)
