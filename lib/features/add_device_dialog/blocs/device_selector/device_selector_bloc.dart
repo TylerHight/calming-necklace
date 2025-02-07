@@ -24,7 +24,7 @@ class DeviceSelectorBloc extends Bloc<DeviceSelectorEvent, DeviceSelectorState> 
 
   Future<void> _onStartScanning(StartScanning event, Emitter<DeviceSelectorState> emit) async {
     try {
-      emit(state.copyWith(isScanning: true, error: null));
+      emit(state.copyWith(isScanning: true, error: null, isInitialLoading: false));
       _deviceSubscription?.cancel();
       _logger.logDebug('Starting BLE scan for devices');
       await _bleRepository.startScanning();

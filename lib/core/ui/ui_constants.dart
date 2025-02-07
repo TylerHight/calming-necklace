@@ -118,19 +118,16 @@ class UIConstants {
   static const Color deviceSelectorBorderColor = Color(0xFFB0BEC5); // Darker border color
   static const Color deviceSelectorTextColor = Color(0xFF455A64); // Darker text color
   static const Color deviceSelectorIconColor = Color(0xFF455A64); // Darker icon color
-
-  // Navigation Bar
-  static const double navigationBarHeight = 60.0;
-  static const double navigationBarElevation = 8.0;
-  static const double navigationBarBorderRadius = 25.0;
-  static const EdgeInsets navigationBarMargin = EdgeInsets.symmetric(
-    horizontal: 16.0,
-    vertical: 8.0,
-  );
-  static const Color navigationBarSelectedColor = Color(0xFF1976D2);  // Blue
-  static const Color navigationBarUnselectedColor = Color(0xFF9E9E9E);  // Grey
-  static const double navigationBarSelectedIconSize = 28.0;
-  static const double navigationBarUnselectedIconSize = 24.0;
-  static const double navigationBarLabelFontSize = 12.0;
-  static const FontWeight navigationBarLabelWeight = FontWeight.w500;
+  
+  // Device Selector Dialog
+  static const double deviceSelectorDialogPadding = 24.0;
+  static const double deviceSelectorDialogVerticalPadding = 16.0;
+  static const double deviceSelectorDialogTitleSpacing = 2.0;
+  static const double deviceSelectorDialogBorderRadius = 20.0;
+  static const double deviceSelectorListMaxHeight = 300.0;
+  static const EdgeInsets deviceSelectorRescanButtonPadding = EdgeInsets.symmetric(vertical: 12.0);
+  static const double deviceSelectorRescanButtonRadius = 12.0;
+  static const Color deviceSelectorRescanButtonColor = Color(0xFF2196F3);
+  static const double deviceSelectorRescanButtonOpacity = 0.9;
+  static const FontWeight deviceSelectorRescanButtonTextWeight = FontWeight.w600;
 }

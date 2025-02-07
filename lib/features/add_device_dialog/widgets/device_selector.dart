@@ -51,16 +51,29 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
       builder: (context, state) {
         return Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (state.isScanning)
+              Container(
+                width: double.infinity,
+                height: 4,
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
             if (state.isScanning && state.devices.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 24.0),
                 child: CircularProgressIndicator(),
               ),
-            const SizedBox(height: 16),
+            const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
             _buildDeviceList(state, theme),
-            if (state.devices.isEmpty)
+            if (state.devices.isEmpty && !state.isInitialLoading)
               Container(
                 padding: const EdgeInsets.all(16),
                 alignment: Alignment.center,
@@ -74,16 +87,38 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                         color: Colors.grey[600],
                       ),
                     ),
-                    if (!state.isScanning)
-                      ElevatedButton.icon(
-                        icon: Icon(Icons.refresh, color: UIConstants.deviceSelectorIconColor),
-                        label: Text(
-                          'Scan for Devices',
-                          style: TextStyle(color: UIConstants.deviceSelectorTextColor),
-                        ),
-                        onPressed: () => context.read<DeviceSelectorBloc>().add(StartScanning()),
-                      ),
                   ],
+                ),
+              ),
+            const SizedBox(height: 16),
+            if (!state.isScanning)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    padding: UIConstants.deviceSelectorRescanButtonPadding,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(UIConstants.deviceSelectorRescanButtonRadius),
+                    ),
+                    backgroundColor: UIConstants.deviceSelectorRescanButtonColor
+                        .withOpacity(UIConstants.deviceSelectorRescanButtonOpacity),
+                    foregroundColor: Colors.white,
+                  ),
+                  icon: state.isScanning
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white))
+                    : const Icon(Icons.refresh),
+                  label: state.isScanning
+                    ? const SizedBox.shrink()
+                    : const Text(
+                        'Scan for Devices',
+                        style: TextStyle(
+                          fontWeight: UIConstants.deviceSelectorRescanButtonTextWeight,
+                        ),
+                      ),
+                  onPressed: state.isScanning
+                    ? null
+                    : () => context.read<DeviceSelectorBloc>().add(StartScanning()),
                 ),
               ),
           ],
@@ -98,13 +133,14 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     }
 
     return Container(
-      constraints: const BoxConstraints(maxHeight: 200),
+      constraints: const BoxConstraints(maxHeight: UIConstants.deviceSelectorListMaxHeight),
       decoration: BoxDecoration(
         border: Border.all(color: UIConstants.deviceSelectorBorderColor),
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListView.builder(
         shrinkWrap: true,
+        padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: state.devices.length,
         itemBuilder: (context, index) {
           final device = state.devices[index];

@@ -15,7 +15,7 @@ class DeviceSelectorDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(UIConstants.deviceSelectorDialogBorderRadius),
       ),
       child: Container(
         constraints: const BoxConstraints(
@@ -23,7 +23,10 @@ class DeviceSelectorDialog extends StatelessWidget {
           maxWidth: 400,
           maxHeight: 500,
         ),
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.symmetric(
+          horizontal: UIConstants.deviceSelectorDialogPadding,
+          vertical: UIConstants.deviceSelectorDialogVerticalPadding,
+        ),
         child: BlocProvider(
           create: (context) => DeviceSelectorBloc(
             bleRepository: context.read<BleRepository>(),
@@ -42,37 +45,23 @@ class _DialogContent extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Expanded(
-              child: Text(
-                'Select Necklace',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Select Device',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
               ),
-            ),
-            BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
-              builder: (context, state) {
-                return IconButton(
-                  icon: const Icon(Icons.refresh, color: UIConstants.deviceSelectorIconColor),
-                  onPressed: state.isScanning
-                      ? null
-                      : () => context.read<DeviceSelectorBloc>().add(StartScanning() as DeviceSelectorEvent),
-                  tooltip: state.isScanning ? 'Scanning...' : 'Rescan',
-                );
-              },
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              icon: const Icon(Icons.close, color: UIConstants.deviceSelectorIconColor),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
         Expanded(
           child: DeviceSelector(
             deviceType: BleDeviceType.necklace,
