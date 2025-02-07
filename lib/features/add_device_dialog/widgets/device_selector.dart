@@ -51,7 +51,14 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
       builder: (context, state) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (state.isScanning && state.devices.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.0),
+                child: CircularProgressIndicator(),
+              ),
+            const SizedBox(height: 16),
             _buildDeviceList(state, theme),
             if (state.devices.isEmpty)
               Container(
@@ -60,8 +67,6 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (state.isScanning)
-                      const CircularProgressIndicator(),
                     const SizedBox(height: 16),
                     Text(
                       state.isScanning ? 'Searching for devices...' : 'No devices found',

@@ -1,3 +1,4 @@
+import 'package:calming_necklace/features/add_device_dialog/blocs/device_selector/device_selector_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
@@ -18,6 +19,7 @@ class DeviceSelectorDialog extends StatelessWidget {
       ),
       child: Container(
         constraints: const BoxConstraints(
+          minWidth: 300,
           maxWidth: 400,
           maxHeight: 500,
         ),
@@ -45,13 +47,25 @@ class _DialogContent extends StatelessWidget {
           children: [
             const Expanded(
               child: Text(
-                'Select Device',
+                'Select Necklace',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
+            BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+              builder: (context, state) {
+                return IconButton(
+                  icon: const Icon(Icons.refresh, color: UIConstants.deviceSelectorIconColor),
+                  onPressed: state.isScanning
+                      ? null
+                      : () => context.read<DeviceSelectorBloc>().add(StartScanning() as DeviceSelectorEvent),
+                  tooltip: state.isScanning ? 'Scanning...' : 'Rescan',
+                );
+              },
+            ),
+            const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.close, color: UIConstants.deviceSelectorIconColor),
               onPressed: () => Navigator.of(context).pop(),
