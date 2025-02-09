@@ -28,7 +28,7 @@ class BleCharacteristicsManager {
 
   Future<void> _validateAndStoreCharacteristics(List<BluetoothService> services) async {
     // Find required services
-    final ledService = _findService(services, BleConstants.LED_SERVICE_UUID);
+    final ledService = _findService(services, BleConstants.ledServiceUuid);
     final settingsService = _findService(services, BleConstants.SETTINGS_SERVICE_UUID);
 
     // Store required characteristics
@@ -47,11 +47,11 @@ class BleCharacteristicsManager {
     // Store switch characteristic
     final switchChar = await _findAndConfigureCharacteristic(
       service,
-      BleConstants.SWITCH_CHARACTERISTIC_UUID,
+      BleConstants.switchCharacteristicUuid,
       required: true,
     );
     if (switchChar != null) {
-      _characteristics[BleConstants.SWITCH_CHARACTERISTIC_UUID.toLowerCase()] = switchChar;
+      _characteristics[BleConstants.switchCharacteristicUuid.toLowerCase()] = switchChar;
     }
 
     // Store keep-alive characteristic
@@ -67,9 +67,9 @@ class BleCharacteristicsManager {
 
   Future<void> _storeOptionalCharacteristics(BluetoothService service) async {
     final charConfigs = [
-      (BleConstants.EMISSION1_CHARACTERISTIC_UUID, false),
-      (BleConstants.INTERVAL1_CHARACTERISTIC_UUID, false),
-      (BleConstants.PERIODIC1_CHARACTERISTIC_UUID, false),
+      (BleConstants.EMISSION_CHARACTERISTIC_UUID, false),
+      (BleConstants.INTERVAL_CHARACTERISTIC_UUID, false),
+      (BleConstants.PERIODIC_CHARACTERISTIC_UUID, false),
     ];
 
     for (final config in charConfigs) {

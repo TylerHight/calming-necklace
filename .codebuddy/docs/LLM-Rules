@@ -1,2 +1,4 @@
 - Adhere to bloc architecture, with usage of bloc, repository, utility, and service files as needed.
 - Avoid direct bloc-to-bloc communication.
+- Delegate tasks to relevant blocs, and try to minimize code duplication assigning logic to more generalized blocs, such as ble blocs, and referencing this bloc in various widgets, rather than creating a bloc for each widget.
+- Use the repository pattern to interact with the database.

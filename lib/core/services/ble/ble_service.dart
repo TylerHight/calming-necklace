@@ -7,6 +7,7 @@ import 'ble_types.dart';
 import 'ble_commands.dart';
 import '../../../core/utils/ble/ble_utils.dart';
 import 'package:flutter/material.dart';
+import '../../../core/data/constants/ble_constants.dart';
 
 class BleService {
   static final BleService _instance = BleService._internal();
@@ -82,7 +83,7 @@ class BleService {
   Future<void> connectToDevice(BluetoothDevice device) async {
     try {
       _loggingService.logBleInfo('Attempting to connect to ${device.platformName}');
-      _deviceStateController.add('Connecting to ${device.platformName}...');
+      _deviceStateController.add(BleConstants.connecting);
 
       final connected = await _connectionManager.connectWithRetry(device);
       if (connected) {
@@ -90,6 +91,12 @@ class BleService {
         _connectedDevice = device;
 
         // Wait for characteristics initialization
+        final services = await device.discoverServices();
+        final ledService = services.firstWhere(
+          (s) => s.uuid.toString().toLowerCase().contains(BleConstants.ledServiceUuid),
+          orElse: () => throw BleException('LED service not found'),
+        );
+
         await _initializeCharacteristics(device, forceRediscovery: true);
 
         // Only maintain connection after successful initialization
@@ -159,7 +166,7 @@ class BleService {
 
       // Look for the LED service (180a)
       final ledService = services.firstWhere(
-            (s) => s.uuid.toString().toLowerCase().contains('180a'),
+            (s) => s.uuid.toString().toLowerCase().contains(BleConstants.ledServiceUuid),
         orElse: () => throw BleException('LED service not found'),
       );
 
@@ -167,7 +174,7 @@ class BleService {
 
       // Look for the switch characteristic (2a57)
       _switchCharacteristic = ledService.characteristics.firstWhere(
-            (c) => c.uuid.toString().toLowerCase().contains('2a57'),
+            (c) => c.uuid.toString().toLowerCase().contains(BleConstants.switchCharacteristicUuid),
         orElse: () => throw BleException('Switch characteristic not found'),
       );
 

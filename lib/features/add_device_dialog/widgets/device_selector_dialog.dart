@@ -66,6 +66,15 @@ class _DialogContent extends StatelessWidget {
           child: DeviceSelector(
             deviceType: BleDeviceType.necklace,
             onDeviceSelected: (device) {
+              // Show loading indicator while connecting
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+              
               Navigator.of(context).pop(device);
             },
           ),

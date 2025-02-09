@@ -4,6 +4,7 @@ import '../../../core/blocs/ble/ble_state.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
+import '../../../core/services/ble/ble_service.dart';
 import '../../../core/services/database_service.dart';
 import '../../add_device_dialog/blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../../add_device_dialog/blocs/device_selector/device_selector_bloc.dart';
@@ -50,6 +51,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             create: (context) => AddDeviceDialogBloc(
               _repository,
               context.read<NecklacesBloc>(),
+              context.read<BleService>(), // Added BleService to constructor
             ),
           ),
           BlocProvider(

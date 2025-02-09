@@ -29,7 +29,11 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AddDeviceDialogBloc(context.read<NecklaceRepository>(), context.read<NecklacesBloc>()),
+          create: (context) => AddDeviceDialogBloc(
+            context.read<NecklaceRepository>(),
+            context.read<NecklacesBloc>(),
+            context.read<BleService>(),
+          ),
         ),
         BlocProvider(
           create: (context) => DeviceSelectorBloc(
@@ -163,6 +167,20 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
+          builder: (context, state) {
+            if (state is AddDeviceDialogLoading) {
+              return const CircularProgressIndicator();
+            }
+            if (state is AddDeviceDialogError) {
+              return Text(
+                state.error,
+                style: TextStyle(color: Colors.red),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
@@ -170,7 +188,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
         BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
           builder: (context, state) {
             return TextButton(
-              onPressed: state is AddDeviceDialogLoading ? null : () {
+              onPressed: (state is AddDeviceDialogLoading || _selectedDevice == null) ? null : () {
                 if (_formKey.currentState?.validate() ?? false) {
                   context.read<AddDeviceDialogBloc>().add(
                     SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
