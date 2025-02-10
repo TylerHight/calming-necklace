@@ -43,7 +43,7 @@ class _DialogContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 16),
@@ -66,18 +66,20 @@ class _DialogContent extends StatelessWidget {
           child: DeviceSelector(
             deviceType: BleDeviceType.necklace,
             onDeviceSelected: (device) {
-              // Show loading indicator while connecting
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-              
-              Navigator.of(context).pop(device);
+              context.read<DeviceSelectorBloc>().add(SelectDevice(device));
             },
           ),
+        ),
+        const SizedBox(height: 16),
+        BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+          builder: (context, state) {
+            return ElevatedButton(
+              onPressed: state.selectedDevice == null ? null : () {
+                Navigator.of(context).pop(state.selectedDevice);
+              },
+              child: const Text('Confirm Selection'),
+            );
+          },
         ),
       ],
     );

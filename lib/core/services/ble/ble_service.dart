@@ -80,38 +80,25 @@ class BleService {
     _deviceStateController.add('Error: $error');
   }
 
-  Future<void> connectToDevice(BluetoothDevice device) async {
+  Future<bool> connectToDevice(BluetoothDevice device) async {
     try {
       _loggingService.logBleInfo('Attempting to connect to ${device.platformName}');
-      _deviceStateController.add(BleConstants.connecting);
+      _deviceStateController.add('Connecting...');
 
       final connected = await _connectionManager.connectWithRetry(device);
       if (connected) {
         _loggingService.logBleInfo('Successfully connected to ${device.platformName}');
         _connectedDevice = device;
-
-        // Wait for characteristics initialization
-        final services = await device.discoverServices();
-        final ledService = services.firstWhere(
-          (s) => s.uuid.toString().toLowerCase().contains(BleConstants.ledServiceUuid),
-          orElse: () => throw BleException('LED service not found'),
-        );
-
-        await _initializeCharacteristics(device, forceRediscovery: true);
-
-        // Only maintain connection after successful initialization
-        await _connectionManager.maintainConnection(device);
-
-        // Signal that device is ready for commands
-        _deviceStateController.add('Ready for commands');
+        return true;
       } else {
-        _loggingService.logBleError('Failed to establish connection with ${device.platformName}');
-        throw BleException('Failed to establish connection');
+        _loggingService.logBleError('Connection failed with ${device.platformName}');
+        throw BleException('Unable to establish connection. Please ensure the device is powered on and nearby.');
       }
     } catch (e, stackTrace) {
       _loggingService.logBleError('Connection error', e, stackTrace);
-      _deviceStateController.add('Connection error: $e');
-      rethrow;
+      _deviceStateController.add('Connection failed');
+      _connectionStatusController.add(false);
+      return false;
     }
   }
 

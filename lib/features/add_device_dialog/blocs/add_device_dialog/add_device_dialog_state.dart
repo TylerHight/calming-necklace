@@ -15,12 +15,21 @@ class AddDeviceDialogLoading extends AddDeviceDialogState {}
 class AddDeviceDialogSuccess extends AddDeviceDialogState {}
 
 class AddDeviceDialogError extends AddDeviceDialogState {
-  final String message;
+  final String error;
 
-  const AddDeviceDialogError(this.message);
+  const AddDeviceDialogError(this.error);
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [error];
+}
+
+class ConnectionInProgress extends AddDeviceDialogState {
+  final String deviceName;
+
+  const ConnectionInProgress(this.deviceName);
+
+  @override
+  List<Object> get props => [deviceName];
 }
 
 class ScanningForDevices extends AddDeviceDialogState {}

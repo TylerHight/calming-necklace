@@ -4,6 +4,8 @@ import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
+import '../../../core/services/ble/ble_service.dart';
+import '../../../core/services/ble/ble_types.dart';
 import '../../../core/ui/ui_constants.dart';
 import '../blocs/add_device_dialog/add_device_dialog_state.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
@@ -32,7 +34,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
           create: (context) => AddDeviceDialogBloc(
             context.read<NecklaceRepository>(),
             context.read<NecklacesBloc>(),
-            context.read<BleService>(),
+            BleService(),
           ),
         ),
         BlocProvider(
@@ -93,6 +95,46 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
+          builder: (context, state) {
+            if (state is AddDeviceDialogLoading) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            if (state is ConnectionInProgress) {
+              return Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text('Connecting to ${state.deviceName}...',
+                      style: const TextStyle(color: Colors.blue),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state is AddDeviceDialogError) {
+              return Container(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(state.error,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
         _buildNameField(),
         const SizedBox(height: 24),
         _buildDeviceSelector(context),
@@ -159,8 +201,7 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     );
     if (device != null) {
       setState(() => _selectedDevice = device);
-      context.read<DeviceSelectorBloc>().add(SelectDevice(device));
-    }
+      context.read<AddDeviceDialogBloc>().add(SelectDeviceEvent(device));    }
   }
 
   Widget _buildButtons(BuildContext context) {
@@ -188,8 +229,14 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
         BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
           builder: (context, state) {
             return TextButton(
-              onPressed: (state is AddDeviceDialogLoading || _selectedDevice == null) ? null : () {
+              onPressed: (state is AddDeviceDialogLoading) ? null : () {
                 if (_formKey.currentState?.validate() ?? false) {
+                  if (_selectedDevice == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a device')),
+                    );
+                    return;
+                  }
                   context.read<AddDeviceDialogBloc>().add(
                     SubmitAddDeviceEvent(_nameController.text, _selectedDevice),
                   );

@@ -21,14 +21,29 @@ class AddDeviceDialogBloc extends Bloc<AddDeviceDialogEvent, AddDeviceDialogStat
   Future<void> _onSubmitAddDevice(SubmitAddDeviceEvent event, Emitter<AddDeviceDialogState> emit) async {
     emit(AddDeviceDialogLoading());
     try {
-      // Attempt to connect to the device first
-      if (event.device?.device != null) {
-        await _bleService.connectToDevice(event.device!.device);
+      final device = event.device;      
+      if (device == null || device.device == null) {
+        emit(ConnectionInProgress(device!.name));
+        throw Exception('No device selected');
       }
-      
-      await _repository.addNecklace(event.name, event.device?.id ?? '');
-      _necklacesBloc.add(FetchNecklacesEvent());
-      emit(AddDeviceDialogSuccess());
+
+      try {
+        emit(ConnectionInProgress(device.name));
+        final connected = await _bleService.connectToDevice(device.device!);
+        if (!connected) {
+          emit(AddDeviceDialogError('Connection failed. Please try again.'));
+          return;
+        } else {
+          await _repository.addNecklace(event.name, device.id);
+          _necklacesBloc.add(FetchNecklacesEvent());
+          emit(AddDeviceDialogSuccess());
+        }
+      } catch (e) {
+        emit(AddDeviceDialogError(
+          'Connection error: ${e.toString().replaceAll(RegExp(r'Exception: '), '')}'
+        ));
+        return;
+      }
     } catch (e) {
       emit(AddDeviceDialogError(e.toString()));
       return;
