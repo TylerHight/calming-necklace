@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:convert';
 import 'ble_device.dart';
 
 class Necklace extends Equatable {
@@ -64,8 +65,12 @@ class Necklace extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'bleDevice': bleDevice != null ? 
+          jsonEncode({
+            ...bleDevice!.toMap(),
+            'device': null  // Exclude the BluetoothDevice instance from serialization
+          }) : null,
       'name': name,
-      'bleDevice': bleDevice?.toMap(), // Update toMap method
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
       'releaseInterval1': releaseInterval1.inSeconds,
@@ -78,8 +83,13 @@ class Necklace extends Equatable {
   factory Necklace.fromMap(Map<String, dynamic> map) {
     return Necklace(
       id: map['id'],
+      bleDevice: map['bleDevice'] != null ? 
+          BleDevice.fromMap(
+            map['bleDevice'] is String ? 
+              jsonDecode(map['bleDevice']) as Map<String, dynamic> :
+              map['bleDevice'] as Map<String, dynamic>
+          ) : null,
       name: map['name'],
-      bleDevice: map['bleDevice'] != null ? BleDevice.fromMap(map['bleDevice']) : null, // Update fromMap method
       autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
       emission1Duration: Duration(seconds: map['emission1Duration']),
       releaseInterval1: Duration(seconds: map['releaseInterval1']),

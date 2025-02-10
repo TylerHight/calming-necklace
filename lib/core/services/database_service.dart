@@ -91,19 +91,32 @@ class DatabaseService {
 
   Future<void> insertNecklace(Necklace necklace) async {
     final db = await database;
-    await db.insert(
-      'necklaces',
-      necklace.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    try {
+      final result = await db.insert(
+        'necklaces',
+        necklace.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      LoggingService().logError('Error inserting necklace: $e');
+      rethrow;
+    }
   }
 
   Future<List<Necklace>> getNecklaces() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('necklaces');
-    return List.generate(maps.length, (i) {
-      return Necklace.fromMap(maps[i]);
-    });
+    try {
+      final List<Map<String, dynamic>> maps = await db.query(
+        'necklaces',
+        where: 'isArchived = ?',
+        whereArgs: [0],
+      );
+      return List.generate(maps.length, 
+        (i) => Necklace.fromMap(Map<String, dynamic>.from(maps[i])));
+    } catch (e) {
+      LoggingService().logError('Error retrieving necklaces: $e');
+      rethrow;
+    }
   }
 
   Future<void> insertNote(Note note) async {

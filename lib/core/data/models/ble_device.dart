@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'dart:convert';
 
 enum BleDeviceType {
   necklace,
@@ -33,7 +34,7 @@ class BleDevice extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
+      'name': name.toString(),
       'address': address,
       'rssi': rssi,
       'deviceType': deviceType.index,
@@ -44,15 +45,28 @@ class BleDevice extends Equatable {
   }
 
   factory BleDevice.fromMap(Map<String, dynamic> map) {
-    return BleDevice(
-      id: map['id'],
-      name: map['name'],
-      address: map['address'],
-      rssi: map['rssi'],
-      deviceType: BleDeviceType.values[map['deviceType']],
-      isConnected: map['isConnected'] == 1,
-      necklaceId: map['necklaceId'], 
-    );
+    try {
+      return BleDevice(
+        id: map['id']?.toString() ?? '',
+        name: map['name']?.toString() ?? 'Unknown Device',
+        address: map['address']?.toString() ?? '',
+        rssi: map['rssi'] is int ? map['rssi'] : 0,
+        deviceType: map['deviceType'] is int ? 
+            BleDeviceType.values[map['deviceType']] : BleDeviceType.necklace,
+        isConnected: map['isConnected'] == 1,
+        necklaceId: map['necklaceId']?.toString(),
+      );
+    } catch (e) {
+      print('Error parsing BleDevice: $e');
+      // Return a default device instead of throwing
+      return BleDevice(
+        id: '',
+        name: 'Parse Error',
+        address: '',
+        rssi: 0,
+        deviceType: BleDeviceType.necklace,
+      );
+    }
   }
 
   BleDevice copyWith({

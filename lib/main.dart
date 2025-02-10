@@ -29,6 +29,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<BleService>(
+          create: (context) => BleService(),
+          lazy: false,
+        ),
         Provider<DatabaseService>(
           create: (context) => DatabaseService(),
           lazy: true,
@@ -44,7 +48,8 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => BleBloc(
-            bleService: BleService()),
+            bleService: context.read<BleService>(),
+          ),
         ),
       ],
       child: MultiBlocProvider(

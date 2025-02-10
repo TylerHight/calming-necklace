@@ -16,32 +16,22 @@ class DeviceSelectorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
-      builder: (context, deviceSelectorState) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(UIConstants.deviceSelectorDialogBorderRadius),
-          ),
-          child: Container(
-            constraints: const BoxConstraints(
-              minWidth: 300,
-              maxWidth: 400,
-              maxHeight: 500,
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: UIConstants.deviceSelectorDialogPadding,
-              vertical: UIConstants.deviceSelectorDialogVerticalPadding,
-            ),
-            child: BlocProvider(
-              create: (context) => DeviceSelectorBloc(
-                bleRepository: context.read<BleRepository>(),
-                bleBloc: context.read<BleBloc>(),
-              ),
-              child: _DialogContent(),
-            ),
-          ),
-        );
-      },
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(UIConstants.deviceSelectorDialogBorderRadius),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(
+          minWidth: 300,
+          maxWidth: 400,
+          maxHeight: 500,
+        ),
+        padding: EdgeInsets.symmetric(
+          horizontal: UIConstants.deviceSelectorDialogPadding,
+          vertical: UIConstants.deviceSelectorDialogVerticalPadding,
+        ),
+        child: _DialogContent(),
+      ),
     );
   }
 }

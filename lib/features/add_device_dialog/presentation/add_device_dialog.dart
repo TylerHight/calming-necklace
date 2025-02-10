@@ -194,7 +194,10 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
   Future<void> _showDeviceSelectorDialog(BuildContext context) async {
     final device = await showDialog<BleDevice>(
       context: context,
-      builder: (context) => const DeviceSelectorDialog(),
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<DeviceSelectorBloc>(),
+        child: const DeviceSelectorDialog(),
+      ),
     );
     if (device != null) {
       setState(() => _selectedDevice = device);
