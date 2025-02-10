@@ -95,16 +95,12 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        _buildNameField(),
+        const SizedBox(height: 24),
+        _buildDeviceSelector(context),
+        const SizedBox(height: 24),
         BlocBuilder<AddDeviceDialogBloc, AddDeviceDialogState>(
           builder: (context, state) {
-            if (state is AddDeviceDialogLoading) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
             if (state is ConnectionInProgress) {
               return Container(
                 padding: const EdgeInsets.all(16.0),
@@ -135,9 +131,6 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
             return const SizedBox.shrink();
           },
         ),
-        _buildNameField(),
-        const SizedBox(height: 24),
-        _buildDeviceSelector(context),
         const SizedBox(height: 24),
         _buildButtons(context),
       ],
@@ -201,7 +194,9 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     );
     if (device != null) {
       setState(() => _selectedDevice = device);
-      context.read<AddDeviceDialogBloc>().add(SelectDeviceEvent(device));    }
+      context.read<AddDeviceDialogBloc>().add(SelectDeviceEvent(device));
+      context.read<AddDeviceDialogBloc>().add(SubmitAddDeviceEvent(_nameController.text, device));
+    }
   }
 
   Widget _buildButtons(BuildContext context) {
