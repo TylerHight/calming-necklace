@@ -7,6 +7,8 @@ class BleState extends Equatable {
   final Map<String, int> reconnectionAttempts;
   final String? error;
   final bool isConnecting;
+  final String deviceState;
+  final int rssi;
 
   const BleState({
     required this.deviceConnectionStates,
@@ -15,6 +17,8 @@ class BleState extends Equatable {
     required this.reconnectionAttempts,
     this.error,
     this.isConnecting = false,
+    required this.deviceState,
+    required this.rssi,
   });
 
   factory BleState.initial() => const BleState(
@@ -22,6 +26,8 @@ class BleState extends Equatable {
     deviceStates: {},
     deviceRssi: {},
     reconnectionAttempts: {},
+    deviceState: 'initial',
+    rssi: 0,
   );
 
   BleState copyWith({
@@ -31,6 +37,8 @@ class BleState extends Equatable {
     Map<String, int>? reconnectionAttempts,
     String? error,
     bool? isConnecting,
+    String? deviceState,
+    int? rssi,
   }) {
     return BleState(
       deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
@@ -39,6 +47,8 @@ class BleState extends Equatable {
       reconnectionAttempts: reconnectionAttempts ?? this.reconnectionAttempts,
       error: error,
       isConnecting: isConnecting ?? this.isConnecting,
+      deviceState: deviceState ?? this.deviceState,
+      rssi: rssi ?? this.rssi,
     );
   }
 
@@ -50,5 +60,7 @@ class BleState extends Equatable {
     reconnectionAttempts,
     error,
     isConnecting,
+    deviceState,
+    rssi,
   ];
 }

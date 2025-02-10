@@ -1,4 +1,5 @@
 import 'package:calming_necklace/core/data/models/necklace.dart';
+import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:calming_necklace/core/services/logging_service.dart';
 import 'package:calming_necklace/core/services/database_service.dart';
 import 'dart:async';
@@ -12,7 +13,7 @@ abstract class NecklaceRepository {
   Future<List<Necklace>> getNecklaces();
   Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
-  Future<void> addNecklace(String name, String bleDevice);
+  Future<void> addNecklace(String name, String bleDeviceId);
   Stream<bool> getEmissionStream(String necklaceId);
 }
 
@@ -31,7 +32,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   StreamController<bool> _getOrCreateController(String necklaceId) {
     return _emissionControllers.putIfAbsent(
       necklaceId,
-      () => StreamController<bool>.broadcast(),
+          () => StreamController<bool>.broadcast(),
     );
   }
 
@@ -67,19 +68,26 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   }
 
   @override
-  Future<void> addNecklace(String name, String bleDevice) async {
+  Future<void> addNecklace(String name, String bleDeviceId) async {
     try {
+      final bleDevice = BleDevice(
+        id: bleDeviceId,
+        name: 'Default Name', // Provide a default name
+        address: '00:00:00:00:00:00', // Provide a default address
+        rssi: 0, // Provide a default RSSI value
+        deviceType: BleDeviceType.necklace, // Provide a default device type
+      ); // Create BleDevice instance
       final necklace = Necklace(
         id: DateTime.now().toString(),
         name: name,
-        bleDevice: bleDevice,
+        bleDevice: bleDevice, // Pass BleDevice instance
         emission1Duration: Duration(seconds: 3),
         releaseInterval1: Duration(seconds: 20),
         isArchived: false,
       );
 
       await _dbService.insertNecklace(necklace);
-      _logger.logInfo('Successfully added necklace: $name with Bluetooth Low Energy device: $bleDevice');
+      _logger.logInfo('Successfully added necklace: $name with Bluetooth Low Energy device: $bleDeviceId');
     } catch (e) {
       _logger.logError('Error adding necklace: $e');
       throw Exception('Failed to add necklace: $e');

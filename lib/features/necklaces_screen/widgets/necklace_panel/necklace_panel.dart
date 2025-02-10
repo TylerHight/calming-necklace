@@ -195,11 +195,11 @@ class _NecklacePanelState extends State<NecklacePanel> {
 
   Widget _buildConnectionIndicator(bool isConnected, int rssi) {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: ConnectionStatus(
-        isConnected: true,
-        deviceId: 'device_id_123',
-      )
+        padding: const EdgeInsets.only(top: 8.0),
+        child: ConnectionStatus(
+          isConnected: isConnected,
+          deviceId: widget.necklace.bleDevice?.id ?? '', // Update to access id property
+        )
     );
   }
 

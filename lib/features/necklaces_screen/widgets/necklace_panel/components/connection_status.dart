@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../../core/blocs/ble/ble_state.dart';
 import '../../../../../core/services/ble/ble_service.dart';
 
 class ConnectionStatus extends StatelessWidget {
@@ -13,11 +16,10 @@ class ConnectionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<bool>(
-      stream: BleService().connectionStatusStream,
-      initialData: isConnected,
-      builder: (context, snapshot) {
-        final connected = snapshot.data ?? false;
+    return BlocBuilder<BleBloc, BleState>(
+      buildWhen: (previous, current) => previous.deviceConnectionStates[deviceId] != current.deviceConnectionStates[deviceId],
+      builder: (context, state) {
+        final connected = state.deviceConnectionStates[deviceId] ?? false;
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [

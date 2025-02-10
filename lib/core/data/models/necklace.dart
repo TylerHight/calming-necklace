@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'ble_device.dart';
 
 class Necklace extends Equatable {
   final String id;
   final String name;
-  final String? bleDevice;
+  final BleDevice? bleDevice; // Change type to BleDevice?
   final bool autoTurnOffEnabled;
   final bool periodicEmissionEnabled;
   final Duration emission1Duration;
@@ -14,7 +15,7 @@ class Necklace extends Equatable {
   Necklace({
     required this.id,
     required this.name,
-    this.bleDevice,
+    this.bleDevice, // Update constructor
     required this.emission1Duration,
     required this.releaseInterval1,
     this.autoTurnOffEnabled = false,
@@ -26,7 +27,7 @@ class Necklace extends Equatable {
   Necklace copyWith({
     String? id,
     String? name,
-    String? bleDevice,
+    BleDevice? bleDevice, // Update copyWith method
     Duration? emission1Duration,
     Duration? releaseInterval1,
     bool? autoTurnOffEnabled,
@@ -37,7 +38,7 @@ class Necklace extends Equatable {
     return Necklace(
       id: id ?? this.id,
       name: name ?? this.name,
-      bleDevice: bleDevice ?? this.bleDevice,
+      bleDevice: bleDevice ?? this.bleDevice, // Update copyWith method
       emission1Duration: emission1Duration ?? this.emission1Duration,
       releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
       autoTurnOffEnabled: autoTurnOffEnabled ?? this.autoTurnOffEnabled,
@@ -51,7 +52,7 @@ class Necklace extends Equatable {
   List<Object?> get props => [
     id,
     name,
-    bleDevice,
+    bleDevice, // Update props
     autoTurnOffEnabled,
     emission1Duration,
     releaseInterval1,
@@ -64,7 +65,7 @@ class Necklace extends Equatable {
     return {
       'id': id,
       'name': name,
-      'bleDevice': bleDevice,
+      'bleDevice': bleDevice?.toMap(), // Update toMap method
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
       'releaseInterval1': releaseInterval1.inSeconds,
@@ -78,7 +79,7 @@ class Necklace extends Equatable {
     return Necklace(
       id: map['id'],
       name: map['name'],
-      bleDevice: map['bleDevice'],
+      bleDevice: map['bleDevice'] != null ? BleDevice.fromMap(map['bleDevice']) : null, // Update fromMap method
       autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
       emission1Duration: Duration(seconds: map['emission1Duration']),
       releaseInterval1: Duration(seconds: map['releaseInterval1']),

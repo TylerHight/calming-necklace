@@ -33,9 +33,8 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     try {
       final deviceId = event.device.id;
       final connected = await _bleService.connectToDevice(event.device.device!);
-
+      final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
       if (connected) {
-        final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
         updatedStates[deviceId] = true;
         emit(state.copyWith(
           deviceConnectionStates: updatedStates,
