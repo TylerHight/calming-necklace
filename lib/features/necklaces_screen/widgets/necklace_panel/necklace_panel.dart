@@ -110,9 +110,9 @@ class _NecklacePanelState extends State<NecklacePanel> {
     return BlocBuilder<BleBloc, BleState>(
       builder: (context, bleState) {
         final isConnected = widget.necklace.bleDevice != null &&
-            (bleState.deviceConnectionStates[widget.necklace.bleDevice] ?? false);
+            (bleState.deviceConnectionStates[widget.necklace.bleDevice?.id ?? ''] ?? false);
 
-        final rssi = isConnected ? (bleState.rssi ?? 0) : 0;
+        final rssi = isConnected ? (bleState.deviceRssi[widget.necklace.bleDevice?.id ?? ''] ?? 0) : 0;
 
         return MultiBlocProvider(
           providers: [

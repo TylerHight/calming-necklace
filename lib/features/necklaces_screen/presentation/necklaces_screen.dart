@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/blocs/ble/ble_bloc.dart';
 import '../../../core/blocs/ble/ble_state.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/ble_repository.dart';
@@ -47,16 +48,20 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       context: context,
       builder: (context) => MultiBlocProvider(
         providers: [
+          BlocProvider<BleBloc>(
+            create: (context) => BleBloc(bleService: context.read<BleService>()),
+          ),
           BlocProvider(
             create: (context) => AddDeviceDialogBloc(
               _repository,
               context.read<NecklacesBloc>(),
-              context.read<BleService>(), // Added BleService to constructor
+              context.read<BleBloc>(),
             ),
           ),
           BlocProvider(
             create: (context) => DeviceSelectorBloc(
               bleRepository: context.read<BleRepository>(),
+              bleBloc: context.read<BleBloc>(),
             ),
           ),
         ],

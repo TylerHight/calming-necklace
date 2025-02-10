@@ -1,6 +1,9 @@
 import 'package:calming_necklace/features/add_device_dialog/blocs/device_selector/device_selector_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_event.dart';
+import '../../../core/blocs/ble/ble_state.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
@@ -13,27 +16,32 @@ class DeviceSelectorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(UIConstants.deviceSelectorDialogBorderRadius),
-      ),
-      child: Container(
-        constraints: const BoxConstraints(
-          minWidth: 300,
-          maxWidth: 400,
-          maxHeight: 500,
-        ),
-        padding: EdgeInsets.symmetric(
-          horizontal: UIConstants.deviceSelectorDialogPadding,
-          vertical: UIConstants.deviceSelectorDialogVerticalPadding,
-        ),
-        child: BlocProvider(
-          create: (context) => DeviceSelectorBloc(
-            bleRepository: context.read<BleRepository>(),
+    return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+      builder: (context, deviceSelectorState) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(UIConstants.deviceSelectorDialogBorderRadius),
           ),
-          child: _DialogContent(),
-        ),
-      ),
+          child: Container(
+            constraints: const BoxConstraints(
+              minWidth: 300,
+              maxWidth: 400,
+              maxHeight: 500,
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: UIConstants.deviceSelectorDialogPadding,
+              vertical: UIConstants.deviceSelectorDialogVerticalPadding,
+            ),
+            child: BlocProvider(
+              create: (context) => DeviceSelectorBloc(
+                bleRepository: context.read<BleRepository>(),
+                bleBloc: context.read<BleBloc>(),
+              ),
+              child: _DialogContent(),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -66,18 +74,43 @@ class _DialogContent extends StatelessWidget {
           child: DeviceSelector(
             deviceType: BleDeviceType.necklace,
             onDeviceSelected: (device) {
-              context.read<DeviceSelectorBloc>().add(SelectDevice(device));
+              // Attempt to connect immediately when device is selected
+              context.read<BleBloc>().add(BleConnectRequest(device));
             },
           ),
         ),
         const SizedBox(height: 16),
-        BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
-          builder: (context, state) {
-            return ElevatedButton(
-              onPressed: state.selectedDevice == null ? null : () {
-                Navigator.of(context).pop(state.selectedDevice);
+        BlocBuilder<BleBloc, BleState>(
+          builder: (context, bleState) {
+            if (bleState.isConnecting) {
+              return const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 8),
+                    Text('Connecting...'),
+                  ],
+                ),
+              );
+            } else if (bleState.error != null) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  bleState.error ?? 'Unknown error',
+                  style: TextStyle(color: Colors.red),
+                ),
+              );
+            }
+            return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+              builder: (context, deviceSelectorState) {
+                return ElevatedButton(
+                  onPressed: deviceSelectorState.selectedDevice == null ? null : () {
+                    Navigator.of(context).pop(deviceSelectorState.selectedDevice);
+                  },
+                  child: const Text('Confirm Selection'),
+                );
               },
-              child: const Text('Confirm Selection'),
             );
           },
         ),

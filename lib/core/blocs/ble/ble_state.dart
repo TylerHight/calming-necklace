@@ -1,39 +1,54 @@
-// lib/core/blocs/ble/ble_state.dart
-import '../../data/models/ble_device.dart';
+import 'package:equatable/equatable.dart';
 
-class BleState {
-  final bool isScanning;
-  final String deviceState;
+class BleState extends Equatable {
   final Map<String, bool> deviceConnectionStates;
-  final int? rssi;
+  final Map<String, String> deviceStates;
+  final Map<String, int> deviceRssi;
+  final Map<String, int> reconnectionAttempts;
+  final String? error;
+  final bool isConnecting;
 
-  BleState({
-    this.isScanning = false,
-    this.deviceState = '',
-    this.deviceConnectionStates = const {},
-    this.rssi,
+  const BleState({
+    required this.deviceConnectionStates,
+    required this.deviceStates,
+    required this.deviceRssi,
+    required this.reconnectionAttempts,
+    this.error,
+    this.isConnecting = false,
   });
 
-  factory BleState.initial() {
+  factory BleState.initial() => const BleState(
+    deviceConnectionStates: {},
+    deviceStates: {},
+    deviceRssi: {},
+    reconnectionAttempts: {},
+  );
+
+  BleState copyWith({
+    Map<String, bool>? deviceConnectionStates,
+    Map<String, String>? deviceStates,
+    Map<String, int>? deviceRssi,
+    Map<String, int>? reconnectionAttempts,
+    String? error,
+    bool? isConnecting,
+  }) {
     return BleState(
-      isScanning: false,
-      deviceState: '',
-      deviceConnectionStates: const {},
-      rssi: 0,
+      deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
+      deviceStates: deviceStates ?? this.deviceStates,
+      deviceRssi: deviceRssi ?? this.deviceRssi,
+      reconnectionAttempts: reconnectionAttempts ?? this.reconnectionAttempts,
+      error: error,
+      isConnecting: isConnecting ?? this.isConnecting,
     );
   }
 
-  BleState copyWith({
-    bool? isScanning,
-    String? deviceState,
-    Map<String, bool>? deviceConnectionStates,
-    int? rssi,
-  }) {
-    return BleState(
-      isScanning: isScanning ?? this.isScanning,
-      deviceState: deviceState ?? this.deviceState,
-      deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
-      rssi: rssi ?? this.rssi,
-    );
-  }
+  @override
+  List<Object?> get props => [
+    deviceConnectionStates,
+    deviceStates,
+    deviceRssi,
+    reconnectionAttempts,
+    error,
+    isConnecting,
+  ];
 }

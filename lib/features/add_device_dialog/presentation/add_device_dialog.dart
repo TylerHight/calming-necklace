@@ -7,12 +7,15 @@ import '../../../core/data/repositories/necklace_repository.dart';
 import '../../../core/services/ble/ble_service.dart';
 import '../../../core/services/ble/ble_types.dart';
 import '../../../core/ui/ui_constants.dart';
+import '../blocs/add_device_dialog/add_device_dialog_event.dart';
 import '../blocs/add_device_dialog/add_device_dialog_state.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
 import '../blocs/add_device_dialog/add_device_dialog_bloc.dart';
 import '../blocs/device_selector/device_selector_event.dart';
 import '../widgets/device_selector.dart';
 import '../widgets/device_selector_dialog.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_event.dart';
 
 class AddDeviceDialog extends StatefulWidget {
   const AddDeviceDialog({super.key});
@@ -34,12 +37,13 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
           create: (context) => AddDeviceDialogBloc(
             context.read<NecklaceRepository>(),
             context.read<NecklacesBloc>(),
-            BleService(),
+            context.read<BleBloc>(),
           ),
         ),
         BlocProvider(
           create: (context) => DeviceSelectorBloc(
             bleRepository: context.read<BleRepository>(),
+            bleBloc: context.read<BleBloc>(),
           ),
         ),
       ],
@@ -195,7 +199,6 @@ class _AddDeviceDialogState extends State<AddDeviceDialog> {
     if (device != null) {
       setState(() => _selectedDevice = device);
       context.read<AddDeviceDialogBloc>().add(SelectDeviceEvent(device));
-      context.read<AddDeviceDialogBloc>().add(SubmitAddDeviceEvent(_nameController.text, device));
     }
   }
 

@@ -6,15 +6,18 @@ import '../../../../core/data/repositories/ble_repository.dart';
 import '../../../../core/services/logging_service.dart';
 import 'device_selector_event.dart';
 import 'device_selector_state.dart';
-import 'package:equatable/equatable.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_event.dart';
 
 class DeviceSelectorBloc extends Bloc<DeviceSelectorEvent, DeviceSelectorState> {
   final BleRepository _bleRepository;
+  final BleBloc _bleBloc;
   final LoggingService _logger = LoggingService();
   StreamSubscription? _deviceSubscription;
 
-  DeviceSelectorBloc({required BleRepository bleRepository})
+  DeviceSelectorBloc({required BleRepository bleRepository, required BleBloc bleBloc})
       : _bleRepository = bleRepository,
+        _bleBloc = bleBloc,
         super(const DeviceSelectorState()) {
     on<StartScanning>(_onStartScanning);
     on<StopScanning>(_onStopScanning);
@@ -72,6 +75,8 @@ class DeviceSelectorBloc extends Bloc<DeviceSelectorEvent, DeviceSelectorState> 
 
   void _onSelectDevice(SelectDevice event, Emitter<DeviceSelectorState> emit) {
     emit(state.copyWith(selectedDevice: event.device));
+    // Attempt to connect immediately when device is selected
+    _bleBloc.add(BleConnectRequest(event.device));
   }
 
   @override

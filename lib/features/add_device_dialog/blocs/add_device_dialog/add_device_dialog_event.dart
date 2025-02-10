@@ -1,4 +1,5 @@
-part of 'add_device_dialog_bloc.dart';
+import 'package:equatable/equatable.dart';
+import '../../../../core/data/models/ble_device.dart';
 
 abstract class AddDeviceDialogEvent extends Equatable {
   const AddDeviceDialogEvent();
