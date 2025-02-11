@@ -190,8 +190,6 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             index: index,
             repository: repository,
             name: necklace.name,
-            isConnected: false,  // Default to false, NecklacePanel will handle actual state
-            rssi: 0,
             necklace: necklace,
             databaseService: _databaseService, // Pass DatabaseService
           ),

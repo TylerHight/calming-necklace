@@ -38,8 +38,8 @@ class BleBloc extends Bloc<BleEvent, BleState> {
       _loggingService.logBleInfo('Attempting to connect and initialize device: $deviceId');
       await _bleService.connectAndInitializeDevice(event.device.device!);
       final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
-      _loggingService.logBleInfo('Successfully connected and initialized device: $deviceId');
       updatedStates[deviceId] = true;
+      _loggingService.logBleInfo('Successfully connected and initialized device: $deviceId');
       emit(state.copyWith(
         deviceConnectionStates: updatedStates,
         isConnecting: false,

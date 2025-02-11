@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_state.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../core/services/database_service.dart';
 import '../../../../core/ui/components/signal_strength_icon.dart';
@@ -13,8 +15,6 @@ import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
 import '../../../../features/notes/widgets/add_note_dialog.dart';
-import '../../../../core/blocs/ble/ble_bloc.dart';
-import '../../../../core/blocs/ble/ble_state.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
@@ -22,8 +22,6 @@ class NecklacePanel extends StatefulWidget {
   final Necklace necklace;
   final NecklaceRepository repository;
   final DatabaseService databaseService;
-  final bool isConnected;
-  final int rssi;
 
   const NecklacePanel({
     Key? key,
@@ -32,8 +30,6 @@ class NecklacePanel extends StatefulWidget {
     required this.necklace,
     required this.repository,
     required this.databaseService,
-    required this.isConnected,
-    required this.rssi,
   }) : super(key: key);
 
   @override
@@ -102,11 +98,6 @@ class _NecklacePanelState extends State<NecklacePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final logger = LoggingService();
-    logger.logDebug('Building NecklacePanel for ${widget.name}');
-    logger.logDebug('NecklacePanel: Using provided repository: ${widget.repository}');
-    final repository = widget.repository; // TODO: handle with bloc instead of directly accessing repository
-
     return BlocBuilder<BleBloc, BleState>(
       builder: (context, bleState) {
         final isConnected = widget.necklace.bleDevice != null &&
@@ -198,16 +189,16 @@ class _NecklacePanelState extends State<NecklacePanel> {
         padding: const EdgeInsets.only(top: 8.0),
         child: ConnectionStatus(
           isConnected: isConnected,
-          deviceId: widget.necklace.bleDevice?.id ?? '', // Update to access id property
+          deviceId: widget.necklace.bleDevice?.id ?? '',
         )
     );
   }
 
   Widget _buildControls(bool isConnected) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 0.0), // Add padding around the row
+      padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Evenly space the buttons
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           IconButton(
@@ -223,7 +214,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
               ),
             ),
           ),
-          const SizedBox(width: UIConstants.settingsNotesSpacing), // Spacing between the settings button and the notes button
+          const SizedBox(width: UIConstants.settingsNotesSpacing),
           IconButton(
             icon: const Icon(Icons.note_add),
             iconSize: UIConstants.notesIconSize,
@@ -234,23 +225,23 @@ class _NecklacePanelState extends State<NecklacePanel> {
               ),
             ),
           ),
-          const SizedBox(width: UIConstants.notesToggleSpacing), // Spacing between the notes button and the toggle button
+          const SizedBox(width: UIConstants.notesToggleSpacing),
           SizedBox(
             width: UIConstants.timedToggleButtonWidth,
-            child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!),
+            child: _buildTimedToggleButton(Icons.spa, Colors.blue[400]!, Colors.blue[100]!, isConnected),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildTimedToggleButton(IconData icon, Color activeColor, Color inactiveColor) {
+  Widget _buildTimedToggleButton(IconData icon, Color activeColor, Color inactiveColor, bool isConnected) {
     return Container(
-      margin: EdgeInsets.zero, // Remove any margin
+      margin: EdgeInsets.zero,
       child: TimedToggleButton(
         autoTurnOffDuration: const Duration(seconds: 5),
         periodicEmissionTimerDuration: const Duration(seconds: 10),
-        isConnected: widget.isConnected,
+        isConnected: isConnected,
         databaseService: widget.databaseService,
         necklace: widget.necklace,
         iconData: icon,

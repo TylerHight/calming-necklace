@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
+import '../../../../../core/blocs/ble/ble_event.dart';
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
 import '../../../../../core/services/database_service.dart';
+import '../../../../../core/blocs/ble/ble_bloc.dart';
 import '../../../../../core/ui/ui_constants.dart';
-import 'release_interval_countdown.dart'; // Import the new countdown widget
+import 'release_interval_countdown.dart';
 
 class TimedToggleButton extends StatelessWidget {
   final Color? activeColor;
@@ -168,11 +170,13 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
           child: InkWell(
             onTap: () {
               if (!widget.isConnected) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Device not connected')),
-                );
+                context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
                 return;
               }
+              context.read<BleBloc>().add(BleLedControlRequest(
+                turnOn: !(state is LightOnState),
+                deviceId: widget.necklace.bleDevice!.id,
+              ));
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             child: Container(
@@ -235,6 +239,22 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
       return '${minutes}m';
     } else {
       return '${seconds}s';
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bleState = context.watch<BleBloc>().state;
+    final isConnected = widget.necklace.bleDevice != null &&
+        (bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] ?? false);
+    
+    if (isConnected != widget.isConnected) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          // This will trigger a rebuild with the updated connection status
+        });
+      });
     }
   }
 }
