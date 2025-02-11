@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import '../../data/models/ble_device.dart';
 import '../../data/models/necklace.dart';
 import '../logging_service.dart';
 import 'managers/ble_connection_manager.dart';
@@ -140,8 +141,9 @@ class BleService {
     if (_isInitialized && !forceRediscovery) return;
 
     try {
+      _loggingService.logBleInfo('Starting service and characteristic discovery for device: ${device.id}');
       final services = await device.discoverServices();
-      _loggingService.logBleDebug('Discovered ${services.length} services:');
+      _loggingService.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
 
       for (var service in services) {
         _loggingService.logBleDebug('Service UUID: ${service.uuid}');
@@ -151,7 +153,6 @@ class BleService {
         }
       }
 
-      // Look for the LED service (180a)
       final ledService = services.firstWhere(
             (s) => s.uuid.toString().toLowerCase().contains(BleConstants.ledServiceUuid),
         orElse: () => throw BleException('LED service not found'),
@@ -159,7 +160,6 @@ class BleService {
 
       _loggingService.logBleDebug('Found LED service: ${ledService.uuid}');
 
-      // Look for the switch characteristic (2a57)
       _switchCharacteristic = ledService.characteristics.firstWhere(
             (c) => c.uuid.toString().toLowerCase().contains(BleConstants.switchCharacteristicUuid),
         orElse: () => throw BleException('Switch characteristic not found'),
@@ -167,15 +167,22 @@ class BleService {
 
       _loggingService.logBleDebug('Found switch characteristic: ${_switchCharacteristic!.uuid}');
 
-      // Verify the characteristic has the required properties
       if (!_switchCharacteristic!.properties.write) {
         throw BleException('Characteristic does not support write operations');
       }
 
       _isInitialized = true;
+      _loggingService.logBleInfo('Service and characteristic discovery completed for device: ${device.id}');
     } catch (e) {
-      _loggingService.logBleError('Error initializing characteristics: $e');
+      _loggingService.logBleError('Error initializing characteristics for device: ${device.id}', e);
       rethrow;
+    }
+  }
+
+  Future<void> connectAndInitializeDevice(BluetoothDevice device) async {
+    final connected = await connectToDevice(device);
+    if (connected) {
+      await _initializeCharacteristics(device);
     }
   }
 

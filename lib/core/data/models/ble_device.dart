@@ -15,7 +15,7 @@ class BleDevice extends Equatable {
   final BleDeviceType deviceType;
   final bool isConnected;
   final String? necklaceId; 
-  final BluetoothDevice? device;  // Add the BluetoothDevice field
+  final BluetoothDevice? device;
 
   const BleDevice({
     required this.id,
@@ -25,10 +25,10 @@ class BleDevice extends Equatable {
     required this.deviceType,
     this.isConnected = false,
     this.necklaceId, 
-    this.device,  // Initialize the new field
+    this.device,
   });
 
-  @override  // Update props to include the device
+  @override
   List<Object?> get props => [id, name, address, rssi, deviceType, isConnected, necklaceId];
 
   Map<String, dynamic> toMap() {
