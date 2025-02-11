@@ -120,6 +120,7 @@ class _NecklacePanelState extends State<NecklacePanel> {
               create: (context) => TimedToggleButtonBloc(
                 repository: widget.repository,
                 necklace: widget.necklace,
+                bleBloc: BlocProvider.of<BleBloc>(context),
               ),
             ),
             BlocProvider(

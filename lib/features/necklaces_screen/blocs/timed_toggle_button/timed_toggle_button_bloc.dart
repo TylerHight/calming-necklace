@@ -7,6 +7,8 @@ import '../../../../core/data/repositories/necklace_repository.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'ticker.dart';
 import '../periodic_emission/periodic_emission_bloc.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_event.dart';
 
 part 'timed_toggle_button_event.dart';
 part 'timed_toggle_button_state.dart';
@@ -14,6 +16,7 @@ part 'periodic_emission_ticker.dart';
 
 class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButtonState> {
   final NecklaceRepository _repository;
+  final BleBloc _bleBloc;
   final Necklace necklace;
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
@@ -24,8 +27,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
   TimedToggleButtonBloc({
     required NecklaceRepository repository,
+    required BleBloc bleBloc,
     required this.necklace,
   }) : _repository = repository,
+       _bleBloc = bleBloc,
        _ticker = const Ticker(),
        super(TimedToggleButtonInitial()) {
     on<StartPeriodicEmission>(_onStartPeriodicEmission);
@@ -52,12 +57,18 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         // Normal toggle behavior
         _isActive = !_isActive;
         if (_isActive) {
-          await _repository.toggleLight(necklace, true);
+          _bleBloc.add(BleLedControlRequest(
+            deviceId: necklace.bleDevice?.id ?? '',
+            turnOn: true,
+          ));
           emit(LightOnState(necklace.emission1Duration.inSeconds));
           _startTimer(necklace.emission1Duration.inSeconds);
         } else {
           if (necklace.periodicEmissionEnabled) {
-            await _repository.toggleLight(necklace, false);
+            _bleBloc.add(BleLedControlRequest(
+              deviceId: necklace.bleDevice?.id ?? '',
+              turnOn: false,
+            ));
           }
           _stopTimer(emit);
         }
@@ -86,7 +97,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     try {
       _isPeriodicEmission = true;
       _isActive = true;
-      await _repository.toggleLight(necklace, true);
+      _bleBloc.add(BleLedControlRequest(
+        deviceId: necklace.bleDevice?.id ?? '',
+        turnOn: true,
+      ));
       emit(LightOnState(necklace.emission1Duration.inSeconds));
       _startTimer(necklace.emission1Duration.inSeconds, isPeriodicEmission: true);
     } catch (e) {
@@ -115,7 +129,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   ) async {
     try {
       _isPeriodicEmission = true;
-      await _repository.toggleLight(necklace, true);
+      _bleBloc.add(BleLedControlRequest(
+        deviceId: necklace.bleDevice?.id ?? '',
+        turnOn: true,
+      ));
       _startTimer(event.duration);
       emit(LightOnState(event.duration));
     } catch (e) {

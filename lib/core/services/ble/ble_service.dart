@@ -209,6 +209,11 @@ class BleService {
     }
   }
 
+  Future<void> setLedState(bool turnOn) async {
+    await ensureConnected();
+    await _writeCommand(turnOn ? BleCommand.ledOn.value : BleCommand.ledOff.value, 0);
+  }
+
   // Device Settings Methods
   Future<void> updateEmission1Duration(String deviceId, Duration duration) async {
     await _writeCommand(BleCommand.emission1Duration.value, duration.inSeconds);

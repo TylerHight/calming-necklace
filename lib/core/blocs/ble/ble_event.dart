@@ -50,3 +50,16 @@ class BleReconnectionAttempt extends BleEvent {
   @override
   List<Object?> get props => [attempt, deviceId];
 }
+
+class BleLedControlRequest extends BleEvent {
+  final String deviceId;
+  final bool turnOn;
+
+  const BleLedControlRequest({
+    required this.deviceId,
+    required this.turnOn,
+  });
+
+  @override
+  List<Object?> get props => [deviceId, turnOn];
+}

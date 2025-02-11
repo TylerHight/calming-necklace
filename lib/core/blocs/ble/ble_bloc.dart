@@ -21,6 +21,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     on<BleConnectionStatusChanged>((event, emit) => _onConnectionStatusChanged(event.isConnected));
     on<BleRssiUpdated>((event, emit) => _onRssiUpdate(event.rssi));
     on<BleReconnectionAttempt>((event, emit) => _onReconnectionAttempt(event.attempt));
+    on<BleLedControlRequest>(_onLedControlRequest);
 
     _deviceStateSubscription = _bleService.deviceStateStream.listen(_onDeviceStateChanged);
     _connectionStatusSubscription = _bleService.connectionStatusStream.listen(_onConnectionStatusChanged);
@@ -91,6 +92,22 @@ class BleBloc extends Bloc<BleEvent, BleState> {
 
   void _onRssiUpdate(int rssi) {
     emit(state.copyWith(rssi: rssi));
+  }
+
+  Future<void> _onLedControlRequest(BleLedControlRequest event, Emitter<BleState> emit) async {
+    try {
+      _loggingService.logBleInfo('LED control request: ${event.turnOn ? 'ON' : 'OFF'}');
+      await _bleService.setLedState(event.turnOn);
+      emit(state.copyWith(
+        error: null,
+        lastCommand: event.turnOn ? 'LED ON' : 'LED OFF',
+      ));
+    } catch (e) {
+      _loggingService.logBleError('LED control error', e);
+      emit(state.copyWith(
+        error: 'LED control error: ${e.toString()}',
+      ));
+    }
   }
 
   @override

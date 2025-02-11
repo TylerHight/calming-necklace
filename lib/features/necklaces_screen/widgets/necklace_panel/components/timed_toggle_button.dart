@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
+import 'package:calming_necklace/core/blocs/ble/ble_bloc.dart'; // Import the BLE bloc
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
@@ -47,6 +48,7 @@ class TimedToggleButton extends StatelessWidget {
     return BlocProvider(
       create: (context) => TimedToggleButtonBloc(
         repository: context.read<NecklaceRepository>(),
+        bleBloc: context.read<BleBloc>(), // Provide the BLE bloc
         necklace: necklace,
       ),
       child: _TimedToggleButtonView(
