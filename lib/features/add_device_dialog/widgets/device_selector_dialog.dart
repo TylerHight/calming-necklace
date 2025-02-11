@@ -67,29 +67,34 @@ class _DialogContent extends StatelessWidget {
         ),
         const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
         Expanded(
-          child: DeviceSelector(
-            deviceType: BleDeviceType.necklace,
-            onDeviceSelected: (device) {
-              // Attempt to connect immediately when device is selected
-              context.read<BleBloc>().add(BleConnectRequest(device));
+          child: BlocBuilder<BleBloc, BleState>(
+            builder: (context, bleState) {
+              if (bleState.isConnecting) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16),
+                      Text('Connecting...'),
+                    ],
+                  ),
+                );
+              } else {
+                return DeviceSelector(
+                  deviceType: BleDeviceType.necklace,
+                  onDeviceSelected: (device) {
+                    context.read<BleBloc>().add(BleConnectRequest(device));
+                  },
+                );
+              }
             },
           ),
         ),
         const SizedBox(height: 16),
         BlocBuilder<BleBloc, BleState>(
           builder: (context, bleState) {
-            if (bleState.isConnecting) {
-              return const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 8),
-                    Text('Connecting...'),
-                  ],
-                ),
-              );
-            } else if (bleState.error != null) {
+            if (bleState.error != null) {
               return Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(

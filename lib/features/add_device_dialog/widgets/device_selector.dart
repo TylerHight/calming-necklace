@@ -54,17 +54,21 @@ class _DeviceSelectorState extends State<DeviceSelector> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (state.isScanning)
-              Container(
-                width: double.infinity,
-                height: 4,
-                child: LinearProgressIndicator(
-                  backgroundColor: Colors.grey[200],
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              child: state.isScanning
+                ? Container(
+                    width: double.infinity,
+                    height: 4,
+                    child: LinearProgressIndicator(
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            ),
             const SizedBox(height: 8),
             const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
             if (state.devices.isEmpty && !state.isInitialLoading)
@@ -85,66 +89,62 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                 ),
               ),
             const SizedBox(height: 16),
-            _buildDeviceList(state, theme),
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              child: Container(
+                key: ValueKey<bool>(!state.isScanning),
+                constraints: const BoxConstraints(maxHeight: UIConstants.deviceSelectorListMaxHeight),
+                decoration: BoxDecoration(
+                  border: Border.all(color: UIConstants.deviceSelectorBorderColor),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  itemCount: state.devices.length,
+                  itemBuilder: (context, index) {
+                    final device = state.devices[index];
+                    return ListTile(
+                      title: Text(
+                        device.name,
+                        style: TextStyle(color: UIConstants.deviceSelectorTextColor),
+                      ),
+                      subtitle: Text(
+                        device.address,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: UIConstants.deviceSelectorTextColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SignalStrengthIcon(rssi: device.rssi, color: UIConstants.deviceSelectorIconColor),
+                          const SizedBox(width: 8),
+                          if (state.selectedDevice?.id == device.id)
+                            Icon(Icons.check_circle, color: theme.colorScheme.primary),
+                        ],
+                      ),
+                      selected: state.selectedDevice?.id == device.id,
+                      selectedTileColor: theme.colorScheme.primary.withOpacity(0.1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      onTap: () {
+                        if (state.selectedDevice?.id != device.id) {
+                          _deviceSelectorBloc.add(SelectDevice(device));
+                          widget.onDeviceSelected(device);
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
         );
       },
-    );
-  }
-
-  Widget _buildDeviceList(DeviceSelectorState state, ThemeData theme) {
-    if (state.devices.isEmpty) {
-      return Container();
-    }
-
-    return Container(
-      constraints: const BoxConstraints(maxHeight: UIConstants.deviceSelectorListMaxHeight),
-      decoration: BoxDecoration(
-        border: Border.all(color: UIConstants.deviceSelectorBorderColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: state.devices.length,
-        itemBuilder: (context, index) {
-          final device = state.devices[index];
-          return ListTile(
-            title: Text(
-              device.name,
-              style: TextStyle(color: UIConstants.deviceSelectorTextColor),
-            ),
-            subtitle: Text(
-              device.address,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: UIConstants.deviceSelectorTextColor,
-                fontSize: 12,
-              ),
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SignalStrengthIcon(rssi: device.rssi, color: UIConstants.deviceSelectorIconColor),
-                const SizedBox(width: 8),
-                if (state.selectedDevice?.id == device.id)
-                  Icon(Icons.check_circle, color: theme.colorScheme.primary),
-              ],
-            ),
-            selected: state.selectedDevice?.id == device.id,
-            selectedTileColor: theme.colorScheme.primary.withOpacity(0.1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            onTap: () {
-              if (state.selectedDevice?.id != device.id) {
-                _deviceSelectorBloc.add(SelectDevice(device));
-                widget.onDeviceSelected(device);
-              }
-            },
-          );
-        },
-      ),
     );
   }
 }
