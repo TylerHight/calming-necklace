@@ -67,7 +67,6 @@ class _DeviceSelectorState extends State<DeviceSelector> {
               ),
             const SizedBox(height: 8),
             const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
-            _buildDeviceList(state, theme),
             if (state.devices.isEmpty && !state.isInitialLoading)
               Container(
                 padding: const EdgeInsets.all(16),
@@ -86,36 +85,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                 ),
               ),
             const SizedBox(height: 16),
-            if (!state.isScanning)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    padding: UIConstants.deviceSelectorRescanButtonPadding,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(UIConstants.deviceSelectorRescanButtonRadius),
-                    ),
-                    backgroundColor: UIConstants.deviceSelectorRescanButtonColor
-                        .withOpacity(UIConstants.deviceSelectorRescanButtonOpacity),
-                    foregroundColor: Colors.white,
-                  ),
-                  icon: state.isScanning
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white))
-                    : const Icon(Icons.refresh),
-                  label: state.isScanning
-                    ? const SizedBox.shrink()
-                    : const Text(
-                        'Scan for Devices',
-                        style: TextStyle(
-                          fontWeight: UIConstants.deviceSelectorRescanButtonTextWeight,
-                        ),
-                      ),
-                  onPressed: state.isScanning
-                    ? null
-                    : () => context.read<DeviceSelectorBloc>().add(StartScanning()),
-                ),
-              ),
+            _buildDeviceList(state, theme),
           ],
         );
       },

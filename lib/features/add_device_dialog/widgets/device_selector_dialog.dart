@@ -48,13 +48,19 @@ class _DialogContent extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Select Device',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+              Expanded(
+                child: const Text(
+                  'Select Device',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.of(context).pop(),
+              BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+                builder: (context, state) => !state.isScanning
+                  ? IconButton(
+                      icon: const Icon(Icons.refresh),
+                      onPressed: () => context.read<DeviceSelectorBloc>().add(StartScanning()),
+                    )
+                  : const SizedBox.shrink(),
               ),
             ],
           ),
