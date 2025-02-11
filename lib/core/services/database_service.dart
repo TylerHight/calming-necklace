@@ -201,6 +201,18 @@ class DatabaseService {
     return Necklace.fromMap(maps.first);
   }
 
+  Future<void> updateNecklaceLedState(String id, bool isOn) async {
+    final db = await database;
+    await db.update(
+      'necklaces',
+      {'isLedOn': isOn ? 1 : 0},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    _necklaceUpdateController.add(null);
+    LoggingService().logDebug('Updated LED state for necklace $id: ${isOn ? 'on' : 'off'}');
+  }
+
   void dispose() {
     _necklaceUpdateController.close();
   }

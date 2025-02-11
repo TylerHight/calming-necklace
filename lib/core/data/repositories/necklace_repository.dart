@@ -2,6 +2,7 @@ import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:calming_necklace/core/services/logging_service.dart';
 import 'package:calming_necklace/core/services/database_service.dart';
+import 'package:calming_necklace/core/services/ble/ble_service.dart';
 import 'dart:async';
 
 abstract class NecklaceRepository {
@@ -20,14 +21,16 @@ abstract class NecklaceRepository {
 class NecklaceRepositoryImpl implements NecklaceRepository {
   final LoggingService _logger;
   final DatabaseService _dbService;
+  final BleService _bleService;
   final List<Necklace> _necklaces = [];
   final Map<String, Timer> _periodicEmissionTimers = {};
   final Map<String, bool> _emissionStates = {};
   final Map<String, StreamController<bool>> _emissionControllers = {};
 
-  NecklaceRepositoryImpl({required DatabaseService databaseService})
+  NecklaceRepositoryImpl({required DatabaseService databaseService, required BleService bleService})
       : _logger = LoggingService(),
-        _dbService = databaseService;
+        _dbService = databaseService,
+        _bleService = bleService;
 
   StreamController<bool> _getOrCreateController(String necklaceId) {
     return _emissionControllers.putIfAbsent(
@@ -39,8 +42,10 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
     try {
-      // Implement actual Bluetooth Low Energy communication here
       _logger.logInfo('Toggle light ${isOn ? 'on' : 'off'} for necklace ${necklace.id}');
+      await _bleService.setLedState(isOn);
+      await _dbService.updateNecklaceLedState(necklace.id, isOn);
+      _emissionControllers[necklace.id]?.add(isOn);
     } catch (e) {
       _logger.logError('Error toggling light: $e');
       rethrow;

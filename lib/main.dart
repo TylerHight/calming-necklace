@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         Provider<NecklaceRepository>(
           create: (context) => NecklaceRepositoryImpl(
             databaseService: context.read<DatabaseService>(),
+            bleService: context.read<BleService>(), // Add this line
           ),
         ),
         Provider<BleRepository>(
