@@ -18,7 +18,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
-  bool _isPeriodicEmission = false;
+  bool _isProcessingStateChange = false;
+  Timer? _stateRecoveryTimer;
   late final StreamSubscription<bool> _emissionSubscription;
   final LoggingService _logger = LoggingService.instance;
 
@@ -39,6 +40,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
     try {
+      if (_isProcessingStateChange) {
+        return;
+      }
+      _cancelStateRecovery();
       emit(TimedToggleButtonLoading());
       _logger.logDebug('Toggle light event received. Current state: ${state.runtimeType}');
       
@@ -46,6 +51,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         // If currently in periodic emission, stop it
         _isPeriodicEmission = false;
         _isActive = false;
+        _isProcessingStateChange = true;
         await _repository.toggleLight(necklace, false);
         _stopTimer(emit);
       } else {
@@ -53,6 +59,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         _isActive = !_isActive;
         if (_isActive) {
           await _repository.toggleLight(necklace, true);
+          _isProcessingStateChange = true;
           emit(LightOnState(necklace.emission1Duration.inSeconds));
           _startTimer(necklace.emission1Duration.inSeconds);
         } else {
@@ -63,9 +70,13 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         }
       }
       _logger.logDebug('Toggle light completed successfully');
+      _isProcessingStateChange = false;
     } catch (e) {
       _logger.logError('Error in _onToggleLight: $e');
       emit(TimedToggleButtonError(e.toString()));
+      _scheduleStateRecovery();
+    } finally {
+      _isProcessingStateChange = false;
     }
   }
 
@@ -134,9 +145,30 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     }
   }
 
+  void _scheduleStateRecovery() {
+    _stateRecoveryTimer?.cancel();
+    _stateRecoveryTimer = Timer(const Duration(seconds: 5), () {
+      if (state is TimedToggleButtonError) {
+        add(ToggleLightEvent());
+      }
+    });
+  }
+
+  void _cancelStateRecovery() {
+    _stateRecoveryTimer?.cancel();
+    _stateRecoveryTimer = null;
+  }
+
+  @override
+  void onError(Object error, StackTrace stackTrace) {
+    _logger.logError('TimedToggleButtonBloc error: $error\n$stackTrace');
+    super.onError(error, stackTrace);
+  }
+
   @override
   Future<void> close() {
     _tickerSubscription?.cancel();
+    _stateRecoveryTimer?.cancel();
     _emissionSubscription.cancel();
     return super.close();
   }

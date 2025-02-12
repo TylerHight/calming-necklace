@@ -14,6 +14,9 @@ class BleService {
   static final BleService _instance = BleService._internal();
   factory BleService() => _instance;
 
+  DateTime? _lastCommandTime;
+  static const _commandDebounceTime = Duration(milliseconds: 500);
+  final Map<String, Completer<void>> _pendingCommands = {};
   final _bleUtils = BleUtils();
   late final LoggingService _logger;
   final _deviceStateController = StreamController<String>.broadcast();
@@ -265,57 +268,45 @@ class BleService {
   Future<void> _writeCommand(int command, int value) async {
     await ensureConnected();
 
-    try {
-      _logger.logBleDebug(
-          'Writing command: $command, value: $value to device: ${_connectedDevice?.platformName}'
-      );
+    final now = DateTime.now();
+    if (_lastCommandTime != null && 
+        now.difference(_lastCommandTime!) < _commandDebounceTime) {
+      _logger.logDebug('Command debounced');
+      return;
+    }
+    _lastCommandTime = now;
 
-      if (_switchCharacteristic == null) {
-        _logger.logBleError('Switch characteristic not found');
-        throw BleException('Switch characteristic not initialized');
-      }
+    final commandId = '${command}_${DateTime.now().millisecondsSinceEpoch}';
+    final completer = Completer<void>();
+    _pendingCommands[commandId] = completer;
+
+    try {
+      Timer(const Duration(seconds: 2), () {
+        if (!completer.isCompleted) {
+          completer.completeError('Command timeout');
+          _pendingCommands.remove(commandId);
+        }
+      });
 
       await _switchCharacteristic!.write([command, value]);
+      completer.complete();
+      _pendingCommands.remove(commandId);
+      
       _logger.logBleInfo('Command $command with value $value sent successfully');
-    } catch (e, stackTrace) {
-      _logger.logBleError('Failed to write command', e, stackTrace);
-      _deviceStateController.add('Write command error: $e');
+    } catch (e) {
+      _logger.logBleError('Failed to write command', e);
+      completer.completeError(e);
+      _pendingCommands.remove(commandId);
       rethrow;
     }
   }
-
-  /** TODO: Adapt this method to work with this app
-      Future<void> connectToDeviceWithFeedback(BuildContext context, Necklace necklace, {VoidCallback? onConnected}) async {
-      if (necklace.bleDevice == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('No Bluetooth device available')),
-      );
-      return;
-      }
-
-      try {
-      await connectToDevice(necklace.bleDevice!);
-      if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Connected successfully')),
-      );
-      }
-      onConnected?.call();
-      } catch (e) {
-      if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Connection failed: $e')),
-      );
-      }
-      }
-      }
-   **/
 
   void dispose() {
     _connectionManager.dispose();
     _deviceStateController.close();
     _connectionStatusController.close();
     _rssiController.close();
+    _pendingCommands.clear();
     _reconnectionAttemptsController.close();
     _stopRssiUpdates();
   }

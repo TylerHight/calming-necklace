@@ -56,7 +56,7 @@ class TimedToggleButton extends StatelessWidget {
         inactiveColor: inactiveColor,
         iconData: iconData,
         iconColor: iconColor,
-        buttonSize: buttonHeight,
+        buttonHeight: buttonHeight,
         iconSize: iconSize,
         buttonWidth: buttonWidth,
         autoTurnOffDuration: autoTurnOffDuration,
@@ -78,7 +78,7 @@ class _TimedToggleButtonView extends StatefulWidget {
   final Color? inactiveColor;
   final IconData iconData;
   final Color? iconColor;
-  final double buttonSize;
+  final double buttonHeight;
   final double iconSize;
   final double buttonWidth;
   final Duration autoTurnOffDuration;
@@ -97,7 +97,7 @@ class _TimedToggleButtonView extends StatefulWidget {
     required this.inactiveColor,
     required this.iconData,
     required this.iconColor,
-    required this.buttonSize,
+    required this.buttonHeight,
     required this.iconSize,
     required this.buttonWidth,
     required this.autoTurnOffDuration,
@@ -117,6 +117,7 @@ class _TimedToggleButtonView extends StatefulWidget {
 
 class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   Duration? _duration;
+  DateTime? _lastTapTime;
 
   @override
   void initState() {
@@ -141,21 +142,22 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
-      buildWhen: (previous, current) {
-        if (previous.runtimeType != current.runtimeType) return true;
-        if (previous is LightOnState && current is LightOnState) {
-          return previous.secondsLeft != current.secondsLeft;
-        }
-        return true;
-      },
       builder: (context, state) {
-        final logger = LoggingService.instance;
         if (state is TimedToggleButtonLoading) {
-          return const CircularProgressIndicator();
+          return Container(
+            width: widget.buttonWidth,
+            height: widget.buttonHeight,
+            child: const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          );
         }
 
         if (state is TimedToggleButtonError) {
-          return Tooltip(
+          return _buildErrorButton(
             message: state.message,
             child: Icon(Icons.error, color: Colors.red),
           );
@@ -164,12 +166,13 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         bool isLightOn = state is LightOnState;
         String timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
 
+        final logger = LoggingService.instance;
         logger.logDebug('Building TimedToggleButton: isLightOn: $isLightOn, timeLeft: $timeLeft');
 
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () {
+            onTap: () async {
               if (!widget.isConnected) {
                 context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
                 return;
@@ -179,6 +182,11 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 deviceId: widget.necklace.bleDevice!.id,
               ));
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+            },
+            onTapDown: (_) {
+              setState(() {
+                _lastTapTime = DateTime.now();
+              });
             },
             child: Container(
               width: UIConstants.timedToggleButtonWidth,
@@ -257,5 +265,21 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         });
       });
     }
+  }
+
+  Widget _buildErrorButton({required String message, required Widget child}) {
+    return Tooltip(
+      message: message,
+      child: Container(
+        width: widget.buttonWidth,
+        height: widget.buttonHeight,
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.red),
+        ),
+        child: Center(child: child),
+      ),
+    );
   }
 }

@@ -1,20 +1,15 @@
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Characteristics:
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a00
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a01
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Characteristics:
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a05
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Characteristics:
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 19b10001-e8f2-537e-4f6c-d104768a1214
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a3b
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵 Characteristics:
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a19
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a1b
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a1d
-I/flutter ( 9655): 01:38:04 🔍 [logging_service] 🔍 🔵   - 2a1f
-I/flutter ( 9655): 01:38:04 🚨 [logging_service] ❌ 🔵 Error initializing characteristics for device: D4:25:CB:B4:D0:52  ERROR: BleException: LED service not found
-I/flutter ( 9655): 01:38:04 🚨 [logging_service] ❌ 🔵 Connection and initialization error for device: D4:25:CB:B4:D0:52  ERROR: BleException: LED service not found
+I/flutter (13321): 02:05:38 📘 [logging_service] ℹ️ 🔵 Command 1 with value 0 sent successfully
+I/flutter (13321): 02:05:38 🔍 [database_service] 🔍 Updated LED state for necklace 2025-02-12 02:04:33.862752: on
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Event: _PeriodicEmissionTriggered()
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]), nextState: NecklacesLoading() }
+I/flutter (13321): 02:05:38 🔍 [timed_toggle_button_bloc] 🔍 Handling periodic emission trigger
+I/flutter (13321): 02:05:38 📘 [necklace_repository] ℹ️ Toggle light on for necklace 2025-02-12 02:04:33.862752
+I/flutter (13321): 02:05:38 🔍 [logging_service] 🔍 🔵 Writing command: 1, value: 0 to device: Calming Necklace
+D/[FBP-Android](13321): [FBP] onMethodCall: writeCharacteristic
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]) }
+I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]) }
+I/flutter (13321): 02:05:38 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
+I/flutter (13321): 02:05:38 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: true, timeLeft: 3s
+D/[FBP-Android](13321): [FBP] onCharacteristicWrite:
