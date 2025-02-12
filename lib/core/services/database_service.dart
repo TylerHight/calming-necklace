@@ -55,7 +55,8 @@ class DatabaseService {
       isRelease1Active INTEGER,
       isLedOn INTEGER DEFAULT 0,
       isArchived INTEGER DEFAULT 0,
-      autoTurnOffEnabled INTEGER
+      autoTurnOffEnabled INTEGER,
+      lastLEDStateChange TEXT
     )
   ''');
   }
@@ -96,6 +97,10 @@ class DatabaseService {
         ALTER TABLE necklaces
         ADD COLUMN isLedOn INTEGER
         DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN lastLEDStateChange TEXT
       ''');
     }
   }
@@ -220,8 +225,8 @@ class DatabaseService {
       await db.update(
         'necklaces',
         {
-          'is_led_on': isOn ? 1 : 0,
-          'last_led_state_change': DateTime.now().toIso8601String()
+          'isLedOn': isOn ? 1 : 0,
+          'lastLEDStateChange': DateTime.now().toIso8601String()
         },
         where: 'id = ?',
         whereArgs: [necklaceId],

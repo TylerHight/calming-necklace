@@ -13,6 +13,7 @@ class Necklace extends Equatable {
   final bool isRelease1Active;
   final bool isArchived;
   final bool isLedOn; // Added isLedOn field
+  final DateTime? lastLEDStateChange; // Added lastLEDStateChange field
 
   Necklace({
     required this.id,
@@ -25,6 +26,7 @@ class Necklace extends Equatable {
     this.periodicEmissionEnabled = false,
     this.isRelease1Active = false,
     this.isArchived = false,
+    this.lastLEDStateChange, // Initialize lastLEDStateChange
   });
 
   Necklace copyWith({
@@ -38,6 +40,7 @@ class Necklace extends Equatable {
     bool? isRelease1Active,
     bool? isArchived,
     bool? isLedOn, // Update copyWith method
+    DateTime? lastLEDStateChange, // Update copyWith method
   }) {
     return Necklace(
       id: id ?? this.id,
@@ -50,6 +53,7 @@ class Necklace extends Equatable {
       periodicEmissionEnabled: periodicEmissionEnabled ?? this.periodicEmissionEnabled,
       isRelease1Active: isRelease1Active ?? this.isRelease1Active,
       isArchived: isArchived ?? this.isArchived,
+      lastLEDStateChange: lastLEDStateChange ?? this.lastLEDStateChange, // Update copyWith method
     );
   }
 
@@ -65,6 +69,7 @@ class Necklace extends Equatable {
     isRelease1Active,
     isArchived,
     isLedOn, // Update props
+    lastLEDStateChange, // Update props
   ];
 
   Map<String, dynamic> toMap() {
@@ -83,6 +88,7 @@ class Necklace extends Equatable {
       'isRelease1Active': isRelease1Active ? 1 : 0,
       'isLedOn': isLedOn ? 1 : 0, // Add isLedOn to map
       'isArchived': isArchived ? 1 : 0,
+      'lastLEDStateChange': lastLEDStateChange?.toIso8601String(), // Add lastLEDStateChange to map
     };
   }
 
@@ -101,8 +107,10 @@ class Necklace extends Equatable {
       releaseInterval1: Duration(seconds: map['releaseInterval1']),
       periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
       isRelease1Active: map['isRelease1Active'] == 1,
-      isLedOn: map['isLedOn'] == 1, // Add isLedOn from map
+      isLedOn: map['isLedOn'] == 1,
       isArchived: map['isArchived'] == 1,
+      lastLEDStateChange: map['lastLEDStateChange'] != null ? 
+          DateTime.parse(map['lastLEDStateChange']) : null, // Add lastLEDStateChange from map
     );
   }
 }

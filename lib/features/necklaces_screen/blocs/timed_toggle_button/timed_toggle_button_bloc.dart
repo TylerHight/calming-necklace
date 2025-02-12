@@ -43,9 +43,13 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   void _initializeFromNecklace() {
     _logger.logDebug('Initializing TimedToggleButtonBloc with necklace state: ${necklace.isLedOn}');
     _isActive = necklace.isLedOn;
-    if (necklace.isLedOn) {
-      emit(LightOnState(necklace.emission1Duration.inSeconds));
-      _startTimer(necklace.emission1Duration.inSeconds);
+    
+    if (necklace.isLedOn && necklace.lastLEDStateChange != null) {
+      final elapsedSeconds = DateTime.now().difference(necklace.lastLEDStateChange!).inSeconds;
+      final remainingSeconds = necklace.emission1Duration.inSeconds - elapsedSeconds;
+      if (remainingSeconds > 0) {
+        _startTimer(remainingSeconds);
+      }
     }
   }
 
