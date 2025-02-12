@@ -27,7 +27,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -53,6 +53,7 @@ class DatabaseService {
       releaseInterval1 INTEGER,
       periodicEmissionEnabled INTEGER,
       isRelease1Active INTEGER,
+      isLedOn INTEGER DEFAULT 0,
       isArchived INTEGER DEFAULT 0,
       autoTurnOffEnabled INTEGER
     )
@@ -88,6 +89,13 @@ class DatabaseService {
       await db.execute('''
         ALTER TABLE necklaces
         ADD COLUMN periodicEmissionEnabled INTEGER
+      ''');
+    }
+    if (oldVersion < 4) {
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN isLedOn INTEGER
+        DEFAULT 0
       ''');
     }
   }

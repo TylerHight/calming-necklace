@@ -12,11 +12,13 @@ class Necklace extends Equatable {
   final Duration releaseInterval1;
   final bool isRelease1Active;
   final bool isArchived;
+  final bool isLedOn; // Added isLedOn field
 
   Necklace({
     required this.id,
     required this.name,
     this.bleDevice, // Update constructor
+    this.isLedOn = false, // Initialize isLedOn
     required this.emission1Duration,
     required this.releaseInterval1,
     this.autoTurnOffEnabled = false,
@@ -35,10 +37,12 @@ class Necklace extends Equatable {
     bool? periodicEmissionEnabled,
     bool? isRelease1Active,
     bool? isArchived,
+    bool? isLedOn, // Update copyWith method
   }) {
     return Necklace(
       id: id ?? this.id,
       name: name ?? this.name,
+      isLedOn: isLedOn ?? this.isLedOn, // Update copyWith method
       bleDevice: bleDevice ?? this.bleDevice, // Update copyWith method
       emission1Duration: emission1Duration ?? this.emission1Duration,
       releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
@@ -60,6 +64,7 @@ class Necklace extends Equatable {
     periodicEmissionEnabled,
     isRelease1Active,
     isArchived,
+    isLedOn, // Update props
   ];
 
   Map<String, dynamic> toMap() {
@@ -76,6 +81,7 @@ class Necklace extends Equatable {
       'releaseInterval1': releaseInterval1.inSeconds,
       'periodicEmissionEnabled': periodicEmissionEnabled ? 1 : 0,
       'isRelease1Active': isRelease1Active ? 1 : 0,
+      'isLedOn': isLedOn ? 1 : 0, // Add isLedOn to map
       'isArchived': isArchived ? 1 : 0,
     };
   }
@@ -95,6 +101,7 @@ class Necklace extends Equatable {
       releaseInterval1: Duration(seconds: map['releaseInterval1']),
       periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
       isRelease1Active: map['isRelease1Active'] == 1,
+      isLedOn: map['isLedOn'] == 1, // Add isLedOn from map
       isArchived: map['isArchived'] == 1,
     );
   }
