@@ -6,16 +6,13 @@
 #include "timing.h"
 
 BLEService settingsService("19B10000-E8F2-537E-4F6C-D104768A1214");  // Settings service
-BLEService ledService("19B10001-E8F2-537E-4F6C-D104768A1214");  // LED control service
+BLEService ledService("19b10000-e8f2-537e-4f6c-d104768a1214");  // LED control service
 
 BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify | BLEWriteWithoutResponse);
 BLEByteCharacteristic keepAliveCharacteristic("2A3B", BLERead | BLEWrite | BLENotify);
 BLELongCharacteristic emission1Characteristic("2A19", BLERead | BLEWrite | BLENotify);
-BLELongCharacteristic emission2Characteristic("2A1A", BLERead | BLEWrite | BLENotify);
 BLELongCharacteristic interval1Characteristic("2A1B", BLERead | BLEWrite | BLENotify);
-BLELongCharacteristic interval2Characteristic("2A1C", BLERead | BLEWrite | BLENotify);
 BLEByteCharacteristic periodic1Characteristic("2A1D", BLERead | BLEWrite | BLENotify);
-BLEByteCharacteristic periodic2Characteristic("2A1E", BLERead | BLEWrite | BLENotify);
 BLEByteCharacteristic heartrateCharacteristic("2A1F", BLERead | BLEWrite | BLENotify);
 
 bool isConnected = false;

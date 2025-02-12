@@ -1,177 +1,20 @@
-Launching lib\main.dart on Pixel 3a in debug mode...
-Running Gradle task 'assembleDebug'...
-√ Built build\app\outputs\flutter-apk\app-debug.apk
-Installing build\app\outputs\flutter-apk\app-debug.apk...
-I/flutter (19736): [INFO:flutter/shell/platform/android/android_context_vk_impeller.cc(64)] Known bad Vulkan driver encountered, falling back to OpenGLES.
-Debug service listening on ws://127.0.0.1:51702/YbkOUlqhHao=/ws
-Syncing files to device Pixel 3a...
-I/flutter (19736): Initializing BLE Service
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:16.502 (+0:00:01.298106)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Event: FetchNecklacesEvent()
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:16.517 (+0:00:01.312803)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Event: FetchNecklacesEvent()
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:17.007 (+0:00:01.803008)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Transition: Transition { currentState: NecklacesInitial(), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:17.010 (+0:00:01.805171)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Change: Change { currentState: NecklacesInitial(), nextState: NecklacesLoading() }
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/Gralloc4(19736): mapper 4.x is not supported
-W/Gralloc3(19736): mapper 3.x is not supported
-W/Gralloc4(19736): allocator 4.x is not supported
-W/Gralloc3(19736): allocator 3.x is not supported
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:17.743 (+0:00:02.538739)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([]) }
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-I/flutter (19736): │ 14:44:17.744 (+0:00:02.539964)
-I/flutter (19736): ├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
-I/flutter (19736): │ 🐛 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([]) }
-I/flutter (19736): └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-D/ProfileInstaller(19736): Installing profile for com.example.calming_necklace
-D/CompatibilityChangeReporter(19736): Compat change id reported: 78294732; UID 10294; state: ENABLED
-D/InputMethodManager(19736): showSoftInput() view=io.flutter.embedding.android.FlutterView{b6feb VFE...... .F....ID 0,0-1080,2088 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
-D/InputConnectionAdaptor(19736): The input method toggled cursor monitoring on
-D/InsetsController(19736): show(ime(), fromIme=true)
-
-======== Exception caught by widgets library =======================================================
-The following ProviderNotFoundException was thrown building DeviceSelectorDialog:
-Error: Could not find the correct Provider<DeviceSelectorBloc> above this BlocBuilder<DeviceSelectorBloc, DeviceSelectorState> Widget
-
-This happens because you used a `BuildContext` that does not include the provider
-of your choice. There are a few common scenarios:
-
-- You added a new provider in your `main.dart` and performed a hot-reload.
-  To fix, perform a hot-restart.
-
-- The provider you are trying to read is in a different route.
-
-  Providers are "scoped". So if you insert of provider inside a route, then
-  other routes will not be able to access that provider.
-
-- You used a `BuildContext` that is an ancestor of the provider you are trying to read.
-
-  Make sure that BlocBuilder<DeviceSelectorBloc, DeviceSelectorState> is under your MultiProvider/Provider<DeviceSelectorBloc>.
-  This usually happens when you are creating a provider and trying to read it immediately.
-
-  For example, instead of:
-
-  ```
-  Widget build(BuildContext context) {
-    return Provider<Example>(
-      create: (_) => Example(),
-      // Will throw a ProviderNotFoundError, because `context` is associated
-      // to the widget that is the parent of `Provider<Example>`
-      child: Text(context.watch<Example>().toString()),
-    );
-  }
-  ```
-
-  consider using `builder` like so:
-
-  ```
-  Widget build(BuildContext context) {
-    return Provider<Example>(
-      create: (_) => Example(),
-      // we use `builder` to obtain a new `BuildContext` that has access to the provider
-      builder: (context, child) {
-        // No longer throws
-        return Text(context.watch<Example>().toString());
-      }
-    );
-  }
-  ```
-
-If none of these solutions work, consider asking for help on StackOverflow:
-https://stackoverflow.com/questions/tagged/flutter
-
-The relevant error-causing widget was:
-  DeviceSelectorDialog DeviceSelectorDialog:file:///C:/Users/hight/StudioProjects/calming_necklace/lib/features/add_device_dialog/presentation/add_device_dialog.dart:197:35
-When the exception was thrown, this was the stack:
-#0      Provider._inheritedElementOf (package:provider/src/provider.dart:343:7)
-#1      Provider.of (package:provider/src/provider.dart:293:30)
-#2      ReadContext.read (package:provider/src/provider.dart:649:21)
-#3      _BlocBuilderBaseState.initState (package:flutter_bloc/src/bloc_builder.dart:152:36)
-#4      StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5762:55)
-#5      ComponentElement.mount (package:flutter/src/widgets/framework.dart:5607:5)
-...     Normal element mounting (211 frames)
-#216    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4480:16)
-#217    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7049:36)
-#218    Element.updateChild (package:flutter/src/widgets/framework.dart:3963:18)
-#219    Element.updateChildren (package:flutter/src/widgets/framework.dart:4150:32)
-#220    MultiChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:7074:17)
-#221    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#222    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#223    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5794:11)
-#224    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#225    StatefulElement.update (package:flutter/src/widgets/framework.dart:5817:5)
-#226    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#227    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#228    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#229    ProxyElement.update (package:flutter/src/widgets/framework.dart:5960:5)
-#230    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#231    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#232    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#233    ProxyElement.update (package:flutter/src/widgets/framework.dart:5960:5)
-#234    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:112:11)
-#235    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#236    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#237    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5794:11)
-#238    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#239    StatefulElement.update (package:flutter/src/widgets/framework.dart:5817:5)
-#240    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#241    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#242    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#243    ProxyElement.update (package:flutter/src/widgets/framework.dart:5960:5)
-#244    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:112:11)
-#245    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#246    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#247    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5794:11)
-#248    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#249    StatefulElement.update (package:flutter/src/widgets/framework.dart:5817:5)
-#250    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#251    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#252    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5794:11)
-#253    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#254    StatefulElement.update (package:flutter/src/widgets/framework.dart:5817:5)
-#255    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#256    SingleChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:6921:14)
-#257    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#258    SingleChildRenderObjectElement.update (package:flutter/src/widgets/framework.dart:6921:14)
-#259    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#260    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#261    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#262    ProxyElement.update (package:flutter/src/widgets/framework.dart:5960:5)
-#263    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#264    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#265    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#266    ProxyElement.update (package:flutter/src/widgets/framework.dart:5960:5)
-#267    Element.updateChild (package:flutter/src/widgets/framework.dart:3941:15)
-#268    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5656:16)
-#269    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5794:11)
-#270    Element.rebuild (package:flutter/src/widgets/framework.dart:5347:7)
-#271    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2694:15)
-#272    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2753:11)
-#273    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3048:18)
-#274    WidgetsBinding.drawFrame (package:flutter/src/widgets/binding.dart:1176:21)
-#275    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:475:5)
-#276    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1397:15)
-#277    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1318:9)
-#278    SchedulerBinding._handleDrawFrame (package:flutter/src/scheduler/binding.dart:1176:5)
-#279    _invoke (dart:ui/hooks.dart:312:13)
-#280    PlatformDispatcher._drawFrame (dart:ui/platform_dispatcher.dart:427:5)
-#281    _drawFrame (dart:ui/hooks.dart:283:31)
-====================================================================================================
-D/InputConnectionAdaptor(19736): The input method toggled cursor monitoring off
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Characteristics:
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a00
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a01
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Characteristics:
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a05
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Characteristics:
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 19b10001-e8f2-537e-4f6c-d104768a1214
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a3b
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵 Characteristics:
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a19
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a1b
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a1d
+I/flutter ( 9655): 01:29:04 🔍 [logging_service] 🔍 🔵   - 2a1f
+I/flutter ( 9655): 01:29:04 🚨 [logging_service] ❌ 🔵 Error initializing characteristics for device: D4:25:CB:B4:D0:52  ERROR: BleException: LED service not found
+I/flutter ( 9655): 01:29:04 🚨 [logging_service] ❌ 🔵 Connection and initialization error for device: D4:25:CB:B4:D0:52  ERROR: BleException: LED service not found
