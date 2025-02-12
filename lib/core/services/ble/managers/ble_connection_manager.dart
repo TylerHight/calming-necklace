@@ -14,7 +14,7 @@ class BleConnectionManager {
   final ErrorCallback onError;
   final _retryDelays = [1, 2, 3]; // Seconds between retries
   final _maxRetries = 5;
-  final _loggingService = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
 
   StreamSubscription? _connectionSubscription;
   StreamSubscription? _keepAliveSubscription;
@@ -38,14 +38,14 @@ class BleConnectionManager {
   });
 
   Future<bool> connectWithRetry(BluetoothDevice device) async {
-    _loggingService.logBleInfo('Starting connection attempt to ${device.platformName}');
+    _logger.logBleInfo('Starting connection attempt to ${device.platformName}');
     int attempts = 0;
     bool connected = false;
 
     _reconnectionSubject.add(0);
     while (attempts < _maxRetries && !connected) {
       try {
-        _loggingService.logBleDebug('Connection attempt ${attempts + 1} of $_maxRetries');
+        _logger.logBleDebug('Connection attempt ${attempts + 1} of $_maxRetries');
         onStateChange(BleConnectionState.connecting);
 
         await device.connect(
@@ -53,13 +53,13 @@ class BleConnectionManager {
             autoConnect: false
         );
 
-        _loggingService.logBleDebug('Waiting for connection stabilization');
+        _logger.logBleDebug('Waiting for connection stabilization');
         await Future.delayed(const Duration(milliseconds: 500));
 
         final state = await device.connectionState.first;
         if (state == BluetoothConnectionState.connected) {
           connected = true;
-          _loggingService.logBleInfo('Successfully connected to ${device.platformName}');
+          _logger.logBleInfo('Successfully connected to ${device.platformName}');
 
           await _setupConnectionMonitoring(device);
           await maintainConnection(device);
@@ -71,7 +71,7 @@ class BleConnectionManager {
         attempts++;
         _reconnectionSubject.add(attempts);
         onReconnectionAttempt(attempts);
-        _loggingService.logBleError(
+        _logger.logBleError(
             'Connection attempt $attempts failed',
             e,
             stackTrace
@@ -79,7 +79,7 @@ class BleConnectionManager {
         onError('Connection attempt $attempts failed: $e');
 
         if (attempts < _maxRetries) {
-          _loggingService.logBleInfo(
+          _logger.logBleInfo(
               'Waiting ${_retryDelays[attempts - 1]}s before next attempt'
           );
           await Future.delayed(Duration(seconds: _retryDelays[attempts - 1]));
@@ -91,13 +91,13 @@ class BleConnectionManager {
 
   Future<void> maintainConnection(BluetoothDevice device) async {
     _currentDevice = device;
-    _loggingService.logBleInfo('Starting connection maintenance for ${device.platformName}');
+    _logger.logBleInfo('Starting connection maintenance for ${device.platformName}');
     _startKeepAlive();
 
     // Monitor connection state
     device.connectionState.listen((BluetoothConnectionState state) {
       if (state == BluetoothConnectionState.disconnected && !_isReconnecting) {
-        _loggingService.logBleWarning('Device ${device.platformName} disconnected unexpectedly');
+        _logger.logBleWarning('Device ${device.platformName} disconnected unexpectedly');
         _handleDisconnection();
       }
     });
@@ -127,7 +127,7 @@ class BleConnectionManager {
 
   Future<void> _handleDisconnection() async {
     if (_isReconnecting) {
-      _loggingService.logBleDebug('Reconnection already in progress, skipping');
+      _logger.logBleDebug('Reconnection already in progress, skipping');
       return;
     }
 
@@ -138,7 +138,7 @@ class BleConnectionManager {
     _reconnectionSubject.add(0);
     while (_reconnectAttempts < _maxRetries && _currentDevice != null) {
       try {
-        _loggingService.logBleInfo(
+        _logger.logBleInfo(
             'Attempting reconnection ${_reconnectAttempts + 1}/$_maxRetries'
         );
         onStateChange(BleConnectionState.connecting);
@@ -154,7 +154,7 @@ class BleConnectionManager {
             BluetoothConnectionState.connected;
 
         if (isConnected) {
-          _loggingService.logBleInfo('Reconnection successful');
+          _logger.logBleInfo('Reconnection successful');
           _isReconnecting = false;
           await _setupConnectionMonitoring(_currentDevice!);
           onStateChange(BleConnectionState.connected);
@@ -162,21 +162,21 @@ class BleConnectionManager {
         }
       } catch (e, stackTrace) {
         _reconnectAttempts++;
-        _loggingService.logBleError(
+        _logger.logBleError(
             'Reconnection attempt $_reconnectAttempts failed',
             e,
             stackTrace
         );
 
         if (_reconnectAttempts >= _maxRetries) {
-          _loggingService.logBleWarning('Max reconnection attempts reached');
+          _logger.logBleWarning('Max reconnection attempts reached');
           onError('Failed to reconnect after $_maxRetries attempts');
           break;
         }
 
         // Exponential backoff
         _currentDelaySeconds = min(_currentDelaySeconds * 2, _maxDelaySeconds);
-        _loggingService.logBleInfo(
+        _logger.logBleInfo(
             'Waiting ${_currentDelaySeconds}s before next attempt'
         );
         await Future.delayed(Duration(seconds: _currentDelaySeconds));
@@ -196,20 +196,20 @@ class BleConnectionManager {
   }
 
   Future<void> _setupConnectionMonitoring(BluetoothDevice device) async {
-    _loggingService.logBleDebug('Setting up connection monitoring');
+    _logger.logBleDebug('Setting up connection monitoring');
     _cleanupMonitoring();
 
     _connectionSubscription = device.connectionState.listen(
             (BluetoothConnectionState state) {
-          _loggingService.logBleDebug('Connection state changed: $state');
+          _logger.logBleDebug('Connection state changed: $state');
           if (state == BluetoothConnectionState.disconnected) {
-            _loggingService.logBleWarning('Device disconnected in monitoring');
+            _logger.logBleWarning('Device disconnected in monitoring');
             onStateChange(BleConnectionState.disconnected);
             _cleanupMonitoring();
           }
         },
         onError: (error, stackTrace) {
-          _loggingService.logBleError(
+          _logger.logBleError(
               'Connection monitoring error',
               error,
               stackTrace
@@ -225,7 +225,7 @@ class BleConnectionManager {
       try {
         final rssi = await device.readRssi();
         if (rssi < BleConstants.MIN_RSSI_THRESHOLD) {
-          _loggingService.logBleWarning('Weak signal strength detected (RSSI: $rssi)');
+          _logger.logBleWarning('Weak signal strength detected (RSSI: $rssi)');
         }
       } catch (e) {
         // Ignore RSSI read errors
@@ -267,16 +267,16 @@ class BleConnectionManager {
 
   Future<void> _sendKeepAlive(BluetoothDevice device) async {
     if (!_isKeepAliveEnabled || _keepAliveCharacteristic == null) {
-      _loggingService.logBleDebug('Keep-alive not enabled, skipping');
+      _logger.logBleDebug('Keep-alive not enabled, skipping');
       return;
     }
 
     try {
       _keepAliveCounter = (_keepAliveCounter + 1) % 256;
-      _loggingService.logBleDebug('Sending keep-alive counter: $_keepAliveCounter');
+      _logger.logBleDebug('Sending keep-alive counter: $_keepAliveCounter');
       await _keepAliveCharacteristic!.write([_keepAliveCounter], withoutResponse: false);
     } catch (e, stackTrace) {
-      _loggingService.logBleError('Keep-alive failed', e, stackTrace);
+      _logger.logBleError('Keep-alive failed', e, stackTrace);
       _isKeepAliveEnabled = false;
       onStateChange(BleConnectionState.keepAliveFailure);
     }

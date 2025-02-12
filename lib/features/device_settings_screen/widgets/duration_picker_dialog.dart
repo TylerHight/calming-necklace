@@ -28,7 +28,7 @@ class DurationPickerDialog extends StatelessWidget {
     required this.scentNumber,
     DatabaseService? databaseService,
     this.defaultDuration = const Duration(seconds: 10),
-  }) : _logger = LoggingService(), _databaseService = databaseService ?? DatabaseService(), super(key: key);
+  }) : _logger = LoggingService.instance, _databaseService = databaseService ?? DatabaseService(), super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,17 +122,17 @@ class DurationPickerDialog extends StatelessWidget {
                         seconds: state.seconds,
                       );
                       // Save to database
-                      final settingKey = isEmissionDuration 
-                        ? 'emission${scentNumber}Duration' 
-                        : 'releaseInterval${scentNumber}';
+                      final settingKey = isEmissionDuration
+                          ? 'emission${scentNumber}Duration'
+                          : 'releaseInterval${scentNumber}';
                       await _databaseService.updateNecklaceSettings(
                         necklaceId,
                         {settingKey: newDuration.inSeconds},
                       );
                       onDurationChanged(newDuration);
-                      LoggingService().logDebug('Successfully saved duration: $newDuration');
+                      LoggingService.instance.logDebug('Successfully saved duration: $newDuration');
                     } catch (e) {
-                      LoggingService().logError('Error updating duration: $e');
+                      LoggingService.instance.logError('Error updating duration: $e');
                     }
                     Navigator.pop(context);
                   },

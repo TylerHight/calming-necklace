@@ -133,7 +133,8 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         });
       }
     } catch (e) {
-      LoggingService().logError('Error refreshing duration: $e');
+      final logger = await LoggingService.getInstance();
+      logger.logError('Error refreshing duration: $e');
     }
   }
 
@@ -148,11 +149,11 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         return true;
       },
       builder: (context, state) {
-        final logger = LoggingService();
+        final logger = LoggingService.instance;
         if (state is TimedToggleButtonLoading) {
           return const CircularProgressIndicator();
         }
-        
+
         if (state is TimedToggleButtonError) {
           return Tooltip(
             message: state.message,
@@ -162,7 +163,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
 
         bool isLightOn = state is LightOnState;
         String timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
-        
+
         logger.logDebug('Building TimedToggleButton: isLightOn: $isLightOn, timeLeft: $timeLeft');
 
         return Material(
@@ -248,7 +249,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     final bleState = context.watch<BleBloc>().state;
     final isConnected = widget.necklace.bleDevice != null &&
         (bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] ?? false);
-    
+
     if (isConnected != widget.isConnected) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {

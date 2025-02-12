@@ -19,7 +19,7 @@ abstract class NecklaceRepository {
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
-  final LoggingService _logger;
+  final LoggingService _logger = LoggingService.instance;
   final DatabaseService _dbService;
   final BleService _bleService;
   final List<Necklace> _necklaces = [];
@@ -28,8 +28,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   final Map<String, StreamController<bool>> _emissionControllers = {};
 
   NecklaceRepositoryImpl({required DatabaseService databaseService, required BleService bleService})
-      : _logger = LoggingService(),
-        _dbService = databaseService,
+      : _dbService = databaseService,
         _bleService = bleService;
 
   StreamController<bool> _getOrCreateController(String necklaceId) {

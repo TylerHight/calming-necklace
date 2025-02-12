@@ -12,7 +12,7 @@ import '../../../../core/blocs/ble/ble_event.dart';
 class DeviceSelectorBloc extends Bloc<DeviceSelectorEvent, DeviceSelectorState> {
   final BleRepository _bleRepository;
   final BleBloc _bleBloc;
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
   StreamSubscription? _deviceSubscription;
 
   DeviceSelectorBloc({required BleRepository bleRepository, required BleBloc bleBloc})

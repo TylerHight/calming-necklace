@@ -7,7 +7,7 @@ import 'ble_state.dart';
 
 class BleBloc extends Bloc<BleEvent, BleState> {
   final BleService _bleService;
-  late final LoggingService _logger;
+  final LoggingService _logger = LoggingService.instance;
   StreamSubscription<String>? _deviceStateSubscription;
   StreamSubscription<bool>? _connectionStatusSubscription;
   StreamSubscription<int>? _rssiSubscription;
@@ -46,7 +46,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
         error: null,
       ));
     } catch (e) {
-      _logger.logBleError('Connection and initialization error for device: $event.device.id', e);
+      _logger.logBleError('Connection and initialization error for device: ${event.device.id}', e);
       emit(state.copyWith(
         isConnecting: false,
         error: 'Connection and initialization error: ${e.toString()}',

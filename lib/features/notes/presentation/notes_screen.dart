@@ -20,14 +20,15 @@ class _NotesScreenState extends State<NotesScreen> {
   void initState() {
     super.initState();
     // Load notes immediately when screen is created
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await LoggingService.getInstance();
       BlocProvider.of<NotesBloc>(context).add(LoadNotes());
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    LoggingService().logDebug('Building NotesScreen');
+    LoggingService.instance.logDebug('Building NotesScreen');
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddNoteDialog(context),
@@ -67,7 +68,7 @@ class _NotesScreenState extends State<NotesScreen> {
           if (state is NotesLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is NotesLoaded) {
-            LoggingService().logDebug('Notes loaded: ${state.notes}');
+            LoggingService.instance.logDebug('Notes loaded: ${state.notes}');
             return _buildNotesList(context, state.notes);
           } else if (state is NotesError) {
             return Center(child: Text('Error: ${state.message}'));
@@ -136,7 +137,7 @@ class _NotesScreenState extends State<NotesScreen> {
   }
 
   void _showAddNoteDialog(BuildContext context) {
-    LoggingService().logDebug('Showing AddNoteDialog');
+    LoggingService.instance.logDebug('Showing AddNoteDialog');
     showDialog(
       context: context,
       builder: (context) => const AddNoteDialog(),

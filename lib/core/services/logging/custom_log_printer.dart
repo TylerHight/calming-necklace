@@ -49,7 +49,7 @@ class CustomLogPrinter extends LogPrinter {
   }
 
   String _getCaller() {
-    const skipFrames = 4;
+    const skipFrames = 5;
     const maxFrames = 3;
     var frames = StackTrace.current.toString().split('\n');
     

@@ -7,7 +7,7 @@ class BleRepository {
   static final BleRepository _instance = BleRepository._internal();
   factory BleRepository() => _instance;
 
-  late final LoggingService _logger;
+  final LoggingService _logger = LoggingService.instance;
   final StreamController<List<BleDevice>> _devicesController = StreamController<List<BleDevice>>.broadcast();
   StreamSubscription<List<BleDevice>>? _deviceSubscription;
   StreamSubscription<List<ScanResult>>? _scanSubscription;

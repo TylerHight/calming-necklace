@@ -41,7 +41,7 @@ class DurationPickerState extends Equatable {
   final int seconds;
   final Duration duration;
   final bool isValid;
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
 
   DurationPickerState({
     this.hours = 0,

@@ -20,7 +20,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   bool _isActive = false;
   bool _isPeriodicEmission = false;
   late final StreamSubscription<bool> _emissionSubscription;
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
 
   TimedToggleButtonBloc({
     required NecklaceRepository repository,

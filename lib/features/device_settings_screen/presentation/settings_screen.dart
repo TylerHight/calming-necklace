@@ -31,12 +31,17 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final LoggingService _logger = LoggingService();
+  late LoggingService _logger;
 
   @override
   void initState() {
     super.initState();
+    _initializeLogger();
     _loadLatestSettings();
+  }
+
+  Future<void> _initializeLogger() async {
+    _logger = await LoggingService.getInstance();
   }
 
   Future<void> _loadLatestSettings() async {
@@ -112,12 +117,16 @@ class SettingsContent extends StatefulWidget {
 }
 
 class _SettingsContentState extends State<SettingsContent> {
-  late final LoggingService _logger;
+  late LoggingService _logger;
 
   @override
   void initState() {
     super.initState();
-    _logger = LoggingService();
+    _initializeLogger();
+  }
+
+  Future<void> _initializeLogger() async {
+    _logger = await LoggingService.getInstance();
   }
 
   @override
@@ -345,10 +354,10 @@ class _SettingsContentState extends State<SettingsContent> {
                           widget.necklace.id,
                           {'bleDevice': device.toMap()},
                         );
-                        
+
                         // Notify the necklaces bloc to refresh
                         context.read<NecklacesBloc>().add(FetchNecklacesEvent());
-                        
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Connected to ${device.name}')),
                         );

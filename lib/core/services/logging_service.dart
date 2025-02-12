@@ -7,13 +7,16 @@ import 'dart:convert';
 
 class LoggingService {
   static LoggingService? _instance;
-  static Future<LoggingService> getInstance({bool force = false}) async {
+  static Future<LoggingService> getInstance() async {
     if (_instance == null) {
       _instance = LoggingService._internal();
       await _instance!._initLogger();
     }
     return _instance!;
   }
+  
+  // Synchronous getter for cases where we know logger is initialized
+  static LoggingService get instance => _instance!;
 
   late Logger _logger;
   File? _logFile;
@@ -25,8 +28,7 @@ class LoggingService {
   Future<void> _initLogger() async {
     if (_initialized) return;
     print('Initializing logging service...'); // Debug print
-    await Future.delayed(Duration(milliseconds: 100)); // Ensure async initialization
-
+    
     await _setupLogFile();
     _logger = Logger(
       printer: CustomLogPrinter(

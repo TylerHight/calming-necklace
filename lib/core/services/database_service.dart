@@ -9,12 +9,12 @@ class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   factory DatabaseService() => _instance;
   static Database? _database;
+  final LoggingService _logger = LoggingService.instance;
   final _necklaceUpdateController = StreamController<void>.broadcast();
   Stream<void> get onNecklaceUpdate => _necklaceUpdateController.stream;
-  late final LoggingService _logger;
 
   DatabaseService._internal() {
-    LoggingService.getInstance().then((logger) => _logger = logger);
+    // Logger is now initialized synchronously
   }
 
   Future<Database> get database async {

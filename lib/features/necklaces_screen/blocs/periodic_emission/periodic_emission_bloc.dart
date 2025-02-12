@@ -10,7 +10,7 @@ part 'periodic_emission_event.dart';
 part 'periodic_emission_state.dart';
 
 class PeriodicEmissionBloc extends Bloc<PeriodicEmissionEvent, PeriodicEmissionState> {
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
   Timer? _timer;
   final Necklace necklace;
   final NecklaceRepository repository;

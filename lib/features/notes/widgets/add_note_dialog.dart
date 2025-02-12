@@ -43,7 +43,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
 
   @override
   Widget build(BuildContext context) {
-    LoggingService().logDebug('Building AddNoteDialog');
+    _logDebug('Building AddNoteDialog');
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -128,12 +128,12 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                 const SizedBox(width: 12),
                 ElevatedButton(
                   onPressed: _isButtonEnabled
-                      ? () {
+                      ? () async {
                     final note = Note(
                       content: _contentController.text,
                       deviceId: deviceId,
                     );
-                    LoggingService().logDebug('New note created: $note');
+                    _logDebug('New note created: $note');
                     context.read<NotesBloc>().add(AddNote(note));
                     Navigator.pop(context);
                   }
@@ -154,5 +154,10 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
         ),
       ),
     );
+  }
+
+  Future<void> _logDebug(String message) async {
+    final logger = await LoggingService.getInstance();
+    logger.logDebug(message);
   }
 }

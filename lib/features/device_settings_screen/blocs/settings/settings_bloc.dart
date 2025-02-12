@@ -100,7 +100,7 @@ class SettingsState extends Equatable {
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final NecklaceRepository _repository;
   final DatabaseService _databaseService;
-  final LoggingService _logger = LoggingService();
+  final LoggingService _logger = LoggingService.instance;
 
   SettingsBloc(Necklace necklace, this._repository, this._databaseService) 
       : super(SettingsState(necklace: necklace)) {
