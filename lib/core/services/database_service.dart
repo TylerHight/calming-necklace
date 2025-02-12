@@ -11,8 +11,11 @@ class DatabaseService {
   static Database? _database;
   final _necklaceUpdateController = StreamController<void>.broadcast();
   Stream<void> get onNecklaceUpdate => _necklaceUpdateController.stream;
+  late final LoggingService _logger;
 
-  DatabaseService._internal();
+  DatabaseService._internal() {
+    LoggingService.getInstance().then((logger) => _logger = logger);
+  }
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -98,7 +101,7 @@ class DatabaseService {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      LoggingService().logError('Error inserting necklace: $e');
+      _logger.logError('Error inserting necklace: $e');
       rethrow;
     }
   }
@@ -114,14 +117,14 @@ class DatabaseService {
       return List.generate(maps.length, 
         (i) => Necklace.fromMap(Map<String, dynamic>.from(maps[i])));
     } catch (e) {
-      LoggingService().logError('Error retrieving necklaces: $e');
+      _logger.logError('Error retrieving necklaces: $e');
       rethrow;
     }
   }
 
   Future<void> insertNote(Note note) async {
     final db = await database;
-    LoggingService().logDebug('Inserting note: ${note.toMap()}');
+    _logger.logDebug('Inserting note: ${note.toMap()}');
     await db.insert(
       'notes',
       note.toMap(),
@@ -131,19 +134,19 @@ class DatabaseService {
 
   Future<List<Note>> getNotes() async {
     final db = await database;
-    LoggingService().logDebug('Retrieving notes from database');
+    _logger.logDebug('Retrieving notes from database');
     try {
       final List<Map<String, dynamic>> maps = await db.query('notes', orderBy: 'timestamp DESC');
       return List.generate(maps.length, (i) => Note.fromMap(maps[i]));
     } catch (e) {
-      LoggingService().logError('Error retrieving notes: $e');
+      _logger.logError('Error retrieving notes: $e');
       return [];
     }
   }
 
   Future<List<Note>> getNotesByDevice(String? deviceId) async {
     final db = await database;
-    LoggingService().logDebug('Retrieving notes by device: $deviceId');
+    _logger.logDebug('Retrieving notes by device: $deviceId');
     List<Map<String, dynamic>> maps;
     if (deviceId != null) {
       maps = await db.query(
@@ -161,7 +164,7 @@ class DatabaseService {
 
   Future<void> deleteNote(String id) async {
     final db = await database;
-    LoggingService().logDebug('Deleting note with id: $id');
+    _logger.logDebug('Deleting note with id: $id');
     await db.delete(
       'notes',
       where: 'id = ?',
@@ -171,7 +174,7 @@ class DatabaseService {
 
   Future<void> archiveNecklace(String id) async {
     final db = await database;
-    LoggingService().logDebug('Archiving necklace with id: $id');
+    _logger.logDebug('Archiving necklace with id: $id');
     await db.transaction((txn) async {
       await txn.update('necklaces', {'isArchived': 1}, 
         where: 'id = ?', whereArgs: [id]);
@@ -187,7 +190,7 @@ class DatabaseService {
       whereArgs: [id],
     );
     _necklaceUpdateController.add(null);
-    LoggingService().logDebug('Updated necklace settings: $settings');
+    _logger.logDebug('Updated necklace settings: $settings');
   }
 
   Future<Necklace?> getNecklaceById(String id) async {
@@ -210,7 +213,7 @@ class DatabaseService {
       whereArgs: [id],
     );
     _necklaceUpdateController.add(null);
-    LoggingService().logDebug('Updated LED state for necklace $id: ${isOn ? 'on' : 'off'}');
+    _logger.logDebug('Updated LED state for necklace $id: ${isOn ? 'on' : 'off'}');
   }
 
   void dispose() {

@@ -15,12 +15,12 @@ class BleService {
   factory BleService() => _instance;
 
   final _bleUtils = BleUtils();
+  late final LoggingService _logger;
   final _deviceStateController = StreamController<String>.broadcast();
   final _connectionStatusController = StreamController<bool>.broadcast();
   final _rssiController = StreamController<int>.broadcast();
   final _reconnectionAttemptsController = StreamController<int>.broadcast();
   late final BleConnectionManager _connectionManager;
-  final _loggingService = LoggingService();
 
   BluetoothDevice? _connectedDevice;
   BluetoothCharacteristic? _switchCharacteristic;
@@ -34,6 +34,7 @@ class BleService {
   BluetoothDevice? get connectedDevice => _connectedDevice;
 
   BleService._internal() {
+    LoggingService.getInstance().then((logger) => _logger = logger);
     print('Initializing BLE Service');
     _initializeConnectionManager();
   }
@@ -83,20 +84,20 @@ class BleService {
 
   Future<bool> connectToDevice(BluetoothDevice device) async {
     try {
-      _loggingService.logBleInfo('Attempting to connect to ${device.platformName}');
+      _logger.logBleInfo('Attempting to connect to ${device.platformName}');
       _deviceStateController.add('Connecting...');
 
       final connected = await _connectionManager.connectWithRetry(device);
       if (connected) {
-        _loggingService.logBleInfo('Successfully connected to ${device.platformName}');
+        _logger.logBleInfo('Successfully connected to ${device.platformName}');
         _connectedDevice = device;
         return true;
       } else {
-        _loggingService.logBleError('Connection failed with ${device.platformName}');
+        _logger.logBleError('Connection failed with ${device.platformName}');
         throw BleException('Unable to establish connection. Please ensure the device is powered on and nearby.');
       }
     } catch (e, stackTrace) {
-      _loggingService.logBleError('Connection error', e, stackTrace);
+      _logger.logBleError('Connection error', e, stackTrace);
       _deviceStateController.add('Connection failed');
       _connectionStatusController.add(false);
       return false;
@@ -110,7 +111,7 @@ class BleService {
           final rssi = await _connectedDevice!.readRssi();
           _rssiController.add(rssi);
         } catch (e) {
-          _loggingService.logBleError('Failed to read RSSI', e);
+          _logger.logBleError('Failed to read RSSI', e);
         }
       }
     });
@@ -130,7 +131,7 @@ class BleService {
         _isInitialized = false; // Ensure characteristics can be re-initialized
         _stopRssiUpdates();
       } catch (e) {
-        _loggingService.logBleError('Disconnect error', e);
+        _logger.logBleError('Disconnect error', e);
         _deviceStateController.add('Disconnect error: $e');
         rethrow;
       }
@@ -141,40 +142,40 @@ class BleService {
     if (_isInitialized && !forceRediscovery) return;
 
     try {
-      _loggingService.logBleInfo('Starting service and characteristic discovery for device: ${device.id}');
+      _logger.logBleInfo('Starting service and characteristic discovery for device: ${device.id}');
       final services = await device.discoverServices();
-      _loggingService.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
+      _logger.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
 
       for (var service in services) {
-        _loggingService.logBleDebug('Service UUID: ${service.uuid}');
-        _loggingService.logBleDebug('Characteristics:');
+        _logger.logBleDebug('Service UUID: ${service.uuid}');
+        _logger.logBleDebug('Characteristics:');
         for (var char in service.characteristics) {
-          _loggingService.logBleDebug('  - ${char.uuid}');
+          _logger.logBleDebug('  - ${char.uuid}');
         }
       }
 
       final ledService = services.firstWhere(
-            (s) => s.uuid.toString().toLowerCase().contains(BleConstants.ledServiceUuid),
+            (s) => s.uuid.toString().toLowerCase() == BleConstants.LED_SERVICE_UUID,
         orElse: () => throw BleException('LED service not found'),
       );
 
-      _loggingService.logBleDebug('Found LED service: ${ledService.uuid}');
+      _logger.logBleDebug('Found LED service: ${ledService.uuid}');
 
       _switchCharacteristic = ledService.characteristics.firstWhere(
             (c) => c.uuid.toString().toLowerCase().contains(BleConstants.switchCharacteristicUuid),
         orElse: () => throw BleException('Switch characteristic not found'),
       );
 
-      _loggingService.logBleDebug('Found switch characteristic: ${_switchCharacteristic!.uuid}');
+      _logger.logBleDebug('Found switch characteristic: ${_switchCharacteristic!.uuid}');
 
       if (!_switchCharacteristic!.properties.write) {
         throw BleException('Characteristic does not support write operations');
       }
 
       _isInitialized = true;
-      _loggingService.logBleInfo('Service and characteristic discovery completed for device: ${device.id}');
+      _logger.logBleInfo('Service and characteristic discovery completed for device: ${device.id}');
     } catch (e) {
-      _loggingService.logBleError('Error initializing characteristics for device: ${device.id}', e);
+      _logger.logBleError('Error initializing characteristics for device: ${device.id}', e);
       rethrow;
     }
   }
@@ -204,7 +205,7 @@ class BleService {
       }
       await _writeCommand(command, 0); // TODO: Provide correct second parameter (currently dummy value)
     } catch (e) {
-      _loggingService.logBleError('Failed to set LED color: $e');
+      _logger.logBleError('Failed to set LED color: $e');
       rethrow;
     }
   }
@@ -265,19 +266,19 @@ class BleService {
     await ensureConnected();
 
     try {
-      _loggingService.logBleDebug(
+      _logger.logBleDebug(
           'Writing command: $command, value: $value to device: ${_connectedDevice?.platformName}'
       );
 
       if (_switchCharacteristic == null) {
-        _loggingService.logBleError('Switch characteristic not found');
+        _logger.logBleError('Switch characteristic not found');
         throw BleException('Switch characteristic not initialized');
       }
 
       await _switchCharacteristic!.write([command, value]);
-      _loggingService.logBleInfo('Command $command with value $value sent successfully');
+      _logger.logBleInfo('Command $command with value $value sent successfully');
     } catch (e, stackTrace) {
-      _loggingService.logBleError('Failed to write command', e, stackTrace);
+      _logger.logBleError('Failed to write command', e, stackTrace);
       _deviceStateController.add('Write command error: $e');
       rethrow;
     }

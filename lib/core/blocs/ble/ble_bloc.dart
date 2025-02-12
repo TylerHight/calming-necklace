@@ -7,7 +7,7 @@ import 'ble_state.dart';
 
 class BleBloc extends Bloc<BleEvent, BleState> {
   final BleService _bleService;
-  final LoggingService _loggingService = LoggingService();
+  late final LoggingService _logger;
   StreamSubscription<String>? _deviceStateSubscription;
   StreamSubscription<bool>? _connectionStatusSubscription;
   StreamSubscription<int>? _rssiSubscription;
@@ -35,18 +35,18 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     emit(state.copyWith(isConnecting: true, error: null));
     try {
       final deviceId = event.device.id;
-      _loggingService.logBleInfo('Attempting to connect and initialize device: $deviceId');
+      _logger.logBleInfo('Attempting to connect and initialize device: $deviceId');
       await _bleService.connectAndInitializeDevice(event.device.device!);
       final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
       updatedStates[deviceId] = true;
-      _loggingService.logBleInfo('Successfully connected and initialized device: $deviceId');
+      _logger.logBleInfo('Successfully connected and initialized device: $deviceId');
       emit(state.copyWith(
         deviceConnectionStates: updatedStates,
         isConnecting: false,
         error: null,
       ));
     } catch (e) {
-      _loggingService.logBleError('Connection and initialization error for device: $event.device.id', e);
+      _logger.logBleError('Connection and initialization error for device: $event.device.id', e);
       emit(state.copyWith(
         isConnecting: false,
         error: 'Connection and initialization error: ${e.toString()}',
@@ -61,7 +61,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
       updatedStates[event.deviceId] = false;
       emit(state.copyWith(deviceConnectionStates: updatedStates));
     } catch (e) {
-      _loggingService.logBleError('Disconnect error: ${e.toString()}', e);
+      _logger.logBleError('Disconnect error: ${e.toString()}', e);
       emit(state.copyWith(error: 'Disconnect error: ${e.toString()}'));
     }
   }
@@ -96,14 +96,14 @@ class BleBloc extends Bloc<BleEvent, BleState> {
 
   Future<void> _onLedControlRequest(BleLedControlRequest event, Emitter<BleState> emit) async {
     try {
-      _loggingService.logBleInfo('LED control request: ${event.turnOn ? 'ON' : 'OFF'}');
+      _logger.logBleInfo('LED control request: ${event.turnOn ? 'ON' : 'OFF'}');
       await _bleService.setLedState(event.turnOn);
       emit(state.copyWith(
         error: null,
         lastCommand: event.turnOn ? 'LED ON' : 'LED OFF',
       ));
     } catch (e) {
-      _loggingService.logBleError('LED control error', e);
+      _logger.logBleError('LED control error', e);
       emit(state.copyWith(
         error: 'LED control error: ${e.toString()}',
       ));

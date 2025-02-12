@@ -17,11 +17,11 @@ class BleConstants {
   static const int MIN_RSSI_THRESHOLD = -80;
 
   // Service UUIDs
-  static const String ledServiceUuid = "180A";
-  static const String SETTINGS_SERVICE_UUID = "180F";
+  static const String LED_SERVICE_UUID = "19B10001-E8F2-537E-4F6C-D104768A1214";
+  static const String SETTINGS_SERVICE_UUID = "00001800-0000-1000-8000-00805f9b34fb";
 
   // Characteristic UUIDs
-  static const String switchCharacteristicUuid = "2A57";
+  static const String switchCharacteristicUuid = "19B10001-E8F2-537E-4F6C-D104768A1214";
   static const String KEEPALIVE_CHARACTERISTIC_UUID = "2A3B";
   static const String EMISSION_CHARACTERISTIC_UUID = "2A19";
   static const String INTERVAL_CHARACTERISTIC_UUID = "2A1B";

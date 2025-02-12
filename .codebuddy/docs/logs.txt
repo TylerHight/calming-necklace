@@ -1,0 +1,11 @@
+Device MAC Address: D4:25:CB:B4:D0:52
+Discovered Services (4 total):
+
+
+Service 1800 with characteristics: 2a00, 2a01
+Service 1801 with characteristic: 2a05
+Service 180a with characteristics: 2a57, 2a3b
+Service 180f with characteristics: 2a19, 2a1a, 2a1b, 2a1c, 2a1d, 2a1e, 2a1f
+
+
+Error: LED service not found when trying to toggle light

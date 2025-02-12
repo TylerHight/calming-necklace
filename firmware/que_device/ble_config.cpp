@@ -5,10 +5,10 @@
 #include "settings.h"
 #include "timing.h"
 
-BLEService ledService("180A");
-BLEService settingsService("180F");
+BLEService settingsService("19B10000-E8F2-537E-4F6C-D104768A1214");  // Settings service
+BLEService ledService("19B10001-E8F2-537E-4F6C-D104768A1214");  // LED control service
 
-BLEByteCharacteristic switchCharacteristic("2A57", BLERead | BLEWrite | BLENotify | BLEWriteWithoutResponse);
+BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify | BLEWriteWithoutResponse);
 BLEByteCharacteristic keepAliveCharacteristic("2A3B", BLERead | BLEWrite | BLENotify);
 BLELongCharacteristic emission1Characteristic("2A19", BLERead | BLEWrite | BLENotify);
 BLELongCharacteristic emission2Characteristic("2A1A", BLERead | BLEWrite | BLENotify);
@@ -32,7 +32,7 @@ void setupBLE() {
 
     BLE.setDeviceName("Calming Necklace");
     BLE.setLocalName("Calming Necklace");
-    BLE.setAdvertisedService(ledService);
+    BLE.setAdvertisedService(ledService);  // Advertise our LED service
 
     BLE.advertise();
     Serial.println("Advertising as 'Calming Necklace'");
@@ -43,11 +43,8 @@ void setupServices() {
     ledService.addCharacteristic(keepAliveCharacteristic);
 
     settingsService.addCharacteristic(emission1Characteristic);
-    settingsService.addCharacteristic(emission2Characteristic);
     settingsService.addCharacteristic(interval1Characteristic);
-    settingsService.addCharacteristic(interval2Characteristic);
     settingsService.addCharacteristic(periodic1Characteristic);
-    settingsService.addCharacteristic(periodic2Characteristic);
     settingsService.addCharacteristic(heartrateCharacteristic);
 
     BLE.addService(ledService);
@@ -60,11 +57,8 @@ void initializeCharacteristics() {
     switchCharacteristic.writeValue(0);
     keepAliveCharacteristic.writeValue(0);
     emission1Characteristic.writeValue(getEmission1Duration());
-    emission2Characteristic.writeValue(getEmission2Duration());
     interval1Characteristic.writeValue(getInterval1());
-    interval2Characteristic.writeValue(getInterval2());
     periodic1Characteristic.writeValue(getPeriodic1Enabled());
-    periodic2Characteristic.writeValue(getPeriodic2Enabled());
     heartrateCharacteristic.writeValue(getHeartrateThreshold());
 }
 

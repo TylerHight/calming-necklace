@@ -8,6 +8,7 @@ import 'core/data/repositories/ble_repository.dart';
 import 'core/data/repositories/necklace_repository.dart';
 import 'core/services/ble/ble_service.dart';
 import 'core/services/database_service.dart';
+import 'core/services/logging_service.dart';
 import 'features/necklaces_screen/presentation/necklaces_screen.dart';
 import 'features/notes/presentation/notes_screen.dart';
 import 'features/notes/bloc/notes_bloc.dart';
@@ -16,9 +17,15 @@ import 'app_bloc_observer.dart';
 import 'core/utils/ble/ble_permissions.dart';
 import 'core/blocs/ble/ble_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize logging service first
+  final loggingService = await LoggingService.getInstance();
+  loggingService.logInfo('Application starting...');
+  loggingService.logDebug('Initializing core services...');
+  
   Bloc.observer = AppBlocObserver();
-
   runApp(const MyApp());
 }
 

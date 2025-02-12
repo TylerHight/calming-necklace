@@ -2,7 +2,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/services/logging_service.dart';
 
 class AppBlocObserver extends BlocObserver {
-  final LoggingService _logger = LoggingService();
+  late final LoggingService _logger;
+
+  AppBlocObserver() {
+    LoggingService.getInstance().then((logger) {
+      _logger = logger;
+    });
+  }
 
   @override
   void onEvent(Bloc bloc, Object? event) {

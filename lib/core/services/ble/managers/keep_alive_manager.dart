@@ -34,7 +34,7 @@ class BleKeepAliveManager {
 
     try {
       final service = services.firstWhere(
-            (s) => s.uuid.toString().toLowerCase() == BleConstants.ledServiceUuid.toLowerCase(),
+            (s) => s.uuid.toString().toLowerCase() == BleConstants.LED_SERVICE_UUID.toLowerCase(),
       );
 
       _keepAliveCharacteristic = service.characteristics.firstWhere(

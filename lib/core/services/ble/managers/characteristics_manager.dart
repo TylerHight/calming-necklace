@@ -1,15 +1,16 @@
-// lib/core/services/ble/managers/characteristics_manager.dart
-
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import '../../logging_service.dart';
 import '../ble_types.dart';
 import '../../../data/constants/ble_constants.dart';
 
 class BleCharacteristicsManager {
   final ErrorCallback onError;
+  final LoggingService loggingService;
   final Map<String, BluetoothCharacteristic> _characteristics = {};
   bool _isInitialized = false;
+  late BluetoothCharacteristic _switchCharacteristic;
 
-  BleCharacteristicsManager({required this.onError});
+  BleCharacteristicsManager({required this.onError, required this.loggingService});
 
   Future<void> discoverCharacteristics(BluetoothDevice device) async {
     try {
@@ -18,6 +19,18 @@ class BleCharacteristicsManager {
 
       final services = await device.discoverServices();
       _logServiceDiscovery(services);
+
+      loggingService.logBleDebug('Looking for LED service: ${BleConstants.LED_SERVICE_UUID}');
+      final ledService = services.firstWhere(
+            (s) => s.uuid.toString().toLowerCase().contains(BleConstants.LED_SERVICE_UUID.toLowerCase()),
+        orElse: () => throw BleException('LED service not found'),
+      );
+
+      loggingService.logBleDebug('Found LED service, looking for switch characteristic');
+      _switchCharacteristic = ledService.characteristics.firstWhere(
+            (c) => c.uuid.toString().toLowerCase().contains(BleConstants.switchCharacteristicUuid.toLowerCase()),
+        orElse: () => throw BleException('Switch characteristic not found'),
+      );
 
       await _validateAndStoreCharacteristics(services);
       _isInitialized = true;
@@ -28,7 +41,7 @@ class BleCharacteristicsManager {
 
   Future<void> _validateAndStoreCharacteristics(List<BluetoothService> services) async {
     // Find required services
-    final ledService = _findService(services, BleConstants.ledServiceUuid);
+    final ledService = _findService(services, BleConstants.LED_SERVICE_UUID);
     final settingsService = _findService(services, BleConstants.SETTINGS_SERVICE_UUID);
 
     // Store required characteristics
@@ -38,8 +51,8 @@ class BleCharacteristicsManager {
 
   BluetoothService _findService(List<BluetoothService> services, String uuid) {
     return services.firstWhere(
-          (s) => s.uuid.toString().toLowerCase() == uuid.toLowerCase(),
-      orElse: () => throw BleException('${BleConstants.ERR_SERVICE_NOT_FOUND}: $uuid'),
+          (s) => s.uuid.toString().toLowerCase().contains(uuid.toLowerCase()),
+          orElse: () => throw BleException('Service not found: $uuid. Available services: ${services.map((s) => s.uuid.toString()).join(", ")}'),
     );
   }
 
@@ -47,7 +60,7 @@ class BleCharacteristicsManager {
     // Store switch characteristic
     final switchChar = await _findAndConfigureCharacteristic(
       service,
-      BleConstants.switchCharacteristicUuid,
+      BleConstants.LED_SERVICE_UUID,  // New LED control characteristic UUID
       required: true,
     );
     if (switchChar != null) {
@@ -92,6 +105,7 @@ class BleCharacteristicsManager {
     try {
       final characteristics = service.characteristics.where(
               (c) => c.uuid.toString().toLowerCase() == uuid.toLowerCase()
+              || c.uuid.toString().toLowerCase().endsWith(uuid.toLowerCase())
       ).toList();
 
       if (characteristics.isEmpty) {
