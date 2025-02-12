@@ -44,9 +44,13 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
     try {
       if (_processingStates[necklace.id] == true) return;
       _processingStates[necklace.id] = true;
+
+      // Update database first to ensure UI reflects the change immediately
+      await _dbService.updateNecklaceLedState(necklace.id, isOn);
+
       _logger.logInfo('Toggle light ${isOn ? 'on' : 'off'} for necklace ${necklace.id}');
       await _bleService.setLedState(isOn);
-      await _dbService.updateNecklaceLedState(necklace.id, isOn);
+
       _emissionControllers[necklace.id]?.add(isOn);
       _processingStates[necklace.id] = false;
     } catch (e) {

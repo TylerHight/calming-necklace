@@ -30,6 +30,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   }) : _repository = repository,
        _ticker = const Ticker(),
        super(TimedToggleButtonInitial()) {
+    _initializeFromNecklace();
     on<StartPeriodicEmission>(_onStartPeriodicEmission);
     on<StopPeriodicEmission>(_onStopPeriodicEmission);
     on<ToggleLightEvent>(_onToggleLight);
@@ -39,21 +40,31 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _emissionSubscription = _repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
   }
 
+  void _initializeFromNecklace() {
+    _logger.logDebug('Initializing TimedToggleButtonBloc with necklace state: ${necklace.isLedOn}');
+    _isActive = necklace.isLedOn;
+    if (necklace.isLedOn) {
+      emit(LightOnState(necklace.emission1Duration.inSeconds));
+      _startTimer(necklace.emission1Duration.inSeconds);
+    }
+  }
+
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
     try {
       if (_isProcessingStateChange) {
-        _logger.logDebug('Toggle light event ignored - already processing state change');
+        _logger.logDebug('Ignoring toggle event - already processing state change');
         return;
       }
+      _isProcessingStateChange = true;
       _cancelStateRecovery();
-      _logger.logDebug('Toggle light event received. Current state: ${state.runtimeType}');
+      
+      _logger.logDebug('Processing toggle event. Current state: ${state.runtimeType}, isActive: $_isActive');
       emit(TimedToggleButtonLoading());
-
+      
       _isActive = !_isActive;
       if (_isActive) {
         _logger.logDebug('Attempting to turn light on');
         await _repository.toggleLight(necklace, true);
-        _isProcessingStateChange = true;
         emit(LightOnState(necklace.emission1Duration.inSeconds));
         _startTimer(necklace.emission1Duration.inSeconds);
       } else {

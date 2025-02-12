@@ -185,12 +185,14 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
                 return;
               }
+
+              final currentState = context.read<TimedToggleButtonBloc>().state;
+              final shouldTurnOn = !(currentState is LightOnState);
               LoggingService.instance.logDebug('Sending LED control request');
               context.read<BleBloc>().add(BleLedControlRequest(
-                turnOn: !(state is LightOnState),
+                turnOn: shouldTurnOn,
                 deviceId: widget.necklace.bleDevice!.id,
               ));
-              LoggingService.instance.logDebug('Dispatching ToggleLightEvent');
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             onTapDown: (_) {
