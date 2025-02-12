@@ -215,7 +215,15 @@ class BleService {
 
   Future<void> setLedState(bool turnOn) async {
     await ensureConnected();
-    await _writeCommand(turnOn ? BleCommand.ledOn.value : BleCommand.ledOff.value, 0);
+    _logger.logDebug('Sending setLedState command: ${turnOn ? 'ON' : 'OFF'}');
+    _logger.logDebug('Connected device: ${_connectedDevice?.name}, Switch characteristic: ${_switchCharacteristic?.uuid}');
+    try {
+      await _writeCommand(turnOn ? BleCommand.ledOn.value : BleCommand.ledOff.value, 0);
+      _logger.logDebug('LED state command sent successfully');
+    } catch (e) {
+      _logger.logBleError('Failed to set LED state: ${e.toString()}', e);
+      rethrow;
+    }
   }
 
   // Device Settings Methods
@@ -268,6 +276,7 @@ class BleService {
   Future<void> _writeCommand(int command, int value) async {
     await ensureConnected();
 
+    if (_pendingCommands.isNotEmpty) return; // Prevent multiple pending commands
     final now = DateTime.now();
     if (_lastCommandTime != null && 
         now.difference(_lastCommandTime!) < _commandDebounceTime) {
@@ -281,6 +290,7 @@ class BleService {
     _pendingCommands[commandId] = completer;
 
     try {
+      await Future.delayed(Duration(milliseconds: 100)); // Add small delay between commands
       Timer(const Duration(seconds: 2), () {
         if (!completer.isCompleted) {
           completer.completeError('Command timeout');
@@ -291,7 +301,6 @@ class BleService {
       await _switchCharacteristic!.write([command, value]);
       completer.complete();
       _pendingCommands.remove(commandId);
-      
       _logger.logBleInfo('Command $command with value $value sent successfully');
     } catch (e) {
       _logger.logBleError('Failed to write command', e);

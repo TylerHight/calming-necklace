@@ -173,14 +173,24 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () async {
+              final now = DateTime.now();
+              if (_lastTapTime != null && now.difference(_lastTapTime!) < Duration(milliseconds: 500)) {
+                LoggingService.instance.logDebug('Tap debounced - ignoring tap');
+                return;
+              }
+              _lastTapTime = now;
+
               if (!widget.isConnected) {
+                LoggingService.instance.logDebug('Device not connected - attempting connection');
                 context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
                 return;
               }
+              LoggingService.instance.logDebug('Sending LED control request');
               context.read<BleBloc>().add(BleLedControlRequest(
                 turnOn: !(state is LightOnState),
                 deviceId: widget.necklace.bleDevice!.id,
               ));
+              LoggingService.instance.logDebug('Dispatching ToggleLightEvent');
               context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
             },
             onTapDown: (_) {
