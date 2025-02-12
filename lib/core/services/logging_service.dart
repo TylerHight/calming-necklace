@@ -92,23 +92,23 @@ class LoggingService {
   }
 
   void logWarning(String message) {
-    if (_initialized) _logger.w(message);
+    if (_initialized) _logger.w('🔵 $message');
   }
 
   void logBleInfo(String message) {
-    logInfo(message);
+    logInfo('🔵 $message');
   }
 
   void logBleError(String message, [dynamic error, StackTrace? stackTrace]) {
-    logError(message, error, stackTrace);
+    logError('🔵 $message', error, stackTrace);
   }
 
   void logBleDebug(String message) {
-    logDebug(message);
+    logDebug('🔵 $message');
   }
 
   void logBleWarning(String message) {
-    logWarning(message);
+    logWarning('🔵 $message');
   }
 
   Future<void> clearLogs() async {

@@ -15,6 +15,7 @@ class BleDevice extends Equatable {
   final BleDeviceType deviceType;
   final bool isConnected;
   final String? necklaceId; 
+  final String? advertisedName;
   final BluetoothDevice? device;
 
   const BleDevice({
@@ -24,12 +25,13 @@ class BleDevice extends Equatable {
     required this.rssi,
     required this.deviceType,
     this.isConnected = false,
+    this.advertisedName,
     this.necklaceId, 
     this.device,
   });
 
   @override
-  List<Object?> get props => [id, name, address, rssi, deviceType, isConnected, necklaceId];
+  List<Object?> get props => [id, name, address, rssi, deviceType, isConnected, advertisedName, necklaceId];
 
   Map<String, dynamic> toMap() {
     return {
@@ -39,7 +41,7 @@ class BleDevice extends Equatable {
       'rssi': rssi,
       'deviceType': deviceType.index,
       'isConnected': isConnected ? 1 : 0,
-      // Note: BluetoothDevice is not serialized in toMap
+      'advertisedName': advertisedName,
       'necklaceId': necklaceId,
     };
   }
@@ -54,6 +56,7 @@ class BleDevice extends Equatable {
         deviceType: map['deviceType'] is int ? 
             BleDeviceType.values[map['deviceType']] : BleDeviceType.necklace,
         isConnected: map['isConnected'] == 1,
+        advertisedName: map['advertisedName']?.toString(),
         necklaceId: map['necklaceId']?.toString(),
       );
     } catch (e) {
@@ -73,6 +76,7 @@ class BleDevice extends Equatable {
     String? name,
     int? rssi,
     bool? isConnected,
+    String? advertisedName,
     String? necklaceId, 
     BluetoothDevice? device,  // Add this parameter to the copyWith method
   }) {
@@ -83,6 +87,7 @@ class BleDevice extends Equatable {
       rssi: rssi ?? this.rssi,
       deviceType: deviceType,
       isConnected: isConnected ?? this.isConnected,
+      advertisedName: advertisedName ?? this.advertisedName,
       necklaceId: necklaceId ?? this.necklaceId, 
       device: device ?? this.device,  // Copy the new field
     );

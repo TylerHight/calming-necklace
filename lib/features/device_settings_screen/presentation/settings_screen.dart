@@ -11,6 +11,7 @@ import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
 import '../widgets/settings_help_dialog.dart';
+import '../widgets/ble_device_info.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/ui/ui_constants.dart';
 
@@ -169,10 +170,10 @@ class _SettingsContentState extends State<SettingsContent> {
             ),
             const SizedBox(height: 16),
             ListTile(
-              title: const Text('Device Name'),
               subtitle: TextFormField(
                 initialValue: state.necklace.name,
                 decoration: const InputDecoration(
+                  labelText: 'Rename necklace',
                   hintText: 'Enter device name',
                   border: UnderlineInputBorder(),
                 ),
@@ -181,7 +182,7 @@ class _SettingsContentState extends State<SettingsContent> {
                     context.read<SettingsBloc>().add(UpdateNecklaceName(value));
                   }
                 },
-              ),
+              )
             ),
             if (state.isSaved)
               Padding(
@@ -206,12 +207,8 @@ class _SettingsContentState extends State<SettingsContent> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    state.necklace.bleDevice!.toString(),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                  BleDeviceInfo(
+                    device: state.necklace.bleDevice!,
                   ),
                 ],
               ),
