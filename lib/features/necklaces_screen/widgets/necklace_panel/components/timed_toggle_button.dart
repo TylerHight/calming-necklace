@@ -116,32 +116,27 @@ class _TimedToggleButtonView extends StatefulWidget {
 }
 
 class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
-  Duration? _duration;
   DateTime? _lastTapTime;
 
   @override
   void initState() {
     super.initState();
-    _refreshDuration();
-  }
-
-  Future<void> _refreshDuration() async {
-    try {
-      final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
-      if (updatedNecklace != null && mounted) {
-        setState(() {
-          _duration = updatedNecklace.emission1Duration;
-        });
-      }
-    } catch (e) {
-      final logger = await LoggingService.getInstance();
-      logger.logError('Error refreshing duration: $e');
-    }
+    _initializeLogger();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TimedToggleButtonBloc, TimedToggleButtonState>(
+    return BlocConsumer<TimedToggleButtonBloc, TimedToggleButtonState>(
+      listener: (context, state) {
+        if (state is TimedToggleButtonError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         if (state is TimedToggleButtonLoading) {
           return Container(
@@ -163,8 +158,8 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
           );
         }
 
-        bool isLightOn = state is LightOnState;
-        String timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
+        final isLightOn = state is LightOnState;
+        final timeLeft = isLightOn ? _formatTime((state).secondsLeft) : '';
 
         final logger = LoggingService.instance;
         logger.logDebug('Building TimedToggleButton: isLightOn: $isLightOn, timeLeft: $timeLeft');
@@ -286,5 +281,14 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         child: Center(child: child),
       ),
     );
+  }
+
+  Future<void> _initializeLogger() async {
+    try {
+      final logger = await LoggingService.getInstance();
+      logger.logError('Error refreshing duration');
+    } catch (e) {
+      print('Error initializing logger: $e');
+    }
   }
 }

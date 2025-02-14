@@ -16,6 +16,7 @@ abstract class NecklaceRepository {
   Future<String> getDeviceNameById(String deviceId);
   Future<void> addNecklace(String name, String bleDeviceId);
   Stream<bool> getEmissionStream(String necklaceId);
+  Future<Necklace?> getNecklaceById(String id);
 }
 
 class NecklaceRepositoryImpl implements NecklaceRepository {
@@ -158,5 +159,16 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
       controller.close();
     }
     _emissionControllers.clear();
+  }
+
+  @override
+  Future<Necklace?> getNecklaceById(String id) async {
+    try {
+      final necklaces = await getNecklaces();
+      return necklaces.firstWhere((necklace) => necklace.id == id, orElse: () => Necklace(id: '', name: '', bleDevice: const BleDevice(id: '', name: '', address: '', rssi: 0, deviceType: BleDeviceType.necklace), emission1Duration: Duration.zero, releaseInterval1: Duration.zero, isArchived: false));
+    } catch (e) {
+      _logger.logError('Error getting necklace by id: $e');
+      return null;
+    }
   }
 }

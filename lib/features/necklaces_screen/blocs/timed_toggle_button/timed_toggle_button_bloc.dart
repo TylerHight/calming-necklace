@@ -21,6 +21,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   bool _isProcessingStateChange = false;
   bool _isPeriodicEmission = false;
   Timer? _stateRecoveryTimer;
+  Duration? _currentDuration;
   late final StreamSubscription<bool> _emissionSubscription;
   final LoggingService _logger = LoggingService.instance;
 
@@ -38,6 +39,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     on<_PeriodicEmissionTriggered>(_onPeriodicEmissionTriggered);
 
     _emissionSubscription = _repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
+    _initializeDuration();
   }
 
   void _initializeFromNecklace() {
@@ -50,6 +52,15 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       if (remainingSeconds > 0) {
         _startTimer(remainingSeconds);
       }
+    }
+  }
+  
+  Future<void> _initializeDuration() async {
+    try {
+      final updatedNecklace = await _repository.getNecklaceById(necklace.id);
+      _currentDuration = updatedNecklace?.emission1Duration;
+    } catch (e) {
+      _logger.logError('Error initializing duration: $e');
     }
   }
 
@@ -69,8 +80,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       if (_isActive) {
         _logger.logDebug('Attempting to turn light on');
         await _repository.toggleLight(necklace, true);
-        emit(LightOnState(necklace.emission1Duration.inSeconds));
-        _startTimer(necklace.emission1Duration.inSeconds);
+        emit(LightOnState(_currentDuration?.inSeconds ?? 0));
+        _startTimer(_currentDuration?.inSeconds ?? 0);
       } else {
         _logger.logDebug('Attempting to turn light off');
         if (necklace.periodicEmissionEnabled) {
@@ -107,8 +118,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       _isPeriodicEmission = true;
       _isActive = true;
       await _repository.toggleLight(necklace, true);
-      emit(LightOnState(necklace.emission1Duration.inSeconds));
-      _startTimer(necklace.emission1Duration.inSeconds, isPeriodicEmission: true);
+      emit(LightOnState(_currentDuration?.inSeconds ?? 0));
+      _startTimer(_currentDuration?.inSeconds ?? 0, isPeriodicEmission: true);
     } catch (e) {
       _logger.logError('Error handling periodic emission trigger: $e');
       emit(TimedToggleButtonError(e.toString()));
