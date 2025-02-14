@@ -1,15 +1,47 @@
-I/flutter (13321): 02:05:38 📘 [logging_service] ℹ️ 🔵 Command 1 with value 0 sent successfully
-I/flutter (13321): 02:05:38 🔍 [database_service] 🔍 Updated LED state for necklace 2025-02-12 02:04:33.862752: on
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Event: _PeriodicEmissionTriggered()
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]), nextState: NecklacesLoading() }
-I/flutter (13321): 02:05:38 🔍 [timed_toggle_button_bloc] 🔍 Handling periodic emission trigger
-I/flutter (13321): 02:05:38 📘 [necklace_repository] ℹ️ Toggle light on for necklace 2025-02-12 02:04:33.862752
-I/flutter (13321): 02:05:38 🔍 [logging_service] 🔍 🔵 Writing command: 1, value: 0 to device: Calming Necklace
-D/[FBP-Android](13321): [FBP] onMethodCall: writeCharacteristic
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]) }
-I/flutter (13321): 02:05:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([Necklace(2025-02-12 01:58:35.836551, ghj, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, false), Necklace(2025-02-12 02:04:33.862752, tyyuu, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, false, null, null), false, 0:00:03.000000, 0:00:20.000000, false, false, false, true)]) }
-I/flutter (13321): 02:05:38 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
-I/flutter (13321): 02:05:38 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: true, timeLeft: 3s
-D/[FBP-Android](13321): [FBP] onCharacteristicWrite:
+
+I/flutter (28095): 14:28:36 🚨 [timed_toggle_button_bloc] ❌ TimedToggleButtonBloc error: Bad state: Cannot add new events after calling close
+I/flutter (28095): #0      _BroadcastStreamController.add (dart:async/broadcast_stream_controller.dart:243:24)
+I/flutter (28095): #1      Bloc.add (package:bloc/src/bloc.dart:100:24)
+I/flutter (28095): #2      TimedToggleButtonBloc._startTimer.<anonymous closure> (package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart:133:31)
+I/flutter (28095): #3      _RootZone.runUnaryGuarded (dart:async/zone.dart:1609:10)
+I/flutter (28095): #4      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:366:11)
+I/flutter (28095): #5      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:297:7)
+I/flutter (28095): #6      _ForwardingStreamSubscription._add (dart:async/stream_pipe.dart:121:11)
+I/flutter (28095): #7      _TakeStream._handleData (dart:async/stream_pipe.dart:303:12)
+I/flutter (28095): #8      _ForwardingStreamSubscription._handleData (dart:async/stream_pipe.dart:151:13)
+I/flutter (28095): #9      _RootZone.runUnaryGuarded (dart:async/zone.dart:1609:10)
+I/flutter (28095): #10     _BufferingStreamSubscription._sendDat
+I/flutter (28095): 14:28:36 🚨 [app_bloc_observer] ❌ Error: Bad state: Cannot add new events after calling close  ERROR: Bad state: Cannot add new events after calling close
+I/flutter (28095):   #0      _BroadcastStreamController.add (dart:async/broadcast_stream_controller.dart:243:24)
+I/flutter (28095):   #1      Bloc.add (package:bloc/src/bloc.dart:100:24)
+I/flutter (28095):   #2      TimedToggleButtonBloc._startTimer.<anonymous closure> (package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart:133:31)
+I/flutter (28095):   #3      _RootZone.runUnaryGuarded (dart:async/zone.dart:1609:10)
+I/flutter (28095):   #4      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:366:11)
+I/flutter (28095):   #5      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:297:7)
+I/flutter (28095):   #6      _ForwardingStreamSubscription._add (dart:async/stream_pipe.dart:121:11)
+I/flutter (28095):   #7      _TakeStream._handleData (dart:async/stream_pipe.dart:303:12)
+E/flutter (28095): [ERROR:flutter/runtime/dart_vm_initializer.cc(40)] Unhandled Exception: Bad state: Cannot add new events after calling close
+E/flutter (28095): #0      _BroadcastStreamController.add (dart:async/broadcast_stream_controller.dart:243:24)
+E/flutter (28095): #1      Bloc.add (package:bloc/src/bloc.dart:100:24)
+E/flutter (28095): #2      TimedToggleButtonBloc._startTimer.<anonymous closure> (package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart:133:31)
+E/flutter (28095): #3      _RootZone.runUnaryGuarded (dart:async/zone.dart:1609:10)
+E/flutter (28095): #4      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:366:11)
+E/flutter (28095): #5      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:297:7)
+E/flutter (28095): #6      _ForwardingStreamSubscription._add (dart:async/stream_pipe.dart:121:11)
+E/flutter (28095): #7      _TakeStream._handleData (dart:async/stream_pipe.dart:303:12)
+E/flutter (28095): #8      _ForwardingStreamSubscription._handleData (dart:async/stream_pipe.dart:151:13)
+E/flutter (28095): #9      _RootZone.runUnaryGuarded (dart:async/zone.dart:1609:10)
+E/flutter (28095): #10     _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:366:11)
+E/flutter (28095): #11     _BufferingStreamSubscription._add (dart:async/stream_impl.dart:297:7)
+E/flutter (28095): #12     _SyncStreamControllerDispatch._sendData (dart:async/stream_controller.dart:777:19)
+E/flutter (28095): #13     _StreamController._add (dart:async/stream_controller.dart:651:7)
+E/flutter (28095): #14     _StreamController.add (dart:async/stream_controller.dart:606:5)
+E/flutter (28095): #15     new Stream.periodic.<anonymous closure>.sendEvent (dart:async/stream.dart:509:22)
+E/flutter (28095): #16     _Timer._runTimers (dart:isolate-patch/timer_impl.dart:398:19)
+E/flutter (28095): #17     _Timer._handleMessage (dart:isolate-patch/timer_impl.dart:429:5)
+E/flutter (28095): #18     _RawReceivePort._handleMessage (dart:isolate-patch/isolate_patch.dart:184:12)
+E/flutter (28095): 
+D/[FBP-Android](28095): [FBP] onCharacteristicWrite:
+D/[FBP-Android](28095): [FBP]   chr: 19b10001-e8f2-537e-4f6c-d104768a1214
+D/[FBP-Android](28095): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (28095): 14:28:36 📘 [logging_service] ℹ️ 🔵 Command 1 with value 0 sent successfully

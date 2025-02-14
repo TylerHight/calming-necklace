@@ -15,6 +15,7 @@ part 'periodic_emission_ticker.dart';
 class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButtonState> {
   final NecklaceRepository _repository;
   final Necklace necklace;
+  bool _isClosed = false;
   final Ticker _ticker;
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
@@ -128,10 +129,16 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
   void _startTimer(int duration, {bool isPeriodicEmission = false}) {
     _tickerSubscription?.cancel();
+    if (_isClosed) {
+      _logger.logDebug('Cannot start timer - bloc is closed');
+      return;
+    }
+    
     _tickerSubscription = _ticker
         .tick(ticks: duration)
-        .listen((duration) => add(_TimerTicked(duration: duration, 
-            isPeriodicEmission: isPeriodicEmission)));
+        .listen(
+          (duration) => !_isClosed ? add(_TimerTicked(duration: duration, isPeriodicEmission: isPeriodicEmission)) : null,
+          onError: (error) => _logger.logError('Timer error: $error'));
   }
 
   void _stopTimer(Emitter<TimedToggleButtonState> emit) {
@@ -188,6 +195,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   @override
   Future<void> close() {
     _tickerSubscription?.cancel();
+    _isClosed = true;
     _isPeriodicEmission = false;
     _stateRecoveryTimer?.cancel();
     _emissionSubscription.cancel();
