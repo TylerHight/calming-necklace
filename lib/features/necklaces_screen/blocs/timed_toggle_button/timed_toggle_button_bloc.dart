@@ -17,6 +17,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   final Necklace necklace;
   bool _isClosed = false;
   final Ticker _ticker;
+  bool _isTimerActive = false;
+  bool _isProcessingToggle = false;
   StreamSubscription<int>? _tickerSubscription;
   bool _isActive = false;
   bool _isProcessingStateChange = false;
@@ -67,22 +69,23 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
     try {
-      if (_isProcessingStateChange) {
-        _logger.logDebug('Ignoring toggle event - already processing state change');
+      if (_isProcessingToggle) return;
+      _isProcessingToggle = true;
+      
+      if (_isTimerActive) {
+        await _stopTimer(emit);
         return;
       }
-      _isProcessingStateChange = true;
-      _cancelStateRecovery();
       
-      _logger.logDebug('Processing toggle event. Current state: ${state.runtimeType}, isActive: $_isActive');
+      _logger.logDebug('Processing toggle event');
       emit(TimedToggleButtonLoading());
       
       _isActive = !_isActive;
       if (_isActive) {
         _logger.logDebug('Attempting to turn light on');
         await _repository.toggleLight(necklace, true);
-        emit(LightOnState(_currentDuration?.inSeconds ?? 0));
-        _startTimer(_currentDuration?.inSeconds ?? 0);
+        emit(LightOnState(_currentDuration?.inSeconds ?? 3));
+        _startTimer(_currentDuration?.inSeconds ?? 3);
       } else {
         _logger.logDebug('Attempting to turn light off');
         if (necklace.periodicEmissionEnabled) {
@@ -92,12 +95,12 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       }
       _logger.logDebug('Toggle light completed successfully');
     } catch (e) {
-      _isProcessingStateChange = false;
+      _isProcessingToggle = false;
       _logger.logError('Error in _onToggleLight: $e');
       emit(TimedToggleButtonError(e.toString()));
       _scheduleStateRecovery();
     } finally {
-      _isProcessingStateChange = false;
+      _isProcessingToggle = false;
     }
   }
 
@@ -105,8 +108,9 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     if (event.duration > 0) {
       emit(LightOnState(event.duration));
     } else {
+      _isTimerActive = false;
       _repository.completeEmission(necklace.id);
-      emit(LightOffState());
+      _stopTimer(emit);
     }
   }
 
@@ -114,6 +118,11 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _PeriodicEmissionTriggered event,
     Emitter<TimedToggleButtonState> emit,
   ) async {
+    if (_isTimerActive) {
+      _logger.logDebug('Ignoring periodic emission - timer already active');
+      return;
+    }
+    
     _logger.logDebug('Handling periodic emission trigger');
     try {
       _isPeriodicEmission = true;
@@ -134,6 +143,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       return;
     }
     
+    _isTimerActive = true;
     _tickerSubscription = _ticker
         .tick(ticks: duration)
         .listen(
@@ -141,8 +151,10 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
           onError: (error) => _logger.logError('Timer error: $error'));
   }
 
-  void _stopTimer(Emitter<TimedToggleButtonState> emit) {
+  Future<void> _stopTimer(Emitter<TimedToggleButtonState> emit) async {
     _tickerSubscription?.cancel();
+    _isTimerActive = false;
+    await _repository.toggleLight(necklace, false);
     emit(LightOffState());
     _logger.logInfo('Timer stopped and light turned off');
   }

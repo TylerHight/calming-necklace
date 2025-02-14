@@ -1,10 +1,13 @@
 class Ticker {
   const Ticker();
-  
   Stream<int> tick({required int ticks}) {
-    return Stream.periodic(
+    return Stream.periodic( 
       const Duration(seconds: 1),
-      (x) => ticks - x - 1,
-    ).take(ticks);
+      (x) {
+        final remaining = ticks - x - 1;
+        if (remaining < 0) return 0;
+        return remaining;
+      },
+    ).take(ticks + 1);
   }
 }
