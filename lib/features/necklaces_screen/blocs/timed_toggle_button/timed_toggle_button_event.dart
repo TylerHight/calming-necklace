@@ -9,6 +9,10 @@ abstract class TimedToggleButtonEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class InitializeTimedToggleButton extends TimedToggleButtonEvent {
+  const InitializeTimedToggleButton();
+}
+
 class ToggleLightEvent extends TimedToggleButtonEvent {}
 
 class StartPeriodicEmission extends TimedToggleButtonEvent {

@@ -9,6 +9,8 @@ abstract class TimedToggleButtonState extends Equatable {
 
 class TimedToggleButtonInitial extends TimedToggleButtonState {}
 
+class TimedToggleButtonInitialized extends TimedToggleButtonState {}
+
 class TimedToggleButtonLoading extends TimedToggleButtonState {}
 
 class TimedToggleButtonError extends TimedToggleButtonState {

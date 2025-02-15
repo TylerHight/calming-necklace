@@ -28,6 +28,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   final Map<String, bool> _emissionStates = {};
   final Map<String, StreamController<bool>> _emissionControllers = {};
   final Map<String, bool> _processingStates = {};
+  final Map<String, bool> _stateChangeInProgress = {};
 
   NecklaceRepositoryImpl({required DatabaseService databaseService, required BleService bleService})
       : _dbService = databaseService,
@@ -44,7 +45,9 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
     try {
       if (_processingStates[necklace.id] == true) return;
+      if (_stateChangeInProgress[necklace.id] == true) return;
       _processingStates[necklace.id] = true;
+      _stateChangeInProgress[necklace.id] = true;
 
       // Update database first to ensure UI reflects the change immediately
       await _dbService.updateNecklaceLedState(necklace.id, isOn);
@@ -54,9 +57,11 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
 
       _emissionControllers[necklace.id]?.add(isOn);
       _processingStates[necklace.id] = false;
+      _stateChangeInProgress[necklace.id] = false;
     } catch (e) {
       _logger.logError('Error toggling light: $e');
       _processingStates[necklace.id] = false;
+      _stateChangeInProgress[necklace.id] = false;
       rethrow;
     }
   }
