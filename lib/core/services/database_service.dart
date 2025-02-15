@@ -56,7 +56,8 @@ class DatabaseService {
       isLedOn INTEGER DEFAULT 0,
       isArchived INTEGER DEFAULT 0,
       autoTurnOffEnabled INTEGER,
-      lastLEDStateChange TEXT
+      lastLEDStateChange TEXT,
+      isConnected INTEGER DEFAULT 0
     )
   ''');
   }
@@ -101,6 +102,11 @@ class DatabaseService {
       await db.execute('''
         ALTER TABLE necklaces
         ADD COLUMN lastLEDStateChange TEXT
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN isConnected INTEGER
+        DEFAULT 0
       ''');
     }
   }

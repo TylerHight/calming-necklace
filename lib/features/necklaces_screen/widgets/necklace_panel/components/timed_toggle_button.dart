@@ -169,8 +169,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
           child: InkWell(
             onTap: () async {
               if (!widget.isConnected) {
-                LoggingService.instance.logDebug('Device not connected - attempting connection');
-                context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
+                _handleDisconnectedState(context);
                 return;
               }
 
@@ -255,9 +254,9 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final bleState = context.watch<BleBloc>().state;
-    final isConnected = widget.necklace.bleDevice != null &&
-        (bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] ?? false);
-
+    final isConnected = widget.necklace.bleDevice != null && 
+        bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] == true;
+    
     if (isConnected != widget.isConnected) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
@@ -289,6 +288,30 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
       logger.logError('Error refreshing duration');
     } catch (e) {
       print('Error initializing logger: $e');
+    }
+  }
+
+  Future<void> _handleDisconnectedState(BuildContext context) async {
+    LoggingService.instance.logDebug('Device not connected - attempting reconnection');
+    
+    // Show reconnection indicator
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Reconnecting to device...'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // Attempt to reconnect
+    context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
+
+    // Wait for connection
+    await for (final bleState in context.read<BleBloc>().stream) {
+      if (bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] == true) {
+        // Once connected, trigger the original toggle action
+        context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+        break;
+      }
     }
   }
 }

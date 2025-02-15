@@ -5,6 +5,7 @@ import 'package:calming_necklace/core/services/logging_service.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
 import 'package:stream_transform/stream_transform.dart';
+import '../../../../core/services/ble/ble_types.dart';
 import 'ticker.dart';
 import '../periodic_emission/periodic_emission_bloc.dart';
 
@@ -69,6 +70,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
     try {
+      await _ensureConnection();
       if (_isProcessingToggle) return;
       _isProcessingToggle = true;
       
@@ -196,6 +198,20 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   void _cancelStateRecovery() {
     _stateRecoveryTimer?.cancel();
     _stateRecoveryTimer = null;
+  }
+
+  Future<void> _ensureConnection() async {
+    try {
+      final bleState = await _repository.getNecklaceById(necklace.id);
+      if (bleState == null) {
+        _logger.logDebug('Connection lost - waiting for reconnection');
+        // Wait for connection to be re-established
+        await Future.delayed(const Duration(seconds: 5));
+      }
+    } catch (e) {
+      _logger.logError('Error ensuring connection: $e');
+      throw BleException('Device connection error: $e');
+    }
   }
 
   @override

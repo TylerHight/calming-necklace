@@ -94,6 +94,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
       final necklace = Necklace(
         id: DateTime.now().toString(),
         name: name,
+        isConnected: false,
         bleDevice: bleDevice, // Pass BleDevice instance
         emission1Duration: Duration(seconds: 3),
         releaseInterval1: Duration(seconds: 20),
@@ -165,7 +166,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   Future<Necklace?> getNecklaceById(String id) async {
     try {
       final necklaces = await getNecklaces();
-      return necklaces.firstWhere((necklace) => necklace.id == id, orElse: () => Necklace(id: '', name: '', bleDevice: const BleDevice(id: '', name: '', address: '', rssi: 0, deviceType: BleDeviceType.necklace), emission1Duration: Duration.zero, releaseInterval1: Duration.zero, isArchived: false));
+      return necklaces.firstWhere((necklace) => necklace.id == id, orElse: () => Necklace(id: '', name: '', isConnected: false, bleDevice: const BleDevice(id: '', name: '', address: '', rssi: 0, deviceType: BleDeviceType.necklace), emission1Duration: Duration.zero, releaseInterval1: Duration.zero, isArchived: false));
     } catch (e) {
       _logger.logError('Error getting necklace by id: $e');
       return null;

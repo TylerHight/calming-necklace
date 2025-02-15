@@ -8,6 +8,7 @@ class Necklace extends Equatable {
   final BleDevice? bleDevice; // Change type to BleDevice?
   final bool autoTurnOffEnabled;
   final bool periodicEmissionEnabled;
+  final bool isConnected; // Added isConnected field
   final Duration emission1Duration;
   final Duration releaseInterval1;
   final bool isRelease1Active;
@@ -20,6 +21,7 @@ class Necklace extends Equatable {
     required this.name,
     this.bleDevice, // Update constructor
     this.isLedOn = false, // Initialize isLedOn
+    this.isConnected = false, // Initialize isConnected
     required this.emission1Duration,
     required this.releaseInterval1,
     this.autoTurnOffEnabled = false,
@@ -40,12 +42,14 @@ class Necklace extends Equatable {
     bool? isRelease1Active,
     bool? isArchived,
     bool? isLedOn, // Update copyWith method
+    bool? isConnected, // Update copyWith method
     DateTime? lastLEDStateChange, // Update copyWith method
   }) {
     return Necklace(
       id: id ?? this.id,
       name: name ?? this.name,
       isLedOn: isLedOn ?? this.isLedOn, // Update copyWith method
+      isConnected: isConnected ?? this.isConnected, // Update copyWith method
       bleDevice: bleDevice ?? this.bleDevice, // Update copyWith method
       emission1Duration: emission1Duration ?? this.emission1Duration,
       releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
@@ -69,6 +73,7 @@ class Necklace extends Equatable {
     isRelease1Active,
     isArchived,
     isLedOn, // Update props
+    isConnected, // Update props
     lastLEDStateChange, // Update props
   ];
 
@@ -87,6 +92,7 @@ class Necklace extends Equatable {
       'periodicEmissionEnabled': periodicEmissionEnabled ? 1 : 0,
       'isRelease1Active': isRelease1Active ? 1 : 0,
       'isLedOn': isLedOn ? 1 : 0, // Add isLedOn to map
+      'isConnected': isConnected ? 1 : 0, // Add isConnected to map
       'isArchived': isArchived ? 1 : 0,
       'lastLEDStateChange': lastLEDStateChange?.toIso8601String(), // Add lastLEDStateChange to map
     };
@@ -108,6 +114,7 @@ class Necklace extends Equatable {
       periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
       isRelease1Active: map['isRelease1Active'] == 1,
       isLedOn: map['isLedOn'] == 1,
+      isConnected: map['isConnected'] == 1, // Add isConnected from map
       isArchived: map['isArchived'] == 1,
       lastLEDStateChange: map['lastLEDStateChange'] != null ? 
           DateTime.parse(map['lastLEDStateChange']) : null, // Add lastLEDStateChange from map
