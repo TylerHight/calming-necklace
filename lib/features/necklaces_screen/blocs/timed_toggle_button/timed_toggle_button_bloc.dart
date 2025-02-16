@@ -44,6 +44,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
 
     _emissionSubscription = _repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
     _initializeDuration();
+    _initializeLogger();
   }
 
   void _initializeFromNecklace() {
@@ -71,6 +72,14 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       _currentDuration = updatedNecklace?.emission1Duration;
     } catch (e) {
       _logger.logError('Error initializing duration: $e');
+    }
+  }
+
+  Future<void> _initializeLogger() async {
+    try {
+      final logger = await LoggingService.getInstance();
+    } catch (e) {
+      print('Error initializing logger: $e');
     }
   }
 

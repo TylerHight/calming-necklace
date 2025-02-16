@@ -121,7 +121,6 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   @override
   void initState() {
     super.initState();
-    _initializeLogger();
   }
 
   @override
@@ -286,15 +285,6 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         child: Center(child: child),
       ),
     );
-  }
-
-  Future<void> _initializeLogger() async {
-    try {
-      final logger = await LoggingService.getInstance();
-      logger.logError('Error refreshing duration');
-    } catch (e) {
-      print('Error initializing logger: $e');
-    }
   }
 
   Future<void> _handleDisconnectedState(BuildContext context) async {

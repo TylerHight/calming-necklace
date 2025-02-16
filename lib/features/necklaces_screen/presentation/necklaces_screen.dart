@@ -30,7 +30,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
   void initState() {
     super.initState();
     _repository = context.read<NecklaceRepository>();
-    _databaseService = context.read<DatabaseService>(); // Initialize DatabaseService
+    _databaseService = context.read<DatabaseService>();
     context.read<NecklacesBloc>().add(FetchNecklacesEvent());
   }
 
