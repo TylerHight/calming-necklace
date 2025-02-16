@@ -15,6 +15,8 @@ class BleConnectionManager {
   final _retryDelays = [1, 2, 3]; // Seconds between retries
   final _maxRetries = 5;
   final LoggingService _logger = LoggingService.instance;
+  Timer? _connectionTimer;
+  Timer? _timeoutTimer;
 
   StreamSubscription? _connectionSubscription;
   StreamSubscription? _keepAliveSubscription;
@@ -41,6 +43,18 @@ class BleConnectionManager {
     _logger.logBleInfo('Starting connection attempt to ${device.platformName}');
     int attempts = 0;
     bool connected = false;
+    bool timeoutOccurred = false;
+
+    // Set up connection timeout
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(BleConstants.CONNECTION_TIMEOUT, () {
+      if (!connected) {
+        timeoutOccurred = true;
+        _logger.logBleError('Connection timeout after ${BleConstants.CONNECTION_TIMEOUT.inSeconds} seconds');
+        device.disconnect();
+        _handleTimeoutError();
+      }
+    });
 
     _reconnectionSubject.add(0);
     while (attempts < _maxRetries && !connected) {
@@ -288,11 +302,13 @@ class BleConnectionManager {
     _keepAliveSubscription?.cancel();
     _keepAliveTimer?.cancel();
     _reconnectTimer?.cancel();
+    _timeoutTimer?.cancel();
     _connectionSubscription = null;
     _rssiCheckTimer = null;
     _keepAliveSubscription = null;
     _keepAliveTimer = null;
     _reconnectTimer = null;
+    _timeoutTimer = null;
     _keepAliveCharacteristic = null;
     _reconnectionSubject.add(0);
     _keepAliveCounter = 0;
@@ -355,5 +371,14 @@ class BleConnectionManager {
     disconnect();
     _cleanupMonitoring();
     _reconnectionSubject.close();
+  }
+
+  void _handleTimeoutError() {
+    onError(BleConstants.ERR_TIMEOUT);
+    if (_currentDevice != null) {
+      _currentDevice!.disconnect();
+      _cleanupMonitoring();
+      onStateChange(BleConnectionState.disconnected);
+    }
   }
 }

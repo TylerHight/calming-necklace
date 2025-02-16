@@ -20,6 +20,7 @@ bool isConnected = false;
 void setupBLE() {
     Serial.println("\nInitializing BLE...");
 
+    BLE.setConnectionInterval(8, 24); // Set min and max connection intervals (10ms * value)
     if (!BLE.begin()) {
         Serial.println("ERROR: Starting BLE failed!");
         while (1);
@@ -62,7 +63,9 @@ void initializeCharacteristics() {
 void onCentralConnected(BLEDevice central) {
     Serial.print("Connected to central: ");
     Serial.println(central.address());
+    resetActivityTimer();  // Reset timer on initial connection
     digitalWrite(LED_BUILTIN, HIGH);
+    BLE.setConnectionInterval(8, 24); // Ensure connection parameters are set
     resetActivityTimer();
     resetKeepAliveTimer();
     isConnected = true;
@@ -79,8 +82,9 @@ void onCentralDisconnected(BLEDevice central) {
 
 void handlePeripheralLoop(BLEDevice central) {
     if (switchCharacteristic.written()) {
-        resetActivityTimer();
-        handleLEDs(switchCharacteristic.value());
+        byte command = switchCharacteristic.value();
+        resetActivityTimer();  // Reset timer on any characteristic write
+        handleLEDs(command);
     }
 
     if (keepAliveCharacteristic.written()) {

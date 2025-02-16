@@ -9,7 +9,7 @@ class BleConstants {
   static const String DEVICE_NAME_PREFIX = "CN";
 
   // Connection settings
-  static const Duration CONNECTION_TIMEOUT = Duration(seconds: 600);
+  static const Duration CONNECTION_TIMEOUT = Duration(seconds: 10);
   static const Duration KEEP_ALIVE_INTERVAL = Duration(seconds: 60);
   static const Duration KEEP_ALIVE_TIMEOUT = Duration(seconds: 120);
   static const Duration RECONNECT_DELAY = Duration(seconds: 2);
@@ -34,7 +34,7 @@ class BleConstants {
   // Error Messages
   static const String ERR_DEVICE_NOT_FOUND = "QUE device not found";
   static const String ERR_CONNECTION_FAILED = "Failed to connect to device";
-  static const String ERR_SERVICE_NOT_FOUND = "Required BLE service not found";
+  static const String ERR_SERVICE_NOT_FOUND = "Required Bluetooth Low Energy service not found";
   static const String ERR_CHARACTERISTIC_NOT_FOUND = "Required characteristic not found";
   static const String ERR_DEVICE_DISCONNECTED = "Device disconnected unexpectedly";
   static const String ERR_BLUETOOTH_DISABLED = "Bluetooth is disabled";
