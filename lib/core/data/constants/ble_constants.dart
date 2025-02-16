@@ -9,7 +9,7 @@ class BleConstants {
   static const String DEVICE_NAME_PREFIX = "CN";
 
   // Connection settings
-  static const Duration CONNECTION_TIMEOUT = Duration(seconds: 180);
+  static const Duration CONNECTION_TIMEOUT = Duration(seconds: 600);
   static const Duration KEEP_ALIVE_INTERVAL = Duration(seconds: 60);
   static const Duration KEEP_ALIVE_TIMEOUT = Duration(seconds: 120);
   static const Duration RECONNECT_DELAY = Duration(seconds: 2);
