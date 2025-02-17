@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => BleBloc(
             bleService: context.read<BleService>(),
+            bleRepository: context.read<BleRepository>(),
           ),
         ),
       ],

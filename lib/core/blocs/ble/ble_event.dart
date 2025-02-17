@@ -27,6 +27,7 @@ class BleDisconnectRequest extends BleEvent {
 class BleConnectionStatusChanged extends BleEvent {
   final bool isConnected;
   final String deviceId;
+
   const BleConnectionStatusChanged(this.isConnected, this.deviceId);
 
   @override
@@ -36,6 +37,7 @@ class BleConnectionStatusChanged extends BleEvent {
 class BleRssiUpdated extends BleEvent {
   final int rssi;
   final String deviceId;
+
   const BleRssiUpdated(this.rssi, this.deviceId);
 
   @override
@@ -45,10 +47,12 @@ class BleRssiUpdated extends BleEvent {
 class BleReconnectionAttempt extends BleEvent {
   final int attempt;
   final String deviceId;
-  const BleReconnectionAttempt(this.attempt, this.deviceId);
+  final bool isScanning;
+
+  const BleReconnectionAttempt(this.attempt, this.deviceId, this.isScanning);
 
   @override
-  List<Object?> get props => [attempt, deviceId];
+  List<Object?> get props => [attempt, deviceId, isScanning];
 }
 
 class BleLedControlRequest extends BleEvent {
@@ -63,3 +67,5 @@ class BleLedControlRequest extends BleEvent {
   @override
   List<Object?> get props => [deviceId, turnOn];
 }
+
+class BleStartScanning extends BleEvent {}

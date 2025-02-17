@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../data/models/ble_device.dart';
+import '../../data/repositories/ble_repository.dart';
 import '../../services/ble/ble_service.dart';
 import '../../services/logging_service.dart';
 import 'ble_event.dart';
@@ -7,14 +9,16 @@ import 'ble_state.dart';
 
 class BleBloc extends Bloc<BleEvent, BleState> {
   final BleService _bleService;
+  final BleRepository _bleRepository;
   final LoggingService _logger = LoggingService.instance;
   StreamSubscription<String>? _deviceStateSubscription;
   StreamSubscription<bool>? _connectionStatusSubscription;
   StreamSubscription<int>? _rssiSubscription;
   StreamSubscription<int>? _reconnectionAttemptsSubscription;
 
-  BleBloc({required BleService bleService})
+  BleBloc({required BleService bleService, required BleRepository bleRepository})
       : _bleService = bleService,
+        _bleRepository = bleRepository,
         super(BleState.initial()) {
     on<BleConnectRequest>(_onConnectRequest);
     on<BleDisconnectRequest>(_onDisconnectRequest);
@@ -22,11 +26,48 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     on<BleRssiUpdated>((event, emit) => _onRssiUpdate(event.rssi));
     on<BleReconnectionAttempt>((event, emit) => _onReconnectionAttempt(event.attempt));
     on<BleLedControlRequest>(_onLedControlRequest);
+    on<BleStartScanning>(_onStartScanning);
 
     _deviceStateSubscription = _bleService.deviceStateStream.listen(_onDeviceStateChanged);
     _connectionStatusSubscription = _bleService.connectionStatusStream.listen(_onConnectionStatusChanged);
     _reconnectionAttemptsSubscription = _bleService.reconnectionAttemptsStream.listen(_onReconnectionAttempt);
     _rssiSubscription = _bleService.rssiStream.listen(_onRssiUpdate);
+  }
+
+  Future<void> _onStartScanning(BleStartScanning event, Emitter<BleState> emit) async {
+    try {
+      _logger.logBleInfo('Starting BLE scan for devices');
+      emit(state.copyWith(
+        isScanning: true, 
+        error: null,
+        deviceConnectionStates: {},
+      ));
+
+      await _bleRepository.startScanning();
+      
+      // Listen for discovered devices
+      _bleRepository.devices.listen((devices) {
+        for (final device in devices) {
+          if (device.device != null) {
+            _tryConnectDevice(device, emit);
+          }
+        }
+      });
+
+      // Auto-stop scanning after 10 seconds
+      _logger.logDebug('Setting up auto-stop timer for scan');
+      await Future.delayed(const Duration(seconds: 10));
+      if (!isClosed) {
+        await _bleRepository.stopScanning();
+        emit(state.copyWith(isScanning: false));
+      }
+    } catch (e) {
+      _logger.logBleError('Error starting BLE scan', e);
+      emit(state.copyWith(
+        isScanning: false,
+        error: 'Failed to start scanning: ${e.toString()}',
+      ));
+    }
   }
 
   Future<void> _onConnectRequest(BleConnectRequest event, Emitter<BleState> emit) async {
@@ -107,6 +148,22 @@ class BleBloc extends Bloc<BleEvent, BleState> {
       emit(state.copyWith(
         error: 'LED control error: ${e.toString()}',
       ));
+    }
+  }
+
+  Future<void> _tryConnectDevice(BleDevice device, Emitter<BleState> emit) async {
+    try {
+      if (device.device != null && !state.deviceConnectionStates.containsKey(device.id)) {
+        _logger.logBleInfo('Attempting to connect to discovered device: ${device.id}');
+        await _bleService.connectAndInitializeDevice(device.device!);
+        
+        final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
+        updatedStates[device.id] = true;
+        emit(state.copyWith(deviceConnectionStates: updatedStates));
+      }
+    } catch (e) {
+      _logger.logBleError('Failed to connect to discovered device: ${device.id}', e);
+      // Don't emit error state here to allow scanning to continue
     }
   }
 

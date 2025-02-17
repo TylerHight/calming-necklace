@@ -10,6 +10,7 @@ class BleState extends Equatable {
   final String deviceState;
   final int rssi;
   final String? lastCommand;
+  final bool isScanning; // New parameter
 
   const BleState({
     required this.deviceConnectionStates,
@@ -21,6 +22,7 @@ class BleState extends Equatable {
     required this.deviceState,
     required this.rssi,
     this.lastCommand,
+    this.isScanning = false, // New parameter
   });
 
   factory BleState.initial() => const BleState(
@@ -31,6 +33,7 @@ class BleState extends Equatable {
     deviceState: 'initial',
     rssi: 0,
     lastCommand: null,
+    isScanning: false, // New parameter
   );
 
   BleState copyWith({
@@ -43,6 +46,7 @@ class BleState extends Equatable {
     String? deviceState,
     int? rssi,
     String? lastCommand,
+    bool? isScanning, // New parameter
   }) {
     return BleState(
       deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
@@ -54,6 +58,7 @@ class BleState extends Equatable {
       deviceState: deviceState ?? this.deviceState,
       rssi: rssi ?? this.rssi,
       lastCommand: lastCommand ?? this.lastCommand,
+      isScanning: isScanning ?? this.isScanning, // New parameter
     );
   }
 
@@ -68,5 +73,6 @@ class BleState extends Equatable {
     deviceState,
     rssi,
     lastCommand,
+    isScanning, // New parameter
   ];
 }

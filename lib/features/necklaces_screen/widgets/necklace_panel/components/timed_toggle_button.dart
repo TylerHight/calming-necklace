@@ -289,7 +289,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
 
   Future<void> _handleDisconnectedState(BuildContext context) async {
     LoggingService.instance.logDebug('Device not connected - attempting reconnection');
-    
+
     // Show reconnection indicator
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -298,8 +298,8 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
       ),
     );
 
-    // Attempt to reconnect
-    context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
+    // Start scanning for devices
+    context.read<BleBloc>().add(BleStartScanning());
 
     // Wait for connection
     await for (final bleState in context.read<BleBloc>().stream) {

@@ -49,7 +49,10 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
       builder: (context) => MultiBlocProvider(
         providers: [
           BlocProvider<BleBloc>(
-            create: (context) => BleBloc(bleService: context.read<BleService>()),
+            create: (context) => BleBloc(
+              bleService: context.read<BleService>(),
+              bleRepository: context.read<BleRepository>(),
+            ),
           ),
           BlocProvider(
             create: (context) => AddDeviceDialogBloc(
