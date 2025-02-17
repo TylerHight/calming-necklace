@@ -89,24 +89,31 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       if (_isProcessingToggle) return;
       if (emit.isDone) return; // Guard against emit after completion
       _isProcessingToggle = true;
-      
+
       if (_isTimerActive) {
         _isProcessingToggle = true;
         await _stopTimer(emit);
         _isProcessingToggle = false;
         return; // Early return after stopping timer
       }
-      
+
       _logger.logDebug('Processing toggle event');
       emit(TimedToggleButtonLoading());
-      
+
       _isActive = !_isActive;
       if (_isActive) {
         await _repository.toggleLight(necklace, true);
         _logger.logDebug('Attempting to turn light on');
-        if (!emit.isDone) {
-          emit(LightOnState(_currentDuration?.inSeconds ?? 3));
-          _startTimer(_currentDuration?.inSeconds ?? 3);
+        // Confirm the LED state change
+        final updatedNecklace = await _repository.getNecklaceById(necklace.id);
+        if (updatedNecklace?.isLedOn == true) {
+          if (!emit.isDone) {
+            emit(LightOnState(_currentDuration?.inSeconds ?? 3));
+            _startTimer(_currentDuration?.inSeconds ?? 3);
+          }
+        } else {
+          _logger.logError('Failed to turn light on');
+          emit(TimedToggleButtonError('Failed to turn light on'));
         }
       } else {
         await _repository.toggleLight(necklace, false);
