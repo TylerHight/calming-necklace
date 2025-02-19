@@ -139,22 +139,27 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
       },
       builder: (context, state) {
         if (state is TimedToggleButtonLoading) {
-          return Container(
-            width: widget.buttonWidth,
-            height: widget.buttonHeight,
-            child: const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+          return _buildButtonWithOverlay(
+            context,
+            isLightOn: false,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  widget.iconData,
+                  color: widget.iconColor?.withOpacity(0.3),
+                  size: UIConstants.timedToggleButtonIconSize,
+                ),
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ),
+              ],
             ),
-          );
-        }
-
-        if (state is TimedToggleButtonError) {
-          return _buildErrorButton(
-            message: state.message,
-            child: Icon(Icons.error, color: Colors.red),
           );
         }
 
@@ -203,6 +208,14 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
               } catch (e) {
                 context.read<TimedToggleButtonBloc>().add(
                   ToggleLightErrorEvent(e.toString()),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to send last command. '
+                        'Ensure that device is in range and powered on'),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 3),
+                  ),
                 );
               }
             },
@@ -291,19 +304,26 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     }
   }
 
-  Widget _buildErrorButton({required String message, required Widget child}) {
-    return Tooltip(
-      message: message,
-      child: Container(
-        width: widget.buttonWidth,
-        height: widget.buttonHeight,
-        decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.red),
+  Widget _buildButtonWithOverlay(
+    BuildContext context,
+    {required bool isLightOn,
+    required Widget child}
+  ) {
+    return Container(
+      width: UIConstants.timedToggleButtonWidth,
+      height: UIConstants.timedToggleButtonHeight,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            isLightOn ? widget.activeColor!.withOpacity(0.9) : widget.inactiveColor!.withOpacity(0.9),
+            isLightOn ? widget.activeColor! : widget.inactiveColor!,
+          ],
         ),
-        child: Center(child: child),
+        borderRadius: BorderRadius.circular(UIConstants.timedToggleButtonBorderRadius),
       ),
+      child: child,
     );
   }
 
