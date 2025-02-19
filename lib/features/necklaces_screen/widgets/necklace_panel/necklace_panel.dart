@@ -14,7 +14,7 @@ import '../../blocs/periodic_emission/periodic_emission_bloc.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
-import '../../../../features/notes/widgets/add_note_dialog.dart';
+import '../../../../features/notes_screen/widgets/add_note_dialog.dart';
 
 class NecklacePanel extends StatefulWidget {
   final int index;
