@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/features/necklaces_screen/blocs/timed_toggle_button/timed_toggle_button_bloc.dart';
 import '../../../../../core/blocs/ble/ble_event.dart';
+import '../../../../../core/blocs/ble/ble_state.dart';
 import '../../../../../core/data/models/necklace.dart';
 import '../../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../../core/services/logging_service.dart';
@@ -168,7 +169,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
           child: InkWell(
             onTap: () async {
               if (!widget.isConnected) {
-                _handleDisconnectedState(context);
+                await _handleDisconnectedState(context);
                 return;
               }
 
@@ -287,27 +288,50 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     );
   }
 
-  Future<void> _handleDisconnectedState(BuildContext context) async {
-    LoggingService.instance.logDebug('Device not connected - attempting reconnection');
+  Future<BleState> _handleDisconnectedState(BuildContext context) async {
+    final logger = LoggingService.instance;
+    logger.logDebug('Device not connected - attempting reconnection');
 
-    // Show reconnection indicator
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Reconnecting to device...'),
-        duration: Duration(seconds: 2),
-      ),
-    );
+    bool isReconnected = false;
+    int attemptCount = 0;
+    const maxAttempts = 3;
 
-    // Start scanning for devices
-    context.read<BleBloc>().add(BleStartScanning());
+    while (!isReconnected && attemptCount < maxAttempts) {
+      attemptCount++;
+      logger.logDebug('Reconnection attempt $attemptCount of $maxAttempts');
 
-    // Wait for connection
-    await for (final bleState in context.read<BleBloc>().stream) {
-      if (bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] == true) {
-        // Once connected, trigger the original toggle action
+      // Show reconnection indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Reconnecting to device... (Attempt $attemptCount/$maxAttempts)'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Start scanning for devices
+      context.read<BleBloc>().add(BleStartScanning());
+
+      // Wait for connection with timeout
+      final bleState = await context.read<BleBloc>().stream
+          .firstWhere((state) => state.deviceConnectionStates[widget.necklace.bleDevice!.id] == true)
+          .timeout(const Duration(seconds: 5), onTimeout: () => BleState.initial());
+      if (bleState != null) {
+        isReconnected = true;
         context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
-        break;
+        return bleState; // Return the valid BleState
       }
     }
+
+    if (!isReconnected) {
+      logger.logError('Failed to reconnect to device after $maxAttempts attempts');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to reconnect to device'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    return Future.error('Failed to reconnect to device'); // Return an error if reconnection fails
   }
 }

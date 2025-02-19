@@ -86,7 +86,7 @@ class BleConnectionManager {
         }
       }
     }
-    return false; // Add this return statement to ensure a bool is returned
+    return false;
   }
 
   Future<void> maintainConnection(BluetoothDevice device) async {
