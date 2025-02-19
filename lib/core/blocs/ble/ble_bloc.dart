@@ -138,6 +138,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   Future<void> _onLedControlRequest(BleLedControlRequest event, Emitter<BleState> emit) async {
     try {
       _logger.logBleInfo('LED control request: ${event.turnOn ? 'ON' : 'OFF'}');
+      if (!await _bleService.isDeviceConnected(event.deviceId)) throw Exception('Device not connected');
       await _bleService.setLedState(event.turnOn);
       emit(state.copyWith(
         error: null,
@@ -154,8 +155,9 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   Future<bool> toggleLight(String deviceId, bool turnOn) async {
     try {
       _logger.logBleInfo('LED control request: ${turnOn ? 'ON' : 'OFF'}');
+      if (!await _bleService.isDeviceConnected(deviceId)) throw Exception('Device not connected');
       add(BleLedControlRequest(deviceId: deviceId, turnOn: turnOn));
-
+      
       await _bleService.setLedState(turnOn);
       emit(state.copyWith(
         error: null,

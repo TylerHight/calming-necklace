@@ -181,10 +181,14 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 context.read<TimedToggleButtonBloc>().add(
                   ToggleLightLoadingEvent(),
                 );
+                await Future.delayed(Duration(milliseconds: 100)); // Allow UI to update
 
                 // Attempt to toggle light
                 await Future.microtask(() async {
                   final bleBloc = context.read<BleBloc>();
+                  final isConnected = await bleBloc.state.deviceConnectionStates[widget.necklace.bleDevice!.id] ?? false;
+                  if (!isConnected) throw Exception('Device not connected');
+                  
                   final success = await bleBloc.toggleLight(
                     widget.necklace.bleDevice!.id,
                     shouldTurnOn,
@@ -273,6 +277,7 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _checkConnectionStatus();
     final bleState = context.watch<BleBloc>().state;
     final isConnected = widget.necklace.bleDevice != null && 
         bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] == true;
@@ -347,5 +352,15 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     }
 
     return Future.error('Failed to reconnect to device'); // Return an error if reconnection fails
+  }
+
+  void _checkConnectionStatus() {
+    final bleState = context.read<BleBloc>().state;
+    final isConnected = widget.necklace.bleDevice != null && 
+        bleState.deviceConnectionStates[widget.necklace.bleDevice!.id] == true;
+    
+    if (!isConnected && context.read<TimedToggleButtonBloc>().state is LightOnState) {
+      context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+    }
   }
 }
