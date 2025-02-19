@@ -334,12 +334,13 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     bool isReconnected = false;
     int attemptCount = 0;
     const maxAttempts = 3;
+    const scanTimeout = Duration(seconds: 5);
 
     while (!isReconnected && attemptCount < maxAttempts) {
       attemptCount++;
       logger.logDebug('Reconnection attempt $attemptCount of $maxAttempts');
 
-      // Show reconnection indicator
+      // Update UI with reconnection status
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Reconnecting to device... (Attempt $attemptCount/$maxAttempts)'),
@@ -347,17 +348,45 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
         ),
       );
 
-      // Start scanning for devices
+      // Start scanning with specific device filter
       context.read<BleBloc>().add(BleStartScanning());
+      
+      try {
+        // Wait for scan results
+        final targetDeviceId = widget.necklace.bleDevice!.id;
+        final bleState = await context.read<BleBloc>().stream
+            .where((state) => state.isScanning)
+            .timeout(scanTimeout)
+            .firstWhere((state) {
+              final hasDevice = state.deviceConnectionStates.containsKey(targetDeviceId);
+              logger.logDebug('Scanning - Found device: $hasDevice');
+              return hasDevice;
+            });
 
-      // Wait for connection with timeout
-      final bleState = await context.read<BleBloc>().stream
-          .firstWhere((state) => state.deviceConnectionStates[widget.necklace.bleDevice!.id] == true)
-          .timeout(const Duration(seconds: 5), onTimeout: () => BleState.initial());
-      if (bleState != null) {
-        isReconnected = true;
-        context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
-        return bleState; // Return the valid BleState
+        // Attempt connection if device found
+        if (bleState.deviceConnectionStates.containsKey(targetDeviceId)) {
+          logger.logDebug('Device found, attempting connection');
+          
+          // Attempt to connect to the found device
+          context.read<BleBloc>().add(BleConnectRequest(widget.necklace.bleDevice!));
+          
+          // Wait for connection confirmation
+          final connectedState = await context.read<BleBloc>().stream
+              .timeout(const Duration(seconds: 5))
+              .firstWhere((state) => 
+                  state.deviceConnectionStates[targetDeviceId] == true);
+          
+          if (connectedState.deviceConnectionStates[targetDeviceId] == true) {
+            isReconnected = true;
+            logger.logDebug('Successfully reconnected to device');
+            context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+            return connectedState;
+          }
+        }
+      } catch (e) {
+        logger.logError('Error during reconnection attempt $attemptCount: $e');
+        await Future.delayed(Duration(milliseconds: 500 * attemptCount));
+        continue;
       }
     }
 
