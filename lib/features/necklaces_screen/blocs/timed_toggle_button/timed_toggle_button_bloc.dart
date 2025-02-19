@@ -88,6 +88,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   Future<void> _onToggleLight(ToggleLightEvent event, Emitter<TimedToggleButtonState> emit) async {
     try {
       await _ensureConnection();
+      _logger.logDebug('Connection verified before toggle');
       if (_isProcessingToggle) return;
       if (emit.isDone) return; // Guard against emit after completion
       _isProcessingToggle = true;
@@ -105,6 +106,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       _isActive = !_isActive;
       if (_isActive) {
         await _repository.toggleLight(necklace, true);
+        await _verifyLightState(true);
         _logger.logDebug('Attempting to turn light on');
         // Confirm the LED state change
         final updatedNecklace = await _repository.getNecklaceById(necklace.id);
@@ -119,6 +121,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
         }
       } else {
         await _repository.toggleLight(necklace, false);
+        await _verifyLightState(false);
         _logger.logDebug('Attempting to turn light off');
         if (!emit.isDone) {
           await _stopTimer(emit);
@@ -128,8 +131,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     } catch (e) {
       _isProcessingToggle = false;
       _logger.logError('Error in _onToggleLight: $e');
+      await _attemptStateRecovery();
       emit(TimedToggleButtonError(e.toString()));
-      _scheduleStateRecovery();
     } finally {
       _isProcessingToggle = false;
     }
@@ -256,6 +259,33 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _isProcessingToggle = false;
     _logger.logError('Toggle light error: ${event.error}');
     emit(TimedToggleButtonError(event.error));
+  }
+
+  Future<void> _verifyLightState(bool expectedState) async {
+    int attempts = 0;
+    const maxAttempts = 3;
+    
+    while (attempts < maxAttempts) {
+      final necklaceState = await _repository.getNecklaceById(necklace.id);
+      if (necklaceState?.isLedOn == expectedState) return;
+      
+      attempts++;
+      _logger.logWarning('Light state verification failed, attempt $attempts of $maxAttempts');
+      await Future.delayed(Duration(milliseconds: 200));
+    }
+    
+    throw BleException('Failed to verify light state after $maxAttempts attempts');
+  }
+
+  Future<void> _attemptStateRecovery() async {
+    _logger.logDebug('Attempting state recovery');
+    try {
+      await _repository.toggleLight(necklace, false);
+      _isActive = false;
+      _isTimerActive = false;
+    } catch (e) {
+      _logger.logError('State recovery failed: $e');
+    }
   }
 
   @override

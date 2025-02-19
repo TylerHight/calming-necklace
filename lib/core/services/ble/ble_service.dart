@@ -227,14 +227,63 @@ class BleService {
   Future<void> setLedState(bool turnOn) async {
     await ensureConnected();
     _logger.logDebug('Sending setLedState command: ${turnOn ? 'ON' : 'OFF'}');
-    _logger.logDebug('Connected device: ${_connectedDevice?.name}, Switch characteristic: ${_switchCharacteristic?.uuid}');
+    _logger.logDebug('Connection state before command: ${await isDeviceConnected(_connectedDevice?.id.toString() ?? "")}');
     try {
+      // Add connection verification before sending command
+      if (!await isDeviceConnected(_connectedDevice?.id.toString() ?? "")) {
+        throw BleException('Device connection lost before sending command');
+      }
+
       await _writeCommand(turnOn ? BleCommand.ledOn.value : BleCommand.ledOff.value, 0);
       _logger.logDebug('LED state command sent successfully');
+      // Verify command was successful
+      await Future.delayed(Duration(milliseconds: 100));
+      return;
     } catch (e) {
-      _logger.logBleError('Failed to set LED state: ${e.toString()}', e);
+      _logger.logBleError('Failed to set LED state: ${e.toString()} - Attempting recovery', e);
+      await _attemptCommandRecovery(turnOn);
       rethrow;
     }
+  }
+
+  Future<void> _attemptCommandRecovery(bool desiredState) async {
+    const maxRetries = 3;
+    const baseDelay = Duration(milliseconds: 500);
+    int attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        _logger.logBleInfo('Command recovery attempt ${attempt + 1} of $maxRetries');
+        
+        // Verify connection status
+        if (!await isDeviceConnected(_connectedDevice?.id.toString() ?? "")) {
+          await _connectionManager.attemptRecovery(_connectedDevice!);
+        }
+
+        // Wait for connection to stabilize
+        await Future.delayed(Duration(milliseconds: 200 * (attempt + 1)));
+
+        // Re-initialize characteristics if needed
+        if (!_isInitialized || _switchCharacteristic == null) {
+          await _initializeCharacteristics(_connectedDevice!, forceRediscovery: true);
+        }
+
+        // Attempt command again
+        await _writeCommand(
+          desiredState ? BleCommand.ledOn.value : BleCommand.ledOff.value, 
+          0
+        );
+
+        _logger.logBleInfo('Command recovery successful on attempt ${attempt + 1}');
+        return;
+      } catch (e) {
+        attempt++;
+        _logger.logBleError('Recovery attempt $attempt failed', e);
+        await Future.delayed(baseDelay * attempt);
+      }
+    }
+    
+    throw BleException('Command recovery failed after $maxRetries attempts');
   }
 
   // Device Settings Methods
@@ -286,38 +335,40 @@ class BleService {
 
   Future<void> _writeCommand(int command, int value) async {
     await ensureConnected();
+    _logger.logDebug('Writing command: $command with value: $value');
 
-    if (_pendingCommands.isNotEmpty) return; // Prevent multiple pending commands
+    if (_pendingCommands.isNotEmpty) {
+      _logger.logWarning('Command rejected - pending command in progress');
+      return;
+    }
+
     final now = DateTime.now();
     if (_lastCommandTime != null && 
         now.difference(_lastCommandTime!) < _commandDebounceTime) {
-      _logger.logDebug('Command debounced');
+      _logger.logWarning('Command debounced - too soon after last command');
       return;
     }
     _lastCommandTime = now;
 
-    final commandId = '${command}_${DateTime.now().millisecondsSinceEpoch}';
-    final completer = Completer<void>();
-    _pendingCommands[commandId] = completer;
+    // Add command verification
+    await _verifyCommandExecution(command, value);
+  }
 
-    try {
-      await Future.delayed(Duration(milliseconds: 100)); // Add small delay between commands
-      Timer(const Duration(seconds: 2), () {
-        if (!completer.isCompleted) {
-          completer.completeError('Command timeout');
-          _pendingCommands.remove(commandId);
-        }
-      });
-
-      await _switchCharacteristic!.write([command, value]);
-      completer.complete();
-      _pendingCommands.remove(commandId);
-      _logger.logBleInfo('Command $command with value $value sent successfully');
-    } catch (e) {
-      _logger.logBleError('Failed to write command', e);
-      completer.completeError(e);
-      _pendingCommands.remove(commandId);
-      rethrow;
+  Future<void> _verifyCommandExecution(int command, int value) async {
+    int retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount < maxRetries) {
+      try {
+        await _switchCharacteristic!.write([command, value]);
+        await Future.delayed(Duration(milliseconds: 100));
+        return;
+      } catch (e) {
+        retryCount++;
+        _logger.logWarning('Command execution failed, attempt $retryCount of $maxRetries');
+        if (retryCount == maxRetries) rethrow;
+        await Future.delayed(Duration(milliseconds: 200));
+      }
     }
   }
 

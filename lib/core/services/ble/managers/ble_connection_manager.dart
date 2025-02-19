@@ -49,6 +49,7 @@ class BleConnectionManager {
         onStateChange(BleConnectionState.connecting);
 
         await device.connect(
+            mtu:null,
             timeout: BleConstants.CONNECTION_TIMEOUT,
             autoConnect: false
         );
@@ -146,6 +147,7 @@ class BleConnectionManager {
         _reconnectionSubject.add(_reconnectAttempts + 1);
         onReconnectionAttempt(_reconnectAttempts + 1);
         await _currentDevice!.connect(
+            mtu:null,
             timeout: const Duration(seconds: 5),
             autoConnect: true
         );
