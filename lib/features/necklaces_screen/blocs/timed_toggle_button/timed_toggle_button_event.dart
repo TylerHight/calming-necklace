@@ -13,12 +13,26 @@ class InitializeTimedToggleButton extends TimedToggleButtonEvent {
   const InitializeTimedToggleButton();
 }
 
-class ToggleLightEvent extends TimedToggleButtonEvent {}
+class ToggleLightEvent extends TimedToggleButtonEvent {
+  const ToggleLightEvent();
+}
+
+class ToggleLightLoadingEvent extends TimedToggleButtonEvent {
+  const ToggleLightLoadingEvent();
+}
+
+class ToggleLightErrorEvent extends TimedToggleButtonEvent {
+  final String error;
+  const ToggleLightErrorEvent(this.error);
+
+  @override
+  List<Object> get props => [error];
+}
 
 class StartPeriodicEmission extends TimedToggleButtonEvent {
   final int duration;
   const StartPeriodicEmission({required this.duration});
-  
+
   @override
   List<Object> get props => [duration];
 }
@@ -44,7 +58,7 @@ class _PeriodicEmissionTicked extends TimedToggleButtonEvent {
   const _PeriodicEmissionTicked({required this.duration, required this.intervalDuration});
 
   @override
-  List<Object> get props => [duration];
+  List<Object> get props => [duration, intervalDuration];
 }
 
 class _PeriodicEmissionTriggered extends TimedToggleButtonEvent {

@@ -42,6 +42,17 @@ class BleService {
     _initializeConnectionManager();
   }
 
+  Future<bool> isDeviceConnected(String deviceId) async {
+    try {
+      if (_connectedDevice == null) return false;
+      final state = await _connectedDevice!.connectionState.first;
+      return state == BluetoothConnectionState.connected;
+    } catch (e) {
+      _logger.logBleError('Error checking device connection', e);
+      return false;
+    }
+  }
+
   void _initializeConnectionManager() {
     _connectionManager = BleConnectionManager(
       onStateChange: _handleConnectionStateChange,

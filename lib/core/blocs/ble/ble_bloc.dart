@@ -36,7 +36,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
 
   Future<void> _onStartScanning(BleStartScanning event, Emitter<BleState> emit) async {
     try {
-      _logger.logBleInfo('Starting BLE scan for devices');
+      _logger.logBleInfo('Starting Bluetooth Low Energy scan for devices');
       emit(state.copyWith(
         isScanning: true, 
         error: null,
@@ -62,7 +62,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
         emit(state.copyWith(isScanning: false));
       }
     } catch (e) {
-      _logger.logBleError('Error starting BLE scan', e);
+      _logger.logBleError('Error starting Bluetooth Low Energy scan', e);
       emit(state.copyWith(
         isScanning: false,
         error: 'Failed to start scanning: ${e.toString()}',
@@ -148,6 +148,26 @@ class BleBloc extends Bloc<BleEvent, BleState> {
       emit(state.copyWith(
         error: 'LED control error: ${e.toString()}',
       ));
+    }
+  }
+
+  Future<bool> toggleLight(String deviceId, bool turnOn) async {
+    try {
+      _logger.logBleInfo('LED control request: ${turnOn ? 'ON' : 'OFF'}');
+      add(BleLedControlRequest(deviceId: deviceId, turnOn: turnOn));
+
+      await _bleService.setLedState(turnOn);
+      emit(state.copyWith(
+        error: null,
+        lastCommand: turnOn ? 'LED ON' : 'LED OFF',
+      ));
+      return true;
+    } catch (e) {
+      _logger.logBleError('LED control error', e);
+      emit(state.copyWith(
+        error: 'LED control error: ${e.toString()}',
+      ));
+      return false;
     }
   }
 

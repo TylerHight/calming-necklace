@@ -29,6 +29,7 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   final Map<String, StreamController<bool>> _emissionControllers = {};
   final Map<String, bool> _processingStates = {};
   final Map<String, bool> _stateChangeInProgress = {};
+  final Map<String, DateTime> _lastToggleAttempt = {};
 
   NecklaceRepositoryImpl({required DatabaseService databaseService, required BleService bleService})
       : _dbService = databaseService,
@@ -44,6 +45,19 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<void> toggleLight(Necklace necklace, bool isOn) async {
     try {
+      // Debounce toggle attempts
+      final now = DateTime.now();
+      final lastAttempt = _lastToggleAttempt[necklace.id];
+      if (lastAttempt != null && now.difference(lastAttempt) < const Duration(milliseconds: 500)) {
+        return;
+      }
+      _lastToggleAttempt[necklace.id] = now;
+
+      // Check if device is connected
+      if (!await _bleService.isDeviceConnected(necklace.bleDevice!.id)) {
+        throw Exception('Device not connected');
+      }
+
       if (_processingStates[necklace.id] == true) return;
       if (_stateChangeInProgress[necklace.id] == true) return;
       _processingStates[necklace.id] = true;

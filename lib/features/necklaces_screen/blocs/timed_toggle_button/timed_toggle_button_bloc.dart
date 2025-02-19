@@ -41,6 +41,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     on<ToggleLightEvent>(_onToggleLight);
     on<_TimerTicked>(_onTimerTicked);
     on<_PeriodicEmissionTriggered>(_onPeriodicEmissionTriggered);
+    on<ToggleLightLoadingEvent>(_onToggleLightLoading);
+    on<ToggleLightErrorEvent>(_onToggleLightError);
 
     _emissionSubscription = _repository.getEmissionStream(necklace.id).listen(_handleEmissionTrigger);
     _initializeDuration();
@@ -244,6 +246,16 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
       _logger.logError('Error ensuring connection: $e');
       throw BleException('Device connection error: $e');
     }
+  }
+
+  void _onToggleLightLoading(ToggleLightLoadingEvent event, Emitter<TimedToggleButtonState> emit) {
+    emit(TimedToggleButtonLoading());
+  }
+
+  void _onToggleLightError(ToggleLightErrorEvent event, Emitter<TimedToggleButtonState> emit) {
+    _isProcessingToggle = false;
+    _logger.logError('Toggle light error: ${event.error}');
+    emit(TimedToggleButtonError(event.error));
   }
 
   @override
