@@ -138,14 +138,15 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     }
   }
 
-  void _onTimerTicked(_TimerTicked event, Emitter<TimedToggleButtonState> emit) {
+  void _onTimerTicked(_TimerTicked event, Emitter<TimedToggleButtonState> emit) async {
     if (event.duration > 0) {
       emit(LightOnState(event.duration));
+      _isActive = true;
     } else if (_isTimerActive) {
       _isTimerActive = false;
-      _repository.completeEmission(necklace.id).then((_) {
-        if (!emit.isDone) emit(LightOffState());
-      });
+      _isActive = false;
+      await _repository.toggleLight(necklace, false);
+      if (!emit.isDone) emit(LightOffState());
       _stopTimer(emit);
     }
   }
@@ -192,6 +193,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   Future<void> _stopTimer(Emitter<TimedToggleButtonState> emit) async {
     _tickerSubscription?.cancel();
     _isTimerActive = false;
+    _isActive = false;
     await _repository.toggleLight(necklace, false).then((_) {
       if (!emit.isDone) emit(LightOffState());
     });

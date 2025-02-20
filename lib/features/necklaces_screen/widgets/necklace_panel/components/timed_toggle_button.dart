@@ -128,6 +128,12 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
   Widget build(BuildContext context) {
     return BlocConsumer<TimedToggleButtonBloc, TimedToggleButtonState>(
       listener: (context, state) {
+        if (state is LightOffState) {
+          setState(() {
+            _lastTapTime = null;
+          });
+        }
+
         if (state is TimedToggleButtonError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -188,23 +194,21 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 );
                 await Future.delayed(Duration(milliseconds: 100)); // Allow UI to update
 
-                // Attempt to toggle light
-                await Future.microtask(() async {
-                  final bleBloc = context.read<BleBloc>();
-                  final isConnected = await bleBloc.state.deviceConnectionStates[widget.necklace.bleDevice!.id] ?? false;
-                  if (!isConnected) throw Exception('Device not connected');
-                  
-                  final success = await bleBloc.toggleLight(
-                    widget.necklace.bleDevice!.id,
-                    shouldTurnOn,
-                  );
+                // Ensure proper state before toggling light
+                await _ensureProperState(context, shouldTurnOn);
 
-                  if (success) {
-                    context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
-                  } else {
-                    throw Exception('Failed to toggle light');
-                  }
-                });
+                // Attempt to toggle light
+                final bleBloc = context.read<BleBloc>();
+                final success = await bleBloc.toggleLight(
+                  widget.necklace.bleDevice!.id,
+                  shouldTurnOn,
+                );
+
+                if (success) {
+                  context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+                } else {
+                  throw Exception('Failed to toggle light');
+                }
               } catch (e) {
                 context.read<TimedToggleButtonBloc>().add(
                   ToggleLightErrorEvent(e.toString()),
@@ -410,6 +414,21 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
     
     if (!isConnected && context.read<TimedToggleButtonBloc>().state is LightOnState) {
       context.read<TimedToggleButtonBloc>().add(ToggleLightEvent());
+    }
+  }
+
+  Future<void> _ensureProperState(BuildContext context, bool desiredState) async {
+    final bloc = context.read<TimedToggleButtonBloc>();
+    final currentState = bloc.state;
+    
+    if (currentState is LightOnState && !desiredState) {
+      // If we're turning off, make sure to clean up the timer
+      bloc.add(ToggleLightEvent());
+    } else if (currentState is LightOffState && desiredState) {
+      // If we're turning on, make sure we're in a clean state
+      if (bloc.state is! TimedToggleButtonLoading) {
+        bloc.add(ToggleLightLoadingEvent());
+      }
     }
   }
 }
