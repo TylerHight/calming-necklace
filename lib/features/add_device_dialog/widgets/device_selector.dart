@@ -3,9 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:calming_necklace/core/ui/components/signal_strength_icon.dart';
 import 'package:calming_necklace/core/ui/ui_constants.dart';
-import '../blocs/device_selector/device_selector_bloc.dart';
-import '../blocs/device_selector/device_selector_event.dart';
-import '../blocs/device_selector/device_selector_state.dart';
+import '../../../../core/blocs/ble/ble_bloc.dart';
+import '../../../../core/blocs/ble/ble_event.dart';
+import '../../../../core/blocs/ble/ble_state.dart';
 
 class DeviceSelector extends StatefulWidget {
   final BleDeviceType deviceType;
@@ -22,12 +22,12 @@ class DeviceSelector extends StatefulWidget {
 }
 
 class _DeviceSelectorState extends State<DeviceSelector> {
-  late DeviceSelectorBloc _deviceSelectorBloc;
+  late BleBloc _bleBloc;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _deviceSelectorBloc = context.read<DeviceSelectorBloc>();
+    _bleBloc = context.read<BleBloc>();
   }
 
   @override
@@ -35,20 +35,20 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Start scanning when the widget is first built
-      _deviceSelectorBloc.add(StartScanning());
+      _bleBloc.add(BleStartScanning());
     });
   }
 
   @override
   void dispose() {
-    _deviceSelectorBloc.add(StopScanning());
+    _bleBloc.add(BleStopScanning());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
+    return BlocBuilder<BleBloc, BleState>(
       builder: (context, state) {
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -57,21 +57,21 @@ class _DeviceSelectorState extends State<DeviceSelector> {
             AnimatedSwitcher(
               duration: Duration(milliseconds: 300),
               child: state.isScanning
-                ? Container(
-                    width: double.infinity,
-                    height: 4,
-                    child: LinearProgressIndicator(
-                      backgroundColor: Colors.grey[200],
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  )
-                : SizedBox.shrink(),
+                  ? Container(
+                width: double.infinity,
+                height: 4,
+                child: LinearProgressIndicator(
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                ),
+              )
+                  : SizedBox.shrink(),
             ),
             const SizedBox(height: 8),
             const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
-            if (state.devices.isEmpty && !state.isInitialLoading)
+            if (state.devices.isEmpty && !state.isScanning)
               Container(
                 padding: const EdgeInsets.all(16),
                 alignment: Alignment.center,
@@ -133,7 +133,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                       ),
                       onTap: () {
                         if (state.selectedDevice?.id != device.id) {
-                          _deviceSelectorBloc.add(SelectDevice(device));
+                          _bleBloc.add(BleConnectRequest(device));
                           widget.onDeviceSelected(device);
                         }
                       },

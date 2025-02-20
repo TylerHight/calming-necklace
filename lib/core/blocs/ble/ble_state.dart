@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../data/models/ble_device.dart';
+
 class BleState extends Equatable {
   final Map<String, bool> deviceConnectionStates;
   final Map<String, String> deviceStates;
@@ -11,6 +13,8 @@ class BleState extends Equatable {
   final int rssi;
   final String? lastCommand;
   final bool isScanning;
+  final List<BleDevice> devices;
+  final BleDevice? selectedDevice;
 
   const BleState({
     required this.deviceConnectionStates,
@@ -23,6 +27,8 @@ class BleState extends Equatable {
     required this.rssi,
     this.lastCommand,
     this.isScanning = false,
+    this.devices = const [],
+    this.selectedDevice,
   });
 
   factory BleState.initial() => const BleState(
@@ -34,6 +40,7 @@ class BleState extends Equatable {
     rssi: 0,
     lastCommand: null,
     isScanning: false,
+    selectedDevice: null,
   );
 
   BleState copyWith({
@@ -47,6 +54,8 @@ class BleState extends Equatable {
     int? rssi,
     String? lastCommand,
     bool? isScanning,
+    List<BleDevice>? devices,
+    BleDevice? selectedDevice,
   }) {
     return BleState(
       deviceConnectionStates: deviceConnectionStates ?? this.deviceConnectionStates,
@@ -59,6 +68,8 @@ class BleState extends Equatable {
       rssi: rssi ?? this.rssi,
       lastCommand: lastCommand ?? this.lastCommand,
       isScanning: isScanning ?? this.isScanning,
+      devices: devices ?? this.devices,
+      selectedDevice: selectedDevice ?? this.selectedDevice,
     );
   }
 
@@ -74,5 +85,6 @@ class BleState extends Equatable {
     rssi,
     lastCommand,
     isScanning,
+    selectedDevice,
   ];
 }

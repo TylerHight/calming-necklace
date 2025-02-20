@@ -15,6 +15,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   StreamSubscription<bool>? _connectionStatusSubscription;
   StreamSubscription<int>? _rssiSubscription;
   StreamSubscription<int>? _reconnectionAttemptsSubscription;
+  StreamSubscription<List<BleDevice>>? _deviceSubscription;
 
   BleBloc({required BleService bleService, required BleRepository bleRepository})
       : _bleService = bleService,
@@ -27,6 +28,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     on<BleReconnectionAttempt>((event, emit) => _onReconnectionAttempt(event.attempt));
     on<BleLedControlRequest>(_onLedControlRequest);
     on<BleStartScanning>(_onStartScanning);
+    on<BleStopScanning>(_onStopScanning);
 
     _deviceStateSubscription = _bleService.deviceStateStream.listen(_onDeviceStateChanged);
     _connectionStatusSubscription = _bleService.connectionStatusStream.listen(_onConnectionStatusChanged);
@@ -36,23 +38,21 @@ class BleBloc extends Bloc<BleEvent, BleState> {
 
   Future<void> _onStartScanning(BleStartScanning event, Emitter<BleState> emit) async {
     try {
-      _logger.logBleInfo('Starting Bluetooth Low Energy scan for devices');
-      emit(state.copyWith(
-        isScanning: true, 
-        error: null,
-        deviceConnectionStates: {},
-      ));
+      _logger.logBleInfo('Starting BLE scan for devices');
+      emit(state.copyWith(isScanning: true, error: null));
 
       await _bleRepository.startScanning();
-      
-      // Listen for discovered devices
-      _bleRepository.devices.listen((devices) {
-        for (final device in devices) {
-          if (device.device != null) {
-            _tryConnectDevice(device, emit);
+
+      _deviceSubscription = _bleRepository.devices.listen(
+            (devices) {
+          for (final device in devices) {
+            if (device.device != null) {
+              _tryConnectDevice(device, emit);
+            }
           }
-        }
-      });
+          emit(state.copyWith(devices: devices));
+        },
+      );
 
       // Auto-stop scanning after 10 seconds
       _logger.logDebug('Setting up auto-stop timer for scan');
@@ -62,7 +62,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
         emit(state.copyWith(isScanning: false));
       }
     } catch (e) {
-      _logger.logBleError('Error starting Bluetooth Low Energy scan', e);
+      _logger.logBleError('Error starting BLE scan', e);
       emit(state.copyWith(
         isScanning: false,
         error: 'Failed to start scanning: ${e.toString()}',
@@ -70,10 +70,25 @@ class BleBloc extends Bloc<BleEvent, BleState> {
     }
   }
 
+  Future<void> _onStopScanning(BleStopScanning event, Emitter<BleState> emit) async {
+    try {
+      await _bleRepository.stopScanning();
+      _deviceSubscription?.cancel();
+      _logger.logDebug('Stopped BLE scan');
+      emit(state.copyWith(isScanning: false));
+    } catch (e) {
+      _logger.logError('Error stopping BLE scan: $e');
+      emit(state.copyWith(
+        isScanning: false,
+        error: 'Failed to stop scanning. Please try again.',
+      ));
+    }
+  }
+
   Future<void> _onConnectRequest(BleConnectRequest event, Emitter<BleState> emit) async {
     if (state.isConnecting) return;
 
-    emit(state.copyWith(isConnecting: true, error: null));
+    emit(state.copyWith(isConnecting: true, error: null, selectedDevice: event.device));
     try {
       final deviceId = event.device.id;
       _logger.logBleInfo('Attempting to connect and initialize device: $deviceId');

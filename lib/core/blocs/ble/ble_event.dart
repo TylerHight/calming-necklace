@@ -69,3 +69,5 @@ class BleLedControlRequest extends BleEvent {
 }
 
 class BleStartScanning extends BleEvent {}
+
+class BleStopScanning extends BleEvent {}
