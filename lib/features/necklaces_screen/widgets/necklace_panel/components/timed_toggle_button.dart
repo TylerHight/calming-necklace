@@ -192,7 +192,6 @@ class _TimedToggleButtonState extends State<_TimedToggleButtonView> {
                 context.read<TimedToggleButtonBloc>().add(
                   ToggleLightLoadingEvent(),
                 );
-                await Future.delayed(Duration(milliseconds: 100)); // Allow UI to update
 
                 // Ensure proper state before toggling light
                 await _ensureProperState(context, shouldTurnOn);
