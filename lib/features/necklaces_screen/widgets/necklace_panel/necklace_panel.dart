@@ -14,6 +14,7 @@ import '../../blocs/periodic_emission/periodic_emission_bloc.dart';
 import '../../../../core/services/logging_service.dart';
 import '../../../../core/ui/ui_constants.dart';
 import '../../../../features/device_settings_screen/presentation/settings_screen.dart';
+import '../../../../features/device_settings_screen/blocs/settings/settings_bloc.dart';
 import '../../../../features/notes_screen/widgets/add_note_dialog.dart';
 
 class NecklacePanel extends StatefulWidget {
@@ -78,10 +79,17 @@ class _NecklacePanelState extends State<NecklacePanel> {
       if (value == 'settings') {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => SettingsScreen(
-              necklace: widget.necklace,
-              repository: widget.repository,
-              databaseService: widget.databaseService,
+            builder: (context) => BlocProvider(
+              create: (context) => SettingsBloc(
+                widget.necklace,
+                widget.repository,
+                widget.databaseService,
+              ),
+              child: SettingsScreen(
+                necklace: widget.necklace,
+                repository: widget.repository,
+                databaseService: widget.databaseService,
+              ),
             ),
           ),
         );
@@ -206,10 +214,17 @@ class _NecklacePanelState extends State<NecklacePanel> {
             iconSize: UIConstants.settingsIconSize,
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => SettingsScreen(
-                  necklace: widget.necklace,
-                  repository: widget.repository,
-                  databaseService: widget.databaseService,
+                builder: (context) => BlocProvider(
+                  create: (context) => SettingsBloc(
+                    widget.necklace,
+                    widget.repository,
+                    widget.databaseService,
+                  ),
+                  child: SettingsScreen(
+                    necklace: widget.necklace,
+                    repository: widget.repository,
+                    databaseService: widget.databaseService,
+                  ),
                 ),
               ),
             ),
