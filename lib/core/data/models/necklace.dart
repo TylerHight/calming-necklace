@@ -15,6 +15,9 @@ class Necklace extends Equatable {
   final bool isArchived;
   final bool isLedOn; // Added isLedOn field
   final DateTime? lastLEDStateChange; // Added lastLEDStateChange field
+  final bool isHeartRateBasedReleaseEnabled;
+  final int highHeartRateThreshold;
+  final int lowHeartRateThreshold;
 
   Necklace({
     required this.id,
@@ -29,6 +32,9 @@ class Necklace extends Equatable {
     this.isRelease1Active = false,
     this.isArchived = false,
     this.lastLEDStateChange, // Initialize lastLEDStateChange
+    this.isHeartRateBasedReleaseEnabled = false,
+    this.highHeartRateThreshold = 120,
+    this.lowHeartRateThreshold = 60,
   });
 
   Necklace copyWith({
@@ -44,6 +50,9 @@ class Necklace extends Equatable {
     bool? isLedOn, // Update copyWith method
     bool? isConnected, // Update copyWith method
     DateTime? lastLEDStateChange, // Update copyWith method
+    bool? isHeartRateBasedReleaseEnabled,
+    int? highHeartRateThreshold,
+    int? lowHeartRateThreshold,
   }) {
     return Necklace(
       id: id ?? this.id,
@@ -58,6 +67,9 @@ class Necklace extends Equatable {
       isRelease1Active: isRelease1Active ?? this.isRelease1Active,
       isArchived: isArchived ?? this.isArchived,
       lastLEDStateChange: lastLEDStateChange ?? this.lastLEDStateChange, // Update copyWith method
+      isHeartRateBasedReleaseEnabled: isHeartRateBasedReleaseEnabled ?? this.isHeartRateBasedReleaseEnabled,
+      highHeartRateThreshold: highHeartRateThreshold ?? this.highHeartRateThreshold,
+      lowHeartRateThreshold: lowHeartRateThreshold ?? this.lowHeartRateThreshold,
     );
   }
 
@@ -75,6 +87,9 @@ class Necklace extends Equatable {
     isLedOn, // Update props
     isConnected, // Update props
     lastLEDStateChange, // Update props
+    isHeartRateBasedReleaseEnabled,
+    highHeartRateThreshold,
+    lowHeartRateThreshold,
   ];
 
   Map<String, dynamic> toMap() {
@@ -95,6 +110,9 @@ class Necklace extends Equatable {
       'isConnected': isConnected ? 1 : 0, // Add isConnected to map
       'isArchived': isArchived ? 1 : 0,
       'lastLEDStateChange': lastLEDStateChange?.toIso8601String(), // Add lastLEDStateChange to map
+      'isHeartRateBasedReleaseEnabled': isHeartRateBasedReleaseEnabled ? 1 : 0,
+      'highHeartRateThreshold': highHeartRateThreshold,
+      'lowHeartRateThreshold': lowHeartRateThreshold,
     };
   }
 
@@ -118,6 +136,9 @@ class Necklace extends Equatable {
       isArchived: map['isArchived'] == 1,
       lastLEDStateChange: map['lastLEDStateChange'] != null ? 
           DateTime.parse(map['lastLEDStateChange']) : null, // Add lastLEDStateChange from map
+      isHeartRateBasedReleaseEnabled: map['isHeartRateBasedReleaseEnabled'] == 1,
+      highHeartRateThreshold: map['highHeartRateThreshold'],
+      lowHeartRateThreshold: map['lowHeartRateThreshold'],
     );
   }
 }

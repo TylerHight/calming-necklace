@@ -63,7 +63,7 @@ class DurationPickerDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: UIConstants.durationPickerSpacing),
-            SizedBox(
+            if (!isEmissionDuration) SizedBox(
               height: UIConstants.durationPickerHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -97,6 +97,21 @@ class DurationPickerDialog extends StatelessWidget {
                       59,
                       state.seconds,
                           (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
+                      'Seconds',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isEmissionDuration) SizedBox(
+              height: UIConstants.durationPickerHeight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: _buildNumberPicker(
+                      context, 0, 59, state.seconds,
+                      (value) => context.read<DurationPickerBloc>().add(UpdateSeconds(value)),
                       'Seconds',
                     ),
                   ),

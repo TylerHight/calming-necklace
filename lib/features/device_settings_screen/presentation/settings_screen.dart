@@ -146,8 +146,9 @@ class _SettingsContentState extends State<SettingsContent> {
             const SizedBox(height: 16),
             _buildScent1Section(context, state),
             const SizedBox(height: 16),
+            _buildHeartRateSection(context, state),
+            const SizedBox(height: 16),
             _buildConnectionSection(context, state),
-            _buildDangerZone(context, state),
           ],
         );
       },
@@ -314,6 +315,64 @@ class _SettingsContentState extends State<SettingsContent> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeartRateSection(BuildContext context, SettingsState state) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Heart Rate Settings',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            SwitchListTile(
+              title: const Text('Enable Heart Rate Based Release'),
+              value: state.necklace.isHeartRateBasedReleaseEnabled,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(UpdateHeartRateBasedRelease(value));
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                children: [
+                  Text('High Heart Rate Threshold: ${state.necklace.highHeartRateThreshold} BPM'),
+                  Slider(
+                    value: state.necklace.highHeartRateThreshold.toDouble(),
+                    min: 30,
+                    max: 200,
+                    divisions: 170,
+                    label: '${state.necklace.highHeartRateThreshold} BPM',
+                    onChanged: (value) {
+                      context.read<SettingsBloc>().add(
+                        UpdateHighHeartRateThreshold(value.round()),
+                      );
+                    },
+                  ),
+                  Text('Low Heart Rate Threshold: ${state.necklace.lowHeartRateThreshold} BPM'),
+                  Slider(
+                    value: state.necklace.lowHeartRateThreshold.toDouble(),
+                    min: 30,
+                    max: 200,
+                    divisions: 170,
+                    label: '${state.necklace.lowHeartRateThreshold} BPM',
+                    onChanged: (value) {
+                      context.read<SettingsBloc>().add(
+                        UpdateLowHeartRateThreshold(value.round()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -27,7 +27,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -57,7 +57,10 @@ class DatabaseService {
       isArchived INTEGER DEFAULT 0,
       autoTurnOffEnabled INTEGER,
       lastLEDStateChange TEXT,
-      isConnected INTEGER DEFAULT 0
+      isConnected INTEGER DEFAULT 0,
+      isHeartRateBasedReleaseEnabled INTEGER DEFAULT 0,
+      highHeartRateThreshold INTEGER DEFAULT 120,
+      lowHeartRateThreshold INTEGER DEFAULT 60
     )
   ''');
   }
@@ -107,6 +110,21 @@ class DatabaseService {
         ALTER TABLE necklaces
         ADD COLUMN isConnected INTEGER
         DEFAULT 0
+      ''');
+    }
+    if (oldVersion < 5) {
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN isHeartRateBasedReleaseEnabled INTEGER
+        DEFAULT 0
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN highHeartRateThreshold INTEGER DEFAULT 120
+      ''');
+      await db.execute('''
+        ALTER TABLE necklaces
+        ADD COLUMN lowHeartRateThreshold INTEGER DEFAULT 60
       ''');
     }
   }

@@ -64,6 +64,23 @@ class RefreshSettings extends SettingsEvent {
   List<Object?> get props => [necklace];
 }
 
+class UpdateHeartRateBasedRelease extends SettingsEvent {
+  final bool enabled;
+  const UpdateHeartRateBasedRelease(this.enabled);
+  @override
+  List<Object?> get props => [enabled];
+}
+
+class UpdateHighHeartRateThreshold extends SettingsEvent {
+  final int threshold;
+  const UpdateHighHeartRateThreshold(this.threshold);
+}
+
+class UpdateLowHeartRateThreshold extends SettingsEvent {
+  final int threshold;
+  const UpdateLowHeartRateThreshold(this.threshold);
+}
+
 // State
 class SettingsState extends Equatable {
   final Necklace necklace;
@@ -111,6 +128,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<ArchiveNecklace>(_onArchiveNecklace);
     on<SaveSettings>(_onSaveSettings);
     on<RefreshSettings>(_onRefreshSettings);
+    on<UpdateHeartRateBasedRelease>(_onUpdateHeartRateBasedRelease);
+    on<UpdateHighHeartRateThreshold>(_onUpdateHighHeartRateThreshold);
+    on<UpdateLowHeartRateThreshold>(_onUpdateLowHeartRateThreshold);
   }
 
   Future<void> _onSaveSettings(
@@ -144,6 +164,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         periodicEmissionEnabled: state.necklace.periodicEmissionEnabled,
         isRelease1Active: state.necklace.isRelease1Active,
         isArchived: state.necklace.isArchived,
+        isHeartRateBasedReleaseEnabled: state.necklace.isHeartRateBasedReleaseEnabled,
+        highHeartRateThreshold: state.necklace.highHeartRateThreshold,
+        lowHeartRateThreshold: state.necklace.lowHeartRateThreshold,
       );
       emit(state.copyWith(
         necklace: updatedNecklace,
@@ -167,6 +190,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         periodicEmissionEnabled: event.enabled,
         isRelease1Active: state.necklace.isRelease1Active,
         isArchived: state.necklace.isArchived,
+        isHeartRateBasedReleaseEnabled: state.necklace.isHeartRateBasedReleaseEnabled,
+        highHeartRateThreshold: state.necklace.highHeartRateThreshold,
+        lowHeartRateThreshold: state.necklace.lowHeartRateThreshold,
       );
       emit(state.copyWith(necklace: updatedNecklace));
     } catch (e) {
@@ -231,5 +257,62 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   void _onRefreshSettings(RefreshSettings event, Emitter<SettingsState> emit) {
     emit(state.copyWith(necklace: event.necklace));
+  }
+
+  void _onUpdateHeartRateBasedRelease(
+    UpdateHeartRateBasedRelease event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        {'isHeartRateBasedReleaseEnabled': event.enabled ? 1 : 0},
+      );
+      emit(state.copyWith(
+        necklace: state.necklace.copyWith(
+          isHeartRateBasedReleaseEnabled: event.enabled,
+        ),
+      ));
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
+  }
+
+  void _onUpdateHighHeartRateThreshold(
+    UpdateHighHeartRateThreshold event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        {'highHeartRateThreshold': event.threshold},
+      );
+      emit(state.copyWith(
+        necklace: state.necklace.copyWith(
+          highHeartRateThreshold: event.threshold,
+        ),
+      ));
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
+  }
+
+  void _onUpdateLowHeartRateThreshold(
+    UpdateLowHeartRateThreshold event,
+    Emitter<SettingsState> emit,
+  ) async {
+    try {
+      await _databaseService.updateNecklaceSettings(
+        state.necklace.id,
+        {'lowHeartRateThreshold': event.threshold},
+      );
+      emit(state.copyWith(
+        necklace: state.necklace.copyWith(
+          lowHeartRateThreshold: event.threshold,
+        ),
+      ));
+    } catch (e) {
+      emit(state.copyWith(error: e.toString()));
+    }
   }
 }
