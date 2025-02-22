@@ -9,6 +9,7 @@ import '../../../core/services/ble/ble_service.dart';
 import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
+import '../widgets/heart_rate_settings_dialog.dart';
 import '../widgets/device_selection_dialog.dart';
 import '../widgets/settings_help_dialog.dart';
 import '../widgets/ble_device_info.dart';
@@ -130,6 +131,17 @@ class _SettingsContentState extends State<SettingsContent> {
     _logger = await LoggingService.getInstance();
   }
 
+  Future<void> _refreshSettings() async {
+    try {
+      final updatedNecklace = await widget.databaseService.getNecklaceById(widget.necklace.id);
+      if (updatedNecklace != null && mounted) {
+        context.read<SettingsBloc>().add(RefreshSettings(updatedNecklace));
+      }
+    } catch (e) {
+      _logger.logError('Error refreshing settings: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SettingsBloc, SettingsState>(
@@ -228,19 +240,6 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
-  Widget _buildNameField(BuildContext context, SettingsState state) {
-    return TextFormField(
-      initialValue: state.necklace.name,
-      decoration: const InputDecoration(
-        labelText: 'Rename Necklace',
-        border: OutlineInputBorder(),
-      ),
-      onChanged: (value) {
-        context.read<SettingsBloc>().add(UpdateNecklaceName(value));
-      },
-    );
-  }
-
   Widget _buildScent1Section(BuildContext context, SettingsState state) {
     return Card(
       elevation: 2,
@@ -335,42 +334,28 @@ class _SettingsContentState extends State<SettingsContent> {
             SwitchListTile(
               title: const Text('Enable Heart Rate Based Release'),
               value: state.necklace.isHeartRateBasedReleaseEnabled,
-              onChanged: (value) {
-                context.read<SettingsBloc>().add(UpdateHeartRateBasedRelease(value));
-              },
+              onChanged: null,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                children: [
-                  Text('High Heart Rate Threshold: ${state.necklace.highHeartRateThreshold} BPM'),
-                  Slider(
-                    value: state.necklace.highHeartRateThreshold.toDouble(),
-                    min: 30,
-                    max: 200,
-                    divisions: 170,
-                    label: '${state.necklace.highHeartRateThreshold} BPM',
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(
-                        UpdateHighHeartRateThreshold(value.round()),
-                      );
-                    },
-                  ),
-                  Text('Low Heart Rate Threshold: ${state.necklace.lowHeartRateThreshold} BPM'),
-                  Slider(
-                    value: state.necklace.lowHeartRateThreshold.toDouble(),
-                    min: 30,
-                    max: 200,
-                    divisions: 170,
-                    label: '${state.necklace.lowHeartRateThreshold} BPM',
-                    onChanged: (value) {
-                      context.read<SettingsBloc>().add(
-                        UpdateLowHeartRateThreshold(value.round()),
-                      );
-                    },
-                  ),
-                ],
+            ListTile(
+              title: Text('Configure Heart Rate Thresholds'),
+              subtitle: Text(
+                'High: ${state.necklace.highHeartRateThreshold} BPM, ' +
+                'Low: ${state.necklace.lowHeartRateThreshold} BPM'
               ),
+              trailing: Icon(Icons.arrow_forward_ios),
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => HeartRateSettingsDialog(
+                  necklaceId: state.necklace.id,
+                  initialEnabled: state.necklace.isHeartRateBasedReleaseEnabled,
+                  initialHighThreshold: state.necklace.highHeartRateThreshold,
+                  initialLowThreshold: state.necklace.lowHeartRateThreshold,
+                ),
+              ).then((saved) {
+                if (saved == true) {
+                  _refreshSettings();
+                }
+              }),
             ),
           ],
         ),
