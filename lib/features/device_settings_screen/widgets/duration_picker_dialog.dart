@@ -5,12 +5,13 @@ import 'package:numberpicker/numberpicker.dart';
 import '../../../core/ui/ui_constants.dart';
 import '../../../core/services/logging_service.dart';
 import '../../../core/services/database_service.dart';
+import '../../../core/ui/formatters.dart';
 import '../blocs/duration_picker/duration_picker_bloc.dart';
 
 class DurationPickerDialog extends StatelessWidget {
   final String title;
   final Duration initialDuration;
-  final bool isEmissionDuration;
+  final bool showSecondsOnly;
   final Function(Duration) onDurationChanged;
   final LoggingService _logger;
   final DatabaseService _databaseService;
@@ -22,7 +23,7 @@ class DurationPickerDialog extends StatelessWidget {
     Key? key,
     required this.title,
     required this.initialDuration,
-    required this.isEmissionDuration,
+    this.showSecondsOnly = false,
     required this.onDurationChanged,
     required this.necklaceId,
     required this.scentNumber,
@@ -63,7 +64,7 @@ class DurationPickerDialog extends StatelessWidget {
               ),
             ),
             const SizedBox(height: UIConstants.durationPickerSpacing),
-            if (!isEmissionDuration) SizedBox(
+            if (!showSecondsOnly) SizedBox(
               height: UIConstants.durationPickerHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -103,7 +104,7 @@ class DurationPickerDialog extends StatelessWidget {
                 ],
               ),
             ),
-            if (isEmissionDuration) SizedBox(
+            if (showSecondsOnly) SizedBox(
               height: UIConstants.durationPickerHeight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -129,29 +130,17 @@ class DurationPickerDialog extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      final newDuration = Duration(
-                        hours: state.hours,
-                        minutes: state.minutes,
-                        seconds: state.seconds,
-                      );
-                      // Save to database
-                      final settingKey = isEmissionDuration
-                          ? 'emission${scentNumber}Duration'
-                          : 'releaseInterval${scentNumber}';
-                      await _databaseService.updateNecklaceSettings(
-                        necklaceId,
-                        {settingKey: newDuration.inSeconds},
-                      );
-                      onDurationChanged(newDuration);
-                      LoggingService.instance.logDebug('Successfully saved duration: $newDuration');
-                    } catch (e) {
-                      LoggingService.instance.logError('Error updating duration: $e');
-                    }
+                  onPressed: () {
+                    final newDuration = Duration(
+                      hours: state.hours,
+                      minutes: state.minutes,
+                      seconds: state.seconds,
+                    );
+                    // Only call onDurationChanged when Save is pressed
+                    onDurationChanged(newDuration);
                     Navigator.pop(context);
                   },
-                  child: const Text('Set'),
+                  child: const Text('Save'),
                 ),
               ],
             ),
