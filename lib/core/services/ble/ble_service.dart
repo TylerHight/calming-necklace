@@ -14,6 +14,7 @@ class BleService {
   static final BleService _instance = BleService._internal();
   factory BleService() => _instance;
 
+  late final BleConnectionManager _connectionManager;
   DateTime? _lastCommandTime;
   static const _commandDebounceTime = Duration(milliseconds: 500);
   final Map<String, Completer<void>> _pendingCommands = {};
@@ -23,7 +24,7 @@ class BleService {
   final _connectionStatusController = StreamController<bool>.broadcast();
   final _rssiController = StreamController<int>.broadcast();
   final _reconnectionAttemptsController = StreamController<int>.broadcast();
-  late final BleConnectionManager _connectionManager;
+  final _connectionQualityController = StreamController<double>.broadcast();
 
   BluetoothDevice? _connectedDevice;
   BluetoothCharacteristic? _switchCharacteristic;
@@ -34,6 +35,7 @@ class BleService {
   Stream<bool> get connectionStatusStream => _connectionStatusController.stream;
   Stream<int> get rssiStream => _rssiController.stream;
   Stream<int> get reconnectionAttemptsStream => _reconnectionAttemptsController.stream;
+  Stream<double> get connectionQualityStream => _connectionQualityController.stream;
   BluetoothDevice? get connectedDevice => _connectedDevice;
 
   BleService._internal() {
@@ -217,6 +219,13 @@ class BleService {
       if (command < 0 || command > BleCommand.periodic1.value) {
         throw BleException('Invalid LED command');
       }
+      
+      // Verify connection before sending command
+      if (!await isDeviceConnected(_connectedDevice?.id.toString() ?? "")) {
+        _connectionStatusController.add(false);
+        throw BleException('Device connection lost');
+      }
+      
       await _writeCommand(command, 0); // TODO: Provide correct second parameter (currently dummy value)
     } catch (e) {
       _logger.logBleError('Failed to set LED color: $e');
@@ -379,6 +388,7 @@ class BleService {
     _rssiController.close();
     _pendingCommands.clear();
     _reconnectionAttemptsController.close();
+    _connectionQualityController.close();
     _stopRssiUpdates();
   }
 }

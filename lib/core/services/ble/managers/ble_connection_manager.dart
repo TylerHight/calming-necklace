@@ -15,6 +15,9 @@ class BleConnectionManager {
   final _retryDelays = [1, 2, 3]; // Seconds between retries
   final _maxRetries = 5;
   final LoggingService _logger = LoggingService.instance;
+  
+  final _connectionStateSubject = BehaviorSubject<BleConnectionState>();
+  final _rssiSubject = BehaviorSubject<int>();
 
   StreamSubscription? _connectionSubscription;
   StreamSubscription? _keepAliveSubscription;
@@ -58,6 +61,7 @@ class BleConnectionManager {
         await Future.delayed(const Duration(milliseconds: 500));
 
         final state = await device.connectionState.first;
+        _connectionStateSubject.add(state == BluetoothConnectionState.connected ? BleConnectionState.connected : BleConnectionState.disconnected);
         if (state == BluetoothConnectionState.connected) {
           connected = true;
           _logger.logBleInfo('Successfully connected to ${device.platformName}');
@@ -117,6 +121,7 @@ class BleConnectionManager {
     try {
       final isConnected = await _currentDevice!.connectionState.first ==
           BluetoothConnectionState.connected;
+      _connectionStateSubject.add(isConnected ? BleConnectionState.connected : BleConnectionState.disconnected);
 
       if (!isConnected && !_isReconnecting) {
         _handleDisconnection();
@@ -226,6 +231,7 @@ class BleConnectionManager {
     _rssiCheckTimer = Timer.periodic(const Duration(seconds: 10), (_) async {
       try {
         final rssi = await device.readRssi();
+        _rssiSubject.add(rssi);
         if (rssi < BleConstants.MIN_RSSI_THRESHOLD) {
           _logger.logBleWarning('Weak signal strength detected (RSSI: $rssi)');
         }
@@ -356,6 +362,8 @@ class BleConnectionManager {
   void dispose() {
     disconnect();
     _cleanupMonitoring();
+    _connectionStateSubject.close();
+    _rssiSubject.close();
     _reconnectionSubject.close();
   }
 }
