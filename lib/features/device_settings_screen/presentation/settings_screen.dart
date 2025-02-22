@@ -161,6 +161,8 @@ class _SettingsContentState extends State<SettingsContent> {
             _buildHeartRateSection(context, state),
             const SizedBox(height: 16),
             _buildConnectionSection(context, state),
+            const SizedBox(height: 16),
+            _buildDangerZone(context, state),
           ],
         );
       },
@@ -334,10 +336,17 @@ class _SettingsContentState extends State<SettingsContent> {
             SwitchListTile(
               title: const Text('Enable Heart Rate Based Release'),
               value: state.necklace.isHeartRateBasedReleaseEnabled,
-              onChanged: null,
+              onChanged: (value) {
+                context.read<SettingsBloc>().add(
+                  UpdateHeartRateBasedRelease(value),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Heart rate based release ${value ? 'enabled' : 'disabled'}')),
+                );
+              },
             ),
             ListTile(
-              title: Text('Configure Heart Rate Thresholds'),
+              title: Text('Adjust Heart Rate Thresholds'),
               subtitle: Text(
                 'High: ${state.necklace.highHeartRateThreshold} BPM, ' +
                 'Low: ${state.necklace.lowHeartRateThreshold} BPM'
@@ -347,7 +356,6 @@ class _SettingsContentState extends State<SettingsContent> {
                 context: context,
                 builder: (context) => HeartRateSettingsDialog(
                   necklaceId: state.necklace.id,
-                  initialEnabled: state.necklace.isHeartRateBasedReleaseEnabled,
                   initialHighThreshold: state.necklace.highHeartRateThreshold,
                   initialLowThreshold: state.necklace.lowHeartRateThreshold,
                 ),
@@ -483,7 +491,7 @@ class _SettingsContentState extends State<SettingsContent> {
         return DurationPickerDialog(
           title: title,
           initialDuration: initialDuration,
-          isEmissionDuration: title.contains('Emission'),
+          showSecondsOnly: title.contains('Release Duration'),
           necklaceId: widget.necklace.id,
           scentNumber: 1,
           databaseService: databaseService,

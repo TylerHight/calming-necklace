@@ -4,14 +4,12 @@ import '../../../core/services/logging_service.dart';
 
 class HeartRateSettingsDialog extends StatefulWidget {
   final String necklaceId;
-  final bool initialEnabled;
   final int initialHighThreshold;
   final int initialLowThreshold;
 
   const HeartRateSettingsDialog({
     Key? key,
     required this.necklaceId,
-    required this.initialEnabled,
     required this.initialHighThreshold,
     required this.initialLowThreshold,
   }) : super(key: key);
@@ -21,7 +19,6 @@ class HeartRateSettingsDialog extends StatefulWidget {
 }
 
 class _HeartRateSettingsDialogState extends State<HeartRateSettingsDialog> {
-  late bool _isEnabled;
   late double _highThreshold;
   late double _lowThreshold;
   final DatabaseService _databaseService = DatabaseService();
@@ -30,7 +27,6 @@ class _HeartRateSettingsDialogState extends State<HeartRateSettingsDialog> {
   @override
   void initState() {
     super.initState();
-    _isEnabled = widget.initialEnabled;
     _highThreshold = widget.initialHighThreshold.toDouble();
     _lowThreshold = widget.initialLowThreshold.toDouble();
   }
@@ -40,7 +36,6 @@ class _HeartRateSettingsDialogState extends State<HeartRateSettingsDialog> {
       await _databaseService.updateNecklaceSettings(
         widget.necklaceId,
         {
-          'isHeartRateBasedReleaseEnabled': _isEnabled ? 1 : 0,
           'highHeartRateThreshold': _highThreshold.round(),
           'lowHeartRateThreshold': _lowThreshold.round(),
         },
@@ -65,15 +60,6 @@ class _HeartRateSettingsDialogState extends State<HeartRateSettingsDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SwitchListTile(
-            title: const Text('Enable Heart Rate Based Release'),
-            value: _isEnabled,
-            onChanged: (value) {
-              setState(() {
-                _isEnabled = value;
-              });
-            },
-          ),
           const SizedBox(height: 16),
           Text('High Heart Rate Threshold: ${_highThreshold.round()} BPM'),
           Slider(
