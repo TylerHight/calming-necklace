@@ -97,10 +97,12 @@ class BleBloc extends Bloc<BleEvent, BleState> {
 
   Future<void> _onDisconnectRequest(BleDisconnectRequest event, Emitter<BleState> emit) async {
     try {
+      _logger.logBleInfo('Attempting to disconnect from device: ${event.deviceId}');
       await _bleService.disconnectFromDevice();
       final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
       updatedStates[event.deviceId] = false;
       emit(state.copyWith(deviceConnectionStates: updatedStates));
+      _logger.logBleInfo('Successfully disconnected from device: ${event.deviceId}');
     } catch (e) {
       _logger.logBleError('Disconnect error: ${e.toString()}', e);
       emit(state.copyWith(error: 'Disconnect error: ${e.toString()}'));

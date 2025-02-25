@@ -1,42 +1,16 @@
-/// A model class representing a Bluetooth Low Energy (BLE) device.
-///
-/// This class is used to store and manage BLE device properties and their association
-/// with necklaces in the application. It handles both physical device properties
-/// (like address and RSSI) and logical properties (like device type and connection status).
-///
-/// The model supports two types of devices:
-/// - Necklaces: The main device type that can be controlled by the app
-/// - Heart Rate Monitors: External devices that can be paired with necklaces
-///
-/// Key features:
-/// - Serializable for persistence (toMap/fromMap)
-/// - Immutable with copyWith support
-/// - Equatable for easy comparison
-/// - Safe handling of parsing errors
-/// - Optional BluetoothDevice instance for direct BLE operations
-///
-/// The necklaceId field creates a link between this BLE device and a Necklace model,
-/// allowing for bi-directional reference between the two models.
-///
-import 'package:equatable/equatable.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'dart:convert';
+import 'package:equatable/equatable.dart';
 
-enum BleDeviceType {
-  necklace,
-  heartRateMonitor,
-}
+enum BleDeviceType { necklace, heartRateMonitor }
 
 class BleDevice extends Equatable {
-  final String id; // id that is unique to this ble device
+  final String id;
   final String name;
   final String address;
   final int rssi;
   final BleDeviceType deviceType;
-  final bool isConnected;
-  final String? necklaceId; // Foreign key: The necklace ID should be the same as the "id" field in the Necklace model
-  final String? advertisedName;
   final BluetoothDevice? device;
+  final List<BleServiceInfo> services;
 
   const BleDevice({
     required this.id,
@@ -44,72 +18,106 @@ class BleDevice extends Equatable {
     required this.address,
     required this.rssi,
     required this.deviceType,
-    this.isConnected = false,
-    this.advertisedName,
-    this.necklaceId, 
     this.device,
+    this.services = const [],
   });
 
+  BleDevice copyWith({
+    String? id,
+    String? name,
+    String? address,
+    int? rssi,
+    BleDeviceType? deviceType,
+    BluetoothDevice? device,
+    List<BleServiceInfo>? services,
+  }) {
+    return BleDevice(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      address: address ?? this.address,
+      rssi: rssi ?? this.rssi,
+      deviceType: deviceType ?? this.deviceType,
+      device: device ?? this.device,
+      services: services ?? this.services,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, name, address, rssi, deviceType, isConnected, advertisedName, necklaceId];
+  List<Object?> get props => [id, name, address, rssi, deviceType, device, services];
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name.toString(),
+      'name': name,
       'address': address,
       'rssi': rssi,
-      'deviceType': deviceType.index,
-      'isConnected': isConnected ? 1 : 0,
-      'advertisedName': advertisedName,
-      'necklaceId': necklaceId,
+      'deviceType': deviceType.toString(),
+      'services': services.map((service) => service.toMap()).toList(),
     };
   }
 
   factory BleDevice.fromMap(Map<String, dynamic> map) {
-    try {
-      return BleDevice(
-        id: map['id']?.toString() ?? '',
-        name: map['name']?.toString() ?? 'Unknown Device',
-        address: map['address']?.toString() ?? '',
-        rssi: map['rssi'] is int ? map['rssi'] : 0,
-        deviceType: map['deviceType'] is int ? 
-            BleDeviceType.values[map['deviceType']] : BleDeviceType.necklace,
-        isConnected: map['isConnected'] == 1,
-        advertisedName: map['advertisedName']?.toString(),
-        necklaceId: map['necklaceId']?.toString(),
-      );
-    } catch (e) {
-      print('Error parsing BleDevice: $e');
-      // Return a default device instead of throwing
-      return BleDevice(
-        id: '',
-        name: 'Parse Error',
-        address: '',
-        rssi: 0,
-        deviceType: BleDeviceType.necklace,
-      );
-    }
+    return BleDevice(
+      id: map['id'],
+      name: map['name'],
+      address: map['address'],
+      rssi: map['rssi'],
+      deviceType: BleDeviceType.values.firstWhere((e) => e.toString() == map['deviceType']),
+      services: List<BleServiceInfo>.from(map['services']?.map((x) => BleServiceInfo.fromMap(x))),
+    );
+  }
+}
+
+class BleServiceInfo extends Equatable {
+  final String uuid;
+  final List<BleCharacteristicInfo> characteristics;
+
+  const BleServiceInfo({
+    required this.uuid,
+    required this.characteristics,
+  });
+
+  @override
+  List<Object?> get props => [uuid, characteristics];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uuid': uuid,
+      'characteristics': characteristics.map((char) => char.toMap()).toList(),
+    };
   }
 
-  BleDevice copyWith({
-    String? name,
-    int? rssi,
-    bool? isConnected,
-    String? advertisedName,
-    String? necklaceId, 
-    BluetoothDevice? device,  // Add this parameter to the copyWith method
-  }) {
-    return BleDevice(
-      id: id,
-      name: name ?? this.name,
-      address: address,
-      rssi: rssi ?? this.rssi,
-      deviceType: deviceType,
-      isConnected: isConnected ?? this.isConnected,
-      advertisedName: advertisedName ?? this.advertisedName,
-      necklaceId: necklaceId ?? this.necklaceId, 
-      device: device ?? this.device,  // Copy the new field
+  factory BleServiceInfo.fromMap(Map<String, dynamic> map) {
+    return BleServiceInfo(
+      uuid: map['uuid'],
+      characteristics: List<BleCharacteristicInfo>.from(map['characteristics']?.map((x) => BleCharacteristicInfo.fromMap(x))),
+    );
+  }
+}
+
+class BleCharacteristicInfo extends Equatable {
+  final String uuid;
+  final List<String> properties;
+
+  const BleCharacteristicInfo({
+    required this.uuid,
+    required this.properties,
+  });
+
+  @override
+  List<Object?> get props => [uuid, properties];
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uuid': uuid,
+      'properties': properties,
+    };
+  }
+
+  factory BleCharacteristicInfo.fromMap(Map<String, dynamic> map) {
+    return BleCharacteristicInfo(
+      uuid: map['uuid'],
+      properties: List<String>.from(map['properties']),
     );
   }
 }

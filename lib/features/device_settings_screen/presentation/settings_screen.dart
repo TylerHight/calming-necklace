@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/blocs/ble/ble_event.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
@@ -371,6 +372,15 @@ class _SettingsContentState extends State<SettingsContent> {
             ListTile(
               title: const Text('Change Heart Rate Monitor'),
               trailing: const Icon(Icons.heart_broken),
+              subtitle: state.necklace.heartRateMonitorDevice != null
+                ? Text(
+                    state.necklace.heartRateMonitorDevice!.name,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 12,
+                    ),
+                  )
+                : null,
               onTap: () => showDialog<BleDevice>(
                   context: context,
                   builder: (context) => MultiBlocProvider(
@@ -388,10 +398,26 @@ class _SettingsContentState extends State<SettingsContent> {
                     ),
                   ),
                 ).then((device) async {
-                  if (device != null) {
-                    // TODO: Implement device change logic
+                  try {
+                    if (device != null) {
+                        await widget.databaseService.updateNecklaceSettings(
+                          widget.necklace.id,
+                          {'heartRateMonitorDevice': device.toMap()},
+                        );
+
+                        // Refresh settings
+                        context.read<SettingsBloc>().add(
+                          RefreshSettings(widget.necklace.copyWith(
+                            heartRateMonitorDevice: device,
+                          )),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Selected device: ${device.name}')),
+                        );
+                    }
+                  } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Selected device: ${device.name}')),
+                      SnackBar(content: Text('Error updating heart rate monitor: $e')),
                     );
                   }
                 }),
@@ -439,25 +465,24 @@ class _SettingsContentState extends State<SettingsContent> {
                     ),
                   ),
                 ).then((device) async {
-                  if (device != null) {
-                    try {
-                      // Update necklace in database with new device
-                      await widget.databaseService.updateNecklaceSettings(
-                        widget.necklace.id,
-                        {'bleDevice': device.toMap()},
-                      );
+                  try {
+                    if (device != null) {
+                        await widget.databaseService.updateNecklaceSettings(
+                          widget.necklace.id,
+                          {'bleDevice': device.toMap()},
+                        );
 
-                      // Notify the necklaces bloc to refresh
-                      context.read<NecklacesBloc>().add(FetchNecklacesEvent());
+                        // Notify the necklaces bloc to refresh
+                        context.read<NecklacesBloc>().add(FetchNecklacesEvent());
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Connected to ${device.name}')),
-                      );
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error updating device: $e')),
-                      );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Connected to ${device.name}')),
+                        );
                     }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error updating device: $e')),
+                    );
                   }
                 });
               },
@@ -554,6 +579,13 @@ class _SettingsContentState extends State<SettingsContent> {
 
     if (confirm == true) {
       try {
+        // First disconnect from the BLE device if it exists
+        if (state.necklace.bleDevice != null) {
+          context.read<BleBloc>().add(
+            BleDisconnectRequest(state.necklace.bleDevice!.id),
+          );
+        }
+
         context.read<SettingsBloc>().add(ArchiveNecklace(state.necklace.id));
         // Refresh the necklaces list
         context.read<NecklacesBloc>().add(FetchNecklacesEvent());

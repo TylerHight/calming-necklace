@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../../data/models/ble_device.dart';
-import '../../data/models/necklace.dart';
 import '../logging_service.dart';
 import 'managers/ble_connection_manager.dart';
 import 'ble_types.dart';
 import 'ble_commands.dart';
 import '../../../core/utils/ble/ble_utils.dart';
-import 'package:flutter/material.dart';
 import '../../../core/data/constants/ble_constants.dart';
 
 class BleService {
@@ -154,42 +152,52 @@ class BleService {
     }
   }
 
-  Future<void> _initializeCharacteristics(BluetoothDevice device, {bool forceRediscovery = false}) async {
-    if (_isInitialized && !forceRediscovery) return;
+  Future<List<BleServiceInfo>> _initializeCharacteristics(BluetoothDevice device, {bool forceRediscovery = false}) async {
+    if (_isInitialized && !forceRediscovery) return [];
 
     try {
       _logger.logBleInfo('Starting service and characteristic discovery for device: ${device.id}');
       final services = await device.discoverServices();
       _logger.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
 
+      List<BleServiceInfo> discoveredServices = [];
+
       for (var service in services) {
         _logger.logBleDebug('Service UUID: ${service.uuid}');
-        _logger.logBleDebug('Characteristics:');
+        List<BleCharacteristicInfo> characteristics = [];
+
         for (var char in service.characteristics) {
-          _logger.logBleDebug('  - ${char.uuid}');
+          characteristics.add(BleCharacteristicInfo(
+            uuid: char.uuid.toString(),
+            properties: [
+              if (char.properties.read) 'read',
+              if (char.properties.write) 'write',
+              if (char.properties.notify) 'notify',
+              if (char.properties.indicate) 'indicate',
+            ],
+          ));
         }
+
+        discoveredServices.add(BleServiceInfo(
+          uuid: service.uuid.toString(),
+          characteristics: characteristics,
+        ));
       }
 
-      final ledService = services.firstWhere(
-            (s) => s.uuid.toString().toLowerCase() == BleConstants.LED_SERVICE_UUID,
-        orElse: () => throw BleException('LED service not found'),
+      // Update the BleDevice model with discovered services
+      final bleDevice = BleDevice(
+        id: device.id.id,
+        name: device.name,
+        address: device.id.id,
+        rssi: 0, // Update with actual RSSI if available
+        deviceType: BleDeviceType.necklace, // Update with actual type if available
+        services: discoveredServices,
       );
-
-      _logger.logBleDebug('Found LED service: ${ledService.uuid}');
-
-      _switchCharacteristic = ledService.characteristics.firstWhere(
-            (c) => c.uuid.toString().toLowerCase().contains(BleConstants.switchCharacteristicUuid),
-        orElse: () => throw BleException('Switch characteristic not found'),
-      );
-
-      _logger.logBleDebug('Found switch characteristic: ${_switchCharacteristic!.uuid}');
-
-      if (!_switchCharacteristic!.properties.write) {
-        throw BleException('Characteristic does not support write operations');
-      }
 
       _isInitialized = true;
       _logger.logBleInfo('Service and characteristic discovery completed for device: ${device.id}');
+
+      return discoveredServices;
     } catch (e) {
       _logger.logBleError('Error initializing characteristics for device: ${device.id}', e);
       rethrow;
@@ -334,7 +342,7 @@ class BleService {
     await connectToDevice(monitor);
   }
 
-  Future<void> forgetDevice(String deviceId) async {
+  Future<void> forgetDevice(String device_id) async {
     await disconnectFromDevice();
   }
 

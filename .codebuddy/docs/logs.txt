@@ -1,0 +1,419 @@
+Launching lib\main.dart on Pixel 3a in debug mode...
+Running Gradle task 'assembleDebug'...
+I/flutter (22912): 02:07:19 ! [logging_service] 🔵 🔵 Device Calming Necklace disconnected unexpectedly
+I/flutter (22912): 02:07:19 ! [logging_service] 🔵 🔵 Device Calming Necklace disconnected unexpectedly
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...
+I/flutter (24151): [INFO:flutter/shell/platform/android/android_context_vk_impeller.cc(64)] Known bad Vulkan driver encountered, falling back to OpenGLES.
+Debug service listening on ws://127.0.0.1:65486/RfR3IB7vRDg=/ws
+Syncing files to device Pixel 3a...
+I/flutter (24151): Initializing logging service...
+I/flutter (24151): 02:07:31 📘 [logging_service] ℹ️ Logging service initialized successfully
+I/flutter (24151): 02:07:31 📘 [main] ℹ️ Application starting...
+I/flutter (24151): 02:07:31 🔍 [main] 🔍 Initializing core services...
+I/flutter (24151): Initializing BLE Service
+I/flutter (24151): 02:07:32 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (24151): 02:07:32 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (24151): 02:07:33 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesInitial(), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter (24151): 02:07:33 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesInitial(), nextState: NecklacesLoading() }
+I/Gralloc4(24151): mapper 4.x is not supported
+W/Gralloc3(24151): mapper 3.x is not supported
+W/Gralloc4(24151): allocator 4.x is not supported
+W/Gralloc3(24151): allocator 3.x is not supported
+I/flutter (24151): 02:07:34 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([]) }
+I/flutter (24151): 02:07:34 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([]) }
+D/ProfileInstaller(24151): Installing profile for com.example.calming_necklace
+D/InputMethodManager(24151): showSoftInput() view=io.flutter.embedding.android.FlutterView{b09dd06 VFE...... .F....ID 0,0-1080,2088 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+D/InputConnectionAdaptor(24151): The input method toggled cursor monitoring on
+D/InsetsController(24151): show(ime(), fromIme=true)
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Event: StartScanning()
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: DeviceSelectorState([], null, false, true, null), event: StartScanning(), nextState: DeviceSelectorState([], null, true, false, null) }
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: DeviceSelectorState([], null, false, true, null), nextState: DeviceSelectorState([], null, true, false, null) }
+I/flutter (24151): 02:10:10 🔍 [device_selector_bloc] 🔍 Starting BLE scan for devices
+I/flutter (24151): 02:10:10 🔍 [ble_repository] 🔍 Starting Bluetooth Low Energy scan
+D/InputConnectionAdaptor(24151): The input method toggled cursor monitoring off
+D/[FBP-Android](24151): [FBP] onMethodCall: flutterRestart
+D/[FBP-Android](24151): [FBP] initializing BluetoothAdapter
+D/[FBP-Android](24151): [FBP] disconnectAllDevices(flutterRestart)
+D/[FBP-Android](24151): [FBP] connectedPeripherals: 0
+I/alming_necklac(24151): Compiler allocated 5471KB to compile void com.lib.flutter_blue_plus.FlutterBluePlusPlugin.onMethodCall(io.flutter.plugin.common.MethodCall, io.flutter.plugin.common.MethodChannel$Result)
+D/[FBP-Android](24151): [FBP] onMethodCall: turnOn
+I/flutter (24151): 02:10:10 🔍 [ble_repository] 🔍 Cleared discovered devices
+D/[FBP-Android](24151): [FBP] onMethodCall: startScan
+D/BluetoothAdapter(24151): isLeEnabled(): ON
+D/BluetoothLeScanner(24151): onScannerRegistered() - status=0 scannerId=13 mScannerId=0
+I/flutter (24151): 02:10:10 🔍 [device_selector_bloc] 🔍 Setting up auto-stop timer for scan
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, [])])
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: DeviceSelectorState([], null, true, false, null), event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, [])]), nextState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, [])], null, true, false, null) }
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: DeviceSelectorState([], null, true, false, null), nextState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, [])], null, true, false, null) }
+I/flutter (24151): 02:10:10 🔍 [app_bloc_observer] 🔍 Event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, [])])
+I/flutter (24151): 02:10:11 🔍 [app_bloc_observer] 🔍 Event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])])
+I/flutter (24151): 02:10:11 🔍 [app_bloc_observer] 🔍 Event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, [])])
+I/flutter (24151): 02:10:11 🔍 [app_bloc_observer] 🔍 Event: DevicesUpdated([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, []), BleDevice(DE:2B:04:37:8E:F7, H96, DE:2B:04:37:8E:F7, -54, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: DE:2B:04:37:8E:F7, platformName: H96, services: null}, [])])
+D/[FBP-Android](24151): [FBP] onMethodCall: stopScan
+D/BluetoothAdapter(24151): isLeEnabled(): ON
+I/flutter (24151): 02:10:20 🔍 [app_bloc_observer] 🔍 Event: StopScanning()
+I/flutter (24151): [FBP] stopScan: already stopped
+I/flutter (24151): 02:10:20 🔍 [ble_repository] 🔍 Stopped Bluetooth Low Energy scan
+I/flutter (24151): 02:10:20 🔍 [device_selector_bloc] 🔍 Stopped BLE scan
+I/flutter (24151): 02:10:20 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, []), BleDevice(DE:2B:04:37:8E:F7, H96, DE:2B:04:37:8E:F7, -54, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: DE:2B:04:37:8E:F7, platformName: H96, services: null
+I/flutter (24151): 02:10:20 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, []), BleDevice(DE:2B:04:37:8E:F7, H96, DE:2B:04:37:8E:F7, -54, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: DE:2B:04:37:8E:F7, platformName: H96, services: null}, [])],
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Event: SelectDevice(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []))
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []))
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, []), BleDevice(DE:2B:04:37:8E:F7, H96, DE:2B:04:37:8E:F7, -54, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: DE:2B:04:37:8E:F7, platformName: H96, services: null
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: DeviceSelectorState([BleDevice(A4:C1:38:D0:F3:66, Minger_H6001_F366, A4:C1:38:D0:F3:66, -67, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: A4:C1:38:D0:F3:66, platformName: Minger_H6001_F366, services: null}, []), BleDevice(50:14:79:B8:09:16, j755020, 50:14:79:B8:09:16, -88, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 50:14:79:B8:09:16, platformName: j755020, services: null}, []), BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []), BleDevice(02:00:74:01:0C:A4, M4, 02:00:74:01:0C:A4, -49, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: 02:00:74:01:0C:A4, platformName: M4, services: null}, []), BleDevice(DE:2B:04:37:8E:F7, H96, DE:2B:04:37:8E:F7, -54, BleDeviceType.heartRateMonitor, BluetoothDevice{remoteId: DE:2B:04:37:8E:F7, platformName: H96, services: null}, [])],
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []))
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: BleState({}, {}, {}, {}, null, false, initial, 0, null, false), event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])), nextState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false) }
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, false, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false) }
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Attempting to connect and initialize device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Attempting to connect to Calming Necklace
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Starting connection attempt to Calming Necklace
+I/flutter (24151): 02:10:22 🔍 [logging_service] 🔍 🔵 Connection attempt 1 of 5
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: BleState({}, {}, {}, {}, null, false, initial, 0, null, false), event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])), nextState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false) }
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, false, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false) }
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Attempting to connect and initialize device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Attempting to connect to Calming Necklace
+I/flutter (24151): 02:10:22 📘 [logging_service] ℹ️ 🔵 Starting connection attempt to Calming Necklace
+I/flutter (24151): 02:10:22 🔍 [logging_service] 🔍 🔵 Connection attempt 1 of 5
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, Connecting..., 0, null, false) }
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, Connecting..., 0, null, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: connect
+D/BluetoothGatt(24151): connect() - device: D4:25:CB:B4:D0:52, auto: false
+D/BluetoothGatt(24151): registerApp()
+D/BluetoothGatt(24151): registerApp() - UUID=4b6e8a6d-e3d0-453b-b3f1-97b8edbb2d19
+D/BluetoothGatt(24151): onClientRegistered() - status=0 clientIf=13
+D/[FBP-Android](24151): [FBP] onMethodCall: getAdapterState
+I/flutter (24151): 02:10:22 🔍 [app_bloc_observer] 🔍 Event: StopScanning()
+I/flutter (24151): [FBP] stopScan: already stopped
+I/flutter (24151): 02:10:22 🔍 [ble_repository] 🔍 Stopped Bluetooth Low Energy scan
+I/flutter (24151): 02:10:22 🔍 [device_selector_bloc] 🔍 Stopped BLE scan
+D/BluetoothGatt(24151): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onConnectionStateChange:connected
+D/[FBP-Android](24151): [FBP]   status: SUCCESS
+I/flutter (24151): 02:10:23 🔍 [logging_service] 🔍 🔵 Waiting for connection stabilization
+D/[FBP-Android](24151): [FBP] onMethodCall: connect
+D/[FBP-Android](24151): [FBP] already connected
+I/flutter (24151): 02:10:23 🔍 [logging_service] 🔍 🔵 Waiting for connection stabilization
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Event: SelectDeviceEvent(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []))
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: AddDeviceDialogInitial(), event: SelectDeviceEvent(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])), nextState: ConnectionInProgress(Calming Necklace) }
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: AddDeviceDialogInitial(), nextState: ConnectionInProgress(Calming Necklace) }
+D/InputMethodManager(24151): showSoftInput() view=io.flutter.embedding.android.FlutterView{b09dd06 VFE...... .F...... 0,0-1080,2088 #1 aid=1073741824} flags=0 reason=SHOW_SOFT_INPUT
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, []))
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: ConnectionInProgress(Calming Necklace), event: SelectDeviceEvent(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])), nextState: DeviceSelected(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])) }
+I/flutter (24151): 02:10:23 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: ConnectionInProgress(Calming Necklace), nextState: DeviceSelected(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: null}, [])) }
+D/InputConnectionAdaptor(24151): The input method toggled cursor monitoring on
+D/InsetsController(24151): show(ime(), fromIme=true)
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=6 latency=0 timeout=500 status=0
+I/flutter (24151): 02:10:23 📘 [logging_service] ℹ️ 🔵 Successfully connected to Calming Necklace
+I/flutter (24151): 02:10:23 🔍 [logging_service] 🔍 🔵 Setting up connection monitoring
+I/flutter (24151): 02:10:23 📘 [logging_service] ℹ️ 🔵 Successfully connected to Calming Necklace
+I/flutter (24151): 02:10:23 🔍 [logging_service] 🔍 🔵 Setting up connection monitoring
+I/flutter (24151): 02:10:23 🔍 [logging_service] 🔍 🔵 Connection state changed: BluetoothConnectionState.connected
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=36 latency=0 timeout=500 status=0
+D/[FBP-Android](24151): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(24151): setCharacteristicNotification() - uuid: 00002a05-0000-1000-8000-00805f9b34fb enable: true
+D/[FBP-Android](24151): [FBP] onDescriptorWrite:
+D/[FBP-Android](24151): [FBP]   chr: 2a05
+D/[FBP-Android](24151): [FBP]   desc: 2902
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](24151): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(24151): setCharacteristicNotification() - uuid: 00002a05-0000-1000-8000-00805f9b34fb enable: true
+D/[FBP-Android](24151): [FBP] onDescriptorWrite:
+D/[FBP-Android](24151): [FBP]   chr: 2a05
+D/[FBP-Android](24151): [FBP]   desc: 2902
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](24151): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(24151): setCharacteristicNotification() - uuid: 00002a3b-0000-1000-8000-00805f9b34fb enable: true
+I/flutter (24151): 02:10:24 🔍 [app_bloc_observer] 🔍 Event: SubmitAddDeviceEvent(tyui, BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: Instance of 'BmDiscoverServicesResult'}, []))
+I/flutter (24151): 02:10:24 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: AddDeviceDialogInitial(), event: SubmitAddDeviceEvent(tyui, BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: Instance of 'BmDiscoverServicesResult'}, [])), nextState: AddDeviceDialogLoading() }
+I/flutter (24151): 02:10:24 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: AddDeviceDialogInitial(), nextState: AddDeviceDialogLoading() }
+D/[FBP-Android](24151): [FBP] onDescriptorWrite:
+D/[FBP-Android](24151): [FBP]   chr: 2a3b
+D/[FBP-Android](24151): [FBP]   desc: 2902
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:24 📘 [logging_service] ℹ️ 🔵 Starting connection maintenance for Calming Necklace
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Successfully connected to Calming Necklace
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Starting service and characteristic discovery for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, true, Connecting..., 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connecting..., 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, true, Connecting..., 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connecting..., 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connecting..., 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connecting..., 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: setNotifyValue
+D/BluetoothGatt(24151): setCharacteristicNotification() - uuid: 00002a3b-0000-1000-8000-00805f9b34fb enable: true
+I/flutter (24151): 02:10:25 📘 [necklace_repository] ℹ️ Successfully added necklace: tyui with Bluetooth Low Energy device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: AddDeviceDialogLoading(), event: SubmitAddDeviceEvent(tyui, BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: Instance of 'BmDiscoverServicesResult'}, [])), nextState: AddDeviceDialogSuccess() }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: AddDeviceDialogLoading(), nextState: AddDeviceDialogSuccess() }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoaded([]), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoaded([]), nextState: NecklacesLoading() }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)]) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)]) }
+D/InputConnectionAdaptor(24151): The input method toggled cursor monitoring off
+D/[FBP-Android](24151): [FBP] onDescriptorWrite:
+D/[FBP-Android](24151): [FBP]   chr: 2a3b
+D/[FBP-Android](24151): [FBP]   desc: 2902
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:25 🔍 [timed_toggle_button_bloc] 🔍 Initializing TimedToggleButtonBloc with necklace state: false
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: TimedToggleButtonInitial(), nextState: TimedToggleButtonInitialized() }
+I/flutter (24151): 02:10:25 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Starting connection maintenance for Calming Necklace
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Successfully connected to Calming Necklace
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Starting service and characteristic discovery for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connected, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connected, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connection unstable, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Service and characteristic discovery completed for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Successfully connected and initialized device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false), event: BleConnectRequest(BleDevice(D4:25:CB:B4:D0:52, Calming Necklace, D4:25:CB:B4:D0:52, -50, BleDeviceType.necklace, BluetoothDevice{remoteId: D4:25:CB:B4:D0:52, platformName: Calming Necklace, services: Instance of 'BmDiscoverServicesResult'}, [])), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, null, false) }
+I/flutter (24151): 02:10:25 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, true, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, null, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+I/flutter (24151): 02:10:25 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:25 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Service and characteristic discovery completed for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:25 📘 [logging_service] ℹ️ 🔵 Successfully connected and initialized device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Event: ToggleLightLoadingEvent()
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: TimedToggleButtonInitialized(), event: ToggleLightLoadingEvent(), nextState: TimedToggleButtonLoading() }
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: TimedToggleButtonInitialized(), nextState: TimedToggleButtonLoading() }
+I/flutter (24151): 02:10:29 📘 [logging_service] ℹ️ 🔵 LED control request: ON
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Event: BleLedControlRequest(D4:25:CB:B4:D0:52, true)
+I/flutter (24151): 02:10:29 📘 [logging_service] ℹ️ 🔵 LED control request: ON
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Sending setLedState command: ON
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Connection state before command: true
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Sending setLedState command: ON
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Connection state before command: true
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Writing command: 1 with value: 0
+I/flutter (24151): 02:10:29 ! [ble_service] 🔵 Command execution failed, attempt 1 of 3
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 Writing command: 1 with value: 0
+I/flutter (24151): 02:10:29 ! [ble_service] 🔵 Command debounced - too soon after last command
+I/flutter (24151): 02:10:29 🔍 [ble_service] 🔍 LED state command sent successfully
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, null, false), event: BleLedControlRequest(D4:25:CB:B4:D0:52, true), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, LED ON, false) }
+I/flutter (24151): 02:10:29 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, null, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, LED ON, false) }
+I/flutter (24151): 02:10:29 ! [ble_service] 🔵 Command execution failed, attempt 2 of 3
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -52
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:30 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, 0, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -52, LED ON, false) }
+I/flutter (24151): 02:10:30 ! [ble_service] 🔵 Command execution failed, attempt 3 of 3
+I/flutter (24151): 02:10:30 🚨 [logging_service] ❌ 🔵 Failed to set LED state: Null check operator used on a null value - Attempting recovery  ERROR: Null check operator used on a null value
+I/flutter (24151): 02:10:30 📘 [logging_service] ℹ️ 🔵 Command recovery attempt 1 of 3
+I/flutter (24151): 02:10:30 📘 [logging_service] ℹ️ 🔵 Starting service and characteristic discovery for device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+I/flutter (24151): 02:10:30 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:30 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter (24151): 02:10:30 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter (24151): 02:10:30 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:30 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:30 📘 [logging_service] ℹ️ 🔵 Service and characteristic discovery completed for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:30 🔍 [ble_service] 🔍 Writing command: 1 with value: 0
+I/flutter (24151): 02:10:30 ! [ble_service] 🔵 Command execution failed, attempt 1 of 3
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -53
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:30 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -52, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -53, LED ON, false) }
+I/flutter (24151): 02:10:30 ! [ble_service] 🔵 Command execution failed, attempt 2 of 3
+I/flutter (24151): 02:10:30 ! [ble_service] 🔵 Command execution failed, attempt 3 of 3
+I/flutter (24151): 02:10:30 🚨 [logging_service] ❌ 🔵 Recovery attempt 1 failed  ERROR: Null check operator used on a null value
+I/flutter (24151): 02:10:31 📘 [logging_service] ℹ️ 🔵 Command recovery attempt 2 of 3
+I/flutter (24151): 02:10:31 📘 [logging_service] ℹ️ 🔵 Starting service and characteristic discovery for device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+I/flutter (24151): 02:10:31 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:31 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter (24151): 02:10:31 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter (24151): 02:10:31 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:31 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:31 📘 [logging_service] ℹ️ 🔵 Service and characteristic discovery completed for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:31 🔍 [ble_service] 🔍 Writing command: 1 with value: 0
+I/flutter (24151): 02:10:31 ! [ble_service] 🔵 Command execution failed, attempt 1 of 3
+I/flutter (24151): 02:10:31 ! [ble_service] 🔵 Command execution failed, attempt 2 of 3
+I/flutter (24151): 02:10:32 ! [ble_service] 🔵 Command execution failed, attempt 3 of 3
+I/flutter (24151): 02:10:32 🚨 [logging_service] ❌ 🔵 Recovery attempt 2 failed  ERROR: Null check operator used on a null value
+I/flutter (24151): 02:10:33 📘 [logging_service] ℹ️ 🔵 Command recovery attempt 3 of 3
+I/flutter (24151): 02:10:33 📘 [logging_service] ℹ️ 🔵 Starting service and characteristic discovery for device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onMethodCall: discoverServices
+D/BluetoothGatt(24151): discoverServices() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
+D/[FBP-Android](24151): [FBP] onServicesDiscovered:
+D/[FBP-Android](24151): [FBP]   count: 4
+D/[FBP-Android](24151): [FBP]   status: 0GATT_SUCCESS
+I/flutter (24151): 02:10:33 🔍 [logging_service] 🔍 🔵 Discovered 4 services for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:33 🔍 [logging_service] 🔍 🔵 Service UUID: 1800
+I/flutter (24151): 02:10:33 🔍 [logging_service] 🔍 🔵 Service UUID: 1801
+I/flutter (24151): 02:10:33 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:33 🔍 [logging_service] 🔍 🔵 Service UUID: 19b10000-e8f2-537e-4f6c-d104768a1214
+I/flutter (24151): 02:10:33 📘 [logging_service] ℹ️ 🔵 Service and characteristic discovery completed for device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:10:33 🔍 [ble_service] 🔍 Writing command: 1 with value: 0
+I/flutter (24151): 02:10:33 ! [ble_service] 🔵 Command execution failed, attempt 1 of 3
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:34 ! [ble_service] 🔵 Command execution failed, attempt 2 of 3
+I/flutter (24151): 02:10:34 ! [ble_service] 🔵 Command execution failed, attempt 3 of 3
+I/flutter (24151): 02:10:34 🚨 [logging_service] ❌ 🔵 Recovery attempt 3 failed  ERROR: Null check operator used on a null value
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:35 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -53, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -54, LED ON, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:35 🚨 [logging_service] ❌ 🔵 LED control error  ERROR: BleException: Command recovery failed after 3 attempts
+I/flutter (24151): 02:10:35 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, LED control error: BleException: Command recovery failed after 3 attempts, false, Connected, -54, LED ON, false) }
+I/flutter (24151): 02:10:35 🔍 [app_bloc_observer] 🔍 Event: ToggleLightErrorEvent(Exception: Failed to toggle light)
+I/flutter (24151): 02:10:35 🚨 [timed_toggle_button_bloc] ❌ Toggle light error: Exception: Failed to toggle light
+I/flutter (24151): 02:10:35 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: TimedToggleButtonLoading(), event: ToggleLightErrorEvent(Exception: Failed to toggle light), nextState: TimedToggleButtonError(Exception: Failed to toggle light) }
+I/flutter (24151): 02:10:35 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: TimedToggleButtonLoading(), nextState: TimedToggleButtonError(Exception: Failed to toggle light) }
+I/flutter (24151): 02:10:35 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:40 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, LED control error: BleException: Command recovery failed after 3 attempts, false, Connected, -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -54, LED ON, false) }
+I/flutter (24151): 02:10:40 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft:
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Event: RefreshSettings(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60))
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), event: RefreshSettings(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null) }
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null) }
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Event: RefreshSettings(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60))
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), event: RefreshSettings(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null) }
+I/flutter (24151): 02:10:44 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null) }
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+D/BluetoothGatt(24151): readRssi() - device: D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onReadRemoteRssi:
+D/[FBP-Android](24151): [FBP]   rssi: -54
+D/[FBP-Android](24151): [FBP]   status: GATT_SUCCESS (0)
+I/flutter (24151): 02:11:18 🔍 [app_bloc_observer] 🔍 Event: BleDisconnectRequest(D4:25:CB:B4:D0:52)
+I/flutter (24151): 02:11:29 🔍 [app_bloc_observer] 🔍 Event: ArchiveNecklace()
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (24151): 02:12:08 📘 [logging_service] ℹ️ 🔵 Attempting to disconnect from device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), event: ArchiveNecklace(), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), true, false, null) }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), false, false, null), nextState: SettingsState(Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60), true, false, null) }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoaded([Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)]), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoaded([Necklace(2025-02-25 02:10:24.940056, tyui, BleDevice(D4:25:CB:B4:D0:52, Default Name, 00:00:00:00:00:00, 0, BleDeviceType.necklace, null, []), null, false, 0:00:03.000000, 0:00:20.000000, false, false, false, false, false, null, false, 120, 60)]), nextState: NecklacesLoading() }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: true}, {}, {}, {}, null, false, Connected, -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Connected, -54, LED ON, false) }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Connected, -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Disconnecting..., -54, LED ON, false) }
+I/flutter (24151): 02:12:08 🔍 [database_service] 🔍 Archiving necklace with id: 2025-02-25 02:10:24.940056
+D/[FBP-Android](24151): [FBP] onMethodCall: disconnect
+D/BluetoothGatt(24151): cancelOpen() - device: D4:25:CB:B4:D0:52
+D/BluetoothGatt(24151): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onConnectionStateChange:disconnected
+D/[FBP-Android](24151): [FBP]   status: SUCCESS
+D/BluetoothGatt(24151): close()
+D/BluetoothGatt(24151): unregisterApp() - mClientIf=13
+I/flutter (24151): 02:12:08 🔍 [logging_service] 🔍 🔵 Connection state changed: BluetoothConnectionState.disconnected
+I/flutter (24151): 02:12:08 ! [logging_service] 🔵 🔵 Device disconnected in monitoring
+I/flutter (24151): 02:12:08 ! [logging_service] 🔵 🔵 Device Calming Necklace disconnected unexpectedly
+I/flutter (24151): 02:12:08 📘 [logging_service] ℹ️ 🔵 Attempting reconnection 1/5
+I/flutter (24151): 02:12:08 📘 [logging_service] ℹ️ 🔵 Successfully disconnected from device: D4:25:CB:B4:D0:52
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Disconnecting..., -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Disconnected, -54, LED ON, false) }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Disconnected, -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Connecting..., -54, LED ON, false) }
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Connecting..., -54, LED ON, false), nextState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {}, null, false, Disconnected, -54, LED ON, false) }
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+I/flutter (24151): 02:12:08 🚨 [logging_service] ❌ 🔵 Failed to read RSSI  ERROR: PlatformException(readRssi, device is disconnected, null, null)
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+I/flutter (24151): 02:12:08 🚨 [logging_service] ❌ 🔵 Failed to read RSSI  ERROR: PlatformException(readRssi, device is disconnected, null, null)
+D/[FBP-Android](24151): [FBP] onMethodCall: readRssi
+I/flutter (24151): 02:12:08 📘 [necklace_repository] ℹ️ Successfully archived necklace with id: 2025-02-25 02:10:24.940056
+D/[FBP-Android](24151): [FBP] onMethodCall: connect
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([]) }
+D/BluetoothGatt(24151): connect() - device: D4:25:CB:B4:D0:52, auto: true
+D/BluetoothGatt(24151): registerApp()
+I/flutter (24151): 02:12:08 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([]) }
+D/BluetoothGatt(24151): registerApp() - UUID=24b500de-dddd-4e5b-970f-81425bada336
+D/BluetoothGatt(24151): onClientRegistered() - status=0 clientIf=13
+D/BluetoothGatt(24151): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onConnectionStateChange:connected
+D/[FBP-Android](24151): [FBP]   status: SUCCESS
+I/flutter (24151): 02:12:08 🚨 [logging_service] ❌ 🔵 Reconnection attempt 1 failed  ERROR: Null check operator used on a null value
+I/flutter (24151):   #0      BleConnectionManager._handleDisconnection (package:calming_necklace/core/services/ble/managers/ble_connection_manager.dart:160:49)
+I/flutter (24151):   <asynchronous suspension>
+I/flutter (24151):
+I/flutter (24151): 02:12:08 📘 [logging_service] ℹ️ 🔵 Waiting 2s before next attempt
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=6 latency=0 timeout=500 status=0
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=36 latency=0 timeout=500 status=0
+D/BluetoothGatt(24151): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onConnectionStateChange:disconnected
+D/[FBP-Android](24151): [FBP]   status: SUCCESS
+D/[FBP-Android](24151): [FBP] autoconnect is true. skipping gatt.close()
+I/flutter (24151): 02:12:22 ! [logging_service] 🔵 🔵 Device Calming Necklace disconnected unexpectedly
+I/flutter (24151): 02:12:22 ! [logging_service] 🔵 🔵 Device Calming Necklace disconnected unexpectedly
+D/BluetoothGatt(24151): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](24151): [FBP] onConnectionStateChange:connected
+D/[FBP-Android](24151): [FBP]   status: SUCCESS
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=6 latency=0 timeout=500 status=0
+D/BluetoothGatt(24151): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=36 latency=0 timeout=500 status=0
