@@ -12,7 +12,8 @@ import '../../../core/ui/ui_constants.dart';
 import 'device_selector.dart';
 
 class DeviceSelectorDialog extends StatelessWidget {
-  const DeviceSelectorDialog({Key? key}) : super(key: key);
+  final BleDeviceType deviceType;
+  const DeviceSelectorDialog({Key? key, required this.deviceType}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,13 +31,17 @@ class DeviceSelectorDialog extends StatelessWidget {
           horizontal: UIConstants.deviceSelectorDialogPadding,
           vertical: UIConstants.deviceSelectorDialogVerticalPadding,
         ),
-        child: _DialogContent(),
+        child: _DialogContent(deviceType: deviceType),
       ),
     );
   }
 }
 
 class _DialogContent extends StatelessWidget {
+  final BleDeviceType deviceType;
+
+  const _DialogContent({Key? key, required this.deviceType}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -49,9 +54,11 @@ class _DialogContent extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: const Text(
-                  'Select Device',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                child: Text(
+                  deviceType == BleDeviceType.necklace
+                    ? 'Select Necklace'
+                    : 'Select Monitor',
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
               ),
               BlocBuilder<DeviceSelectorBloc, DeviceSelectorState>(
@@ -74,15 +81,15 @@ class _DialogContent extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text('Connecting...'),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 16),
+                      const Text('Connecting...'),
                     ],
                   ),
                 );
               } else {
                 return DeviceSelector(
-                  deviceType: BleDeviceType.necklace,
+                  deviceType: deviceType,
                   onDeviceSelected: (device) {
                     context.read<BleBloc>().add(BleConnectRequest(device));
                   },
@@ -99,7 +106,7 @@ class _DialogContent extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   bleState.error ?? 'Unknown error',
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             }

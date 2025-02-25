@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:calming_necklace/core/data/models/ble_device.dart';
+import 'package:calming_necklace/core/services/ble/ble_types.dart';
 import 'package:calming_necklace/core/ui/components/signal_strength_icon.dart';
 import 'package:calming_necklace/core/ui/ui_constants.dart';
 import '../blocs/device_selector/device_selector_bloc.dart';
@@ -45,6 +46,16 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     super.dispose();
   }
 
+  bool _isDeviceTypeMatch(BleDevice device) {
+    if (widget.deviceType == BleDeviceType.necklace) {
+      return device.name.toLowerCase().contains('necklace') ||
+             device.name.toLowerCase().contains('calm');
+    } else {
+      return device.name.toLowerCase().contains('hr') ||
+             device.name.toLowerCase().contains('heart');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -71,7 +82,7 @@ class _DeviceSelectorState extends State<DeviceSelector> {
             ),
             const SizedBox(height: 8),
             const SizedBox(height: UIConstants.deviceSelectorDialogTitleSpacing),
-            if (state.devices.isEmpty && !state.isInitialLoading)
+            if (state.devices.where((device) => _isDeviceTypeMatch(device)).isEmpty && !state.isInitialLoading)
               Container(
                 padding: const EdgeInsets.all(16),
                 alignment: Alignment.center,
@@ -101,9 +112,12 @@ class _DeviceSelectorState extends State<DeviceSelector> {
                 child: ListView.builder(
                   shrinkWrap: true,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: state.devices.length,
+                  itemCount: state.devices
+                      .where((device) => _isDeviceTypeMatch(device)).length,
                   itemBuilder: (context, index) {
-                    final device = state.devices[index];
+                    final device = state.devices
+                        .where((device) => _isDeviceTypeMatch(device))
+                        .toList()[index];
                     return ListTile(
                       title: Text(
                         device.name,
