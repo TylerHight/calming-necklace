@@ -53,8 +53,9 @@ class BleDevice extends Equatable {
       'name': name,
       'address': address,
       'rssi': rssi,
-      'deviceType': deviceType.toString().split('.').last,
+      'deviceType': deviceType.toString().split('.').last.toLowerCase(),
       'services': services.map((service) => service.toMap()).toList(),
+      'device': null, // Ensure device field is explicitly null
     };
   }
 

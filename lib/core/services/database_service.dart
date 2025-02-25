@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/necklace.dart';
@@ -227,6 +228,17 @@ class DatabaseService {
 
   Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
     final db = await database;
+    // Ensure proper JSON encoding for device fields
+    if (settings.containsKey('heartRateMonitorDevice')) {
+      if (settings['heartRateMonitorDevice'] is Map) {
+        settings['heartRateMonitorDevice'] = jsonEncode(settings['heartRateMonitorDevice']);
+      }
+    }
+    if (settings.containsKey('bleDevice')) {
+      if (settings['bleDevice'] is Map) {
+        settings['bleDevice'] = jsonEncode(settings['bleDevice']);
+      }
+    }
     await db.update(
       'necklaces',
       settings,
@@ -234,7 +246,7 @@ class DatabaseService {
       whereArgs: [id],
     );
     _necklaceUpdateController.add(null);
-    _logger.logDebug('Updated necklace settings: $settings');
+    _logger.logDebug('Updated necklace settings for id: $id');
   }
 
   Future<Necklace?> getNecklaceById(String id) async {

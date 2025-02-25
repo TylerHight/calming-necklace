@@ -101,18 +101,12 @@ class Necklace extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'bleDevice': bleDevice != null ? 
-          jsonEncode({
-            ...bleDevice!.toMap(),
-            'device': null,
-            'deviceType': bleDevice!.deviceType.toString().split('.').last
-          }) : null,
-      'heartRateMonitorDevice': heartRateMonitorDevice != null ? 
-          jsonEncode({
-            ...heartRateMonitorDevice!.toMap(),
-            'device': null,
-            'deviceType': BleDeviceType.heartRateMonitor.toString().split('.').last
-          }) : null,
+      'bleDevice': bleDevice != null 
+          ? jsonEncode(bleDevice!.toMap())
+          : null,
+      'heartRateMonitorDevice': heartRateMonitorDevice != null 
+          ? jsonEncode(heartRateMonitorDevice!.toMap())
+          : null,
       'name': name,
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
@@ -133,9 +127,21 @@ class Necklace extends Equatable {
     BleDevice? parseDevice(dynamic deviceData) {
       if (deviceData == null) return null;
       try {
-        final Map<String, dynamic> deviceMap = deviceData is String ? 
-          jsonDecode(deviceData) as Map<String, dynamic> :
-          deviceData as Map<String, dynamic>;
+        Map<String, dynamic> deviceMap;
+        if (deviceData is String) {
+          deviceMap = jsonDecode(deviceData) as Map<String, dynamic>;
+        } else if (deviceData is Map) {
+          deviceMap = Map<String, dynamic>.from(deviceData);
+        } else {
+          LoggingService.instance.logError('Invalid device data format: $deviceData');
+          return null;
+        }
+        
+        // Ensure deviceType is properly formatted
+        if (deviceMap['deviceType'] != null) {
+          deviceMap['deviceType'] = deviceMap['deviceType'].toString().toLowerCase();
+        }
+        
         return BleDevice.fromMap(deviceMap);
       } catch (e) {
         LoggingService.instance.logError('Error parsing device data: $e');
