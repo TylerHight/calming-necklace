@@ -1,32 +1,20 @@
-D/BluetoothGatt(24666): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
-I/flutter (24666): 02:40:14 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([]) }
-D/[FBP-Android](24666): [FBP] onConnectionStateChange:connected
-D/[FBP-Android](24666): [FBP]   status: SUCCESS
-I/flutter (24666): 02:40:14 📘 [logging_service] ℹ️ 🔵 Reconnection successful
-I/flutter (24666): 02:40:14 🔍 [logging_service] 🔍 🔵 Setting up connection monitoring
-I/flutter (24666): 02:40:14 🔍 [logging_service] 🔍 🔵 Connection state changed: BluetoothConnectionState.connected
-D/[FBP-Android](24666): [FBP] onMethodCall: discoverServices
-D/BluetoothGatt(24666): discoverServices() - device: D4:25:CB:B4:D0:52
-D/BluetoothGatt(24666): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=6 latency=0 timeout=500 status=0
-I/flutter (24666): 02:40:14 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Connecting..., -53, LED ON, false), event: BleDisconnectRequest(D4:25:CB:B4:D0:52), nextState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Disconnected, -53, LED ON, false) }
-I/flutter (24666): 02:40:14 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({D4:25:CB:B4:D0:52: false}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Connecting..., -53, LED ON, false), nextState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Disconnected, -53, LED ON, false) }
-I/flutter (24666): 02:40:14 📘 [logging_service] ℹ️ 🔵 Successfully disconnected from device: D4:25:CB:B4:D0:52
-D/BluetoothGatt(24666): onSearchComplete() = Device=D4:25:CB:B4:D0:52 Status=0
-D/[FBP-Android](24666): [FBP] onServicesDiscovered:
-D/[FBP-Android](24666): [FBP]   count: 4
-D/[FBP-Android](24666): [FBP]   status: 0GATT_SUCCESS
-D/[FBP-Android](24666): [FBP] onMethodCall: setNotifyValue
-D/BluetoothGatt(24666): setCharacteristicNotification() - uuid: 00002a05-0000-1000-8000-00805f9b34fb enable: true
-D/[FBP-Android](24666): [FBP] onDescriptorWrite:
-D/[FBP-Android](24666): [FBP]   chr: 2a05
-D/[FBP-Android](24666): [FBP]   desc: 2902
-D/[FBP-Android](24666): [FBP]   status: GATT_SUCCESS (0)
-D/[FBP-Android](24666): [FBP] onMethodCall: setNotifyValue
-D/BluetoothGatt(24666): setCharacteristicNotification() - uuid: 00002a3b-0000-1000-8000-00805f9b34fb enable: true
-D/BluetoothGatt(24666): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=36 latency=0 timeout=500 status=0
-D/[FBP-Android](24666): [FBP] onDescriptorWrite:
-D/[FBP-Android](24666): [FBP]   chr: 2a3b
-D/[FBP-Android](24666): [FBP]   desc: 2902
-D/[FBP-Android](24666): [FBP]   status: GATT_SUCCESS (0)
-I/flutter (24666): 02:40:15 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Disconnected, -53, LED ON, false), nextState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Connected, -53, LED ON, false) }
-I/flutter (24666): 02:40:15 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Connected, -53, LED ON, false), nextState: BleState({}, {}, {}, {D4:25:CB:B4:D0:52: 1}, null, false, Connection unstable, -53, LED ON, false) }
+Performing hot restart...
+Syncing files to device Pixel 3a...
+D/[FBP-Android]( 7662): [FBP] onMethodCall: readRssi
+D/BluetoothGatt( 7662): readRssi() - device: 02:00:74:01:0C:A4
+D/[FBP-Android]( 7662): [FBP] onReadRemoteRssi:
+D/[FBP-Android]( 7662): [FBP]   rssi: -54
+D/[FBP-Android]( 7662): [FBP]   status: GATT_SUCCESS (0)
+Restarted application in 1,649ms.
+I/flutter ( 7662): Initializing logging service...
+I/flutter ( 7662): 15:02:34 📘 [logging_service] ℹ️ Logging service initialized successfully
+I/flutter ( 7662): 15:02:34 📘 [main] ℹ️ Application starting...
+I/flutter ( 7662): 15:02:34 🔍 [main] 🔍 Initializing core services...
+I/flutter ( 7662): Initializing BLE Service
+I/flutter ( 7662): 15:02:35 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter ( 7662): 15:02:35 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter ( 7662): 15:02:36 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesInitial(), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter ( 7662): 15:02:36 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesInitial(), nextState: NecklacesLoading() }
+I/flutter ( 7662): 15:02:37 🚨 [database_service] ❌ Error retrieving necklaces: FormatException: Unexpected character (at character 2)
+I/flutter ( 7662): {deviceType=BleDeviceType.heartRateMonitor, rssi=-79, address=02:00:74:01:0...
+I/flutter ( 7662):  ^

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'dart:convert';
+import '../../services/logging_service.dart';
 import 'ble_device.dart';
 
 class Necklace extends Equatable {
@@ -103,12 +104,14 @@ class Necklace extends Equatable {
       'bleDevice': bleDevice != null ? 
           jsonEncode({
             ...bleDevice!.toMap(),
-            'device': null
+            'device': null,
+            'deviceType': bleDevice!.deviceType.toString().split('.').last
           }) : null,
       'heartRateMonitorDevice': heartRateMonitorDevice != null ? 
           jsonEncode({
             ...heartRateMonitorDevice!.toMap(),
-            'device': null
+            'device': null,
+            'deviceType': BleDeviceType.heartRateMonitor.toString().split('.').last
           }) : null,
       'name': name,
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
@@ -127,20 +130,23 @@ class Necklace extends Equatable {
   }
 
   factory Necklace.fromMap(Map<String, dynamic> map) {
+    BleDevice? parseDevice(dynamic deviceData) {
+      if (deviceData == null) return null;
+      try {
+        final Map<String, dynamic> deviceMap = deviceData is String ? 
+          jsonDecode(deviceData) as Map<String, dynamic> :
+          deviceData as Map<String, dynamic>;
+        return BleDevice.fromMap(deviceMap);
+      } catch (e) {
+        LoggingService.instance.logError('Error parsing device data: $e');
+        return null;
+      }
+    }
+
     return Necklace(
       id: map['id'],
-      bleDevice: map['bleDevice'] != null ? 
-          BleDevice.fromMap(
-            map['bleDevice'] is String ? 
-              jsonDecode(map['bleDevice']) as Map<String, dynamic> :
-              map['bleDevice'] as Map<String, dynamic>
-          ) : null,
-      heartRateMonitorDevice: map['heartRateMonitorDevice'] != null ? 
-          BleDevice.fromMap(
-            map['heartRateMonitorDevice'] is String ? 
-              jsonDecode(map['heartRateMonitorDevice']) as Map<String, dynamic> :
-              map['heartRateMonitorDevice'] as Map<String, dynamic>
-          ) : null,
+      bleDevice: parseDevice(map['bleDevice']),
+      heartRateMonitorDevice: parseDevice(map['heartRateMonitorDevice']),
       name: map['name'],
       autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
       emission1Duration: Duration(seconds: map['emission1Duration']),
