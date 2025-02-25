@@ -28,13 +28,13 @@ enum BleDeviceType {
 }
 
 class BleDevice extends Equatable {
-  final String id;
+  final String id; // id that is unique to this ble device
   final String name;
   final String address;
   final int rssi;
   final BleDeviceType deviceType;
   final bool isConnected;
-  final String? necklaceId; // should be the same as the "id" field in the Necklace model
+  final String? necklaceId; // Foreign key: The necklace ID should be the same as the "id" field in the Necklace model
   final String? advertisedName;
   final BluetoothDevice? device;
 
