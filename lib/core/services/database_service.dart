@@ -27,7 +27,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -43,12 +43,13 @@ class DatabaseService {
       FOREIGN KEY (deviceId) REFERENCES necklaces(id)
     )
   ''');
-  
+
     await db.execute('''
     CREATE TABLE necklaces(
       id TEXT PRIMARY KEY,
       name TEXT,
       bleDevice TEXT,
+      heartRateMonitorDevice TEXT,
       emission1Duration INTEGER,
       releaseInterval1 INTEGER,
       periodicEmissionEnabled INTEGER,
@@ -126,6 +127,12 @@ class DatabaseService {
         ALTER TABLE necklaces
         ADD COLUMN lowHeartRateThreshold INTEGER DEFAULT 60
       ''');
+    }
+    if (oldVersion < 6) {
+      await db.execute('''
+      ALTER TABLE necklaces
+      ADD COLUMN heartRateMonitorDevice TEXT
+    ''');
     }
   }
 

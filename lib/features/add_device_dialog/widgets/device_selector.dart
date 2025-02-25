@@ -11,11 +11,13 @@ import '../blocs/device_selector/device_selector_state.dart';
 class DeviceSelector extends StatefulWidget {
   final BleDeviceType deviceType;
   final Function(BleDevice) onDeviceSelected;
+  final String? associatedNecklaceId;
 
   const DeviceSelector({
     super.key,
     required this.deviceType,
     required this.onDeviceSelected,
+    this.associatedNecklaceId,
   });
 
   @override
@@ -50,8 +52,10 @@ class _DeviceSelectorState extends State<DeviceSelector> {
     // Add filters for the results
     if (widget.deviceType == BleDeviceType.necklace) {
       return device.name.toLowerCase().contains('');
-    } else {
+    } else if (widget.deviceType == BleDeviceType.heartRateMonitor){
       return device.name.toLowerCase().contains('');
+    } else {
+      return true;
     }
   }
 

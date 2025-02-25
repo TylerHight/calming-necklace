@@ -6,6 +6,7 @@ class Necklace extends Equatable {
   final String id;
   final String name;
   final BleDevice? bleDevice;
+  final BleDevice? heartRateMonitorDevice;
   final bool autoTurnOffEnabled;
   final bool periodicEmissionEnabled;
   final bool isConnected;
@@ -22,16 +23,17 @@ class Necklace extends Equatable {
   Necklace({
     required this.id,
     required this.name,
-    this.bleDevice, // Update constructor
-    this.isLedOn = false, // Initialize isLedOn
-    this.isConnected = false, // Initialize isConnected
+    this.bleDevice,
+    this.heartRateMonitorDevice,
+    this.isLedOn = false,
+    this.isConnected = false,
     required this.emission1Duration,
     required this.releaseInterval1,
     this.autoTurnOffEnabled = false,
     this.periodicEmissionEnabled = false,
     this.isRelease1Active = false,
     this.isArchived = false,
-    this.lastLEDStateChange, // Initialize lastLEDStateChange
+    this.lastLEDStateChange,
     this.isHeartRateBasedReleaseEnabled = false,
     this.highHeartRateThreshold = 120,
     this.lowHeartRateThreshold = 60,
@@ -40,16 +42,17 @@ class Necklace extends Equatable {
   Necklace copyWith({
     String? id,
     String? name,
-    BleDevice? bleDevice, // Update copyWith method
+    BleDevice? bleDevice,
+    BleDevice? heartRateMonitorDevice,
     Duration? emission1Duration,
     Duration? releaseInterval1,
     bool? autoTurnOffEnabled,
     bool? periodicEmissionEnabled,
     bool? isRelease1Active,
     bool? isArchived,
-    bool? isLedOn, // Update copyWith method
-    bool? isConnected, // Update copyWith method
-    DateTime? lastLEDStateChange, // Update copyWith method
+    bool? isLedOn,
+    bool? isConnected,
+    DateTime? lastLEDStateChange,
     bool? isHeartRateBasedReleaseEnabled,
     int? highHeartRateThreshold,
     int? lowHeartRateThreshold,
@@ -57,16 +60,17 @@ class Necklace extends Equatable {
     return Necklace(
       id: id ?? this.id,
       name: name ?? this.name,
-      isLedOn: isLedOn ?? this.isLedOn, // Update copyWith method
-      isConnected: isConnected ?? this.isConnected, // Update copyWith method
-      bleDevice: bleDevice ?? this.bleDevice, // Update copyWith method
+      isLedOn: isLedOn ?? this.isLedOn,
+      isConnected: isConnected ?? this.isConnected,
+      bleDevice: bleDevice ?? this.bleDevice,
+      heartRateMonitorDevice: heartRateMonitorDevice ?? this.heartRateMonitorDevice,
       emission1Duration: emission1Duration ?? this.emission1Duration,
       releaseInterval1: releaseInterval1 ?? this.releaseInterval1,
       autoTurnOffEnabled: autoTurnOffEnabled ?? this.autoTurnOffEnabled,
       periodicEmissionEnabled: periodicEmissionEnabled ?? this.periodicEmissionEnabled,
       isRelease1Active: isRelease1Active ?? this.isRelease1Active,
       isArchived: isArchived ?? this.isArchived,
-      lastLEDStateChange: lastLEDStateChange ?? this.lastLEDStateChange, // Update copyWith method
+      lastLEDStateChange: lastLEDStateChange ?? this.lastLEDStateChange,
       isHeartRateBasedReleaseEnabled: isHeartRateBasedReleaseEnabled ?? this.isHeartRateBasedReleaseEnabled,
       highHeartRateThreshold: highHeartRateThreshold ?? this.highHeartRateThreshold,
       lowHeartRateThreshold: lowHeartRateThreshold ?? this.lowHeartRateThreshold,
@@ -77,16 +81,17 @@ class Necklace extends Equatable {
   List<Object?> get props => [
     id,
     name,
-    bleDevice, // Update props
+    bleDevice,
+    heartRateMonitorDevice,
     autoTurnOffEnabled,
     emission1Duration,
     releaseInterval1,
     periodicEmissionEnabled,
     isRelease1Active,
     isArchived,
-    isLedOn, // Update props
-    isConnected, // Update props
-    lastLEDStateChange, // Update props
+    isLedOn,
+    isConnected,
+    lastLEDStateChange,
     isHeartRateBasedReleaseEnabled,
     highHeartRateThreshold,
     lowHeartRateThreshold,
@@ -98,7 +103,12 @@ class Necklace extends Equatable {
       'bleDevice': bleDevice != null ? 
           jsonEncode({
             ...bleDevice!.toMap(),
-            'device': null  // Exclude the BluetoothDevice instance from serialization
+            'device': null
+          }) : null,
+      'heartRateMonitorDevice': heartRateMonitorDevice != null ? 
+          jsonEncode({
+            ...heartRateMonitorDevice!.toMap(),
+            'device': null
           }) : null,
       'name': name,
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
@@ -106,10 +116,10 @@ class Necklace extends Equatable {
       'releaseInterval1': releaseInterval1.inSeconds,
       'periodicEmissionEnabled': periodicEmissionEnabled ? 1 : 0,
       'isRelease1Active': isRelease1Active ? 1 : 0,
-      'isLedOn': isLedOn ? 1 : 0, // Add isLedOn to map
-      'isConnected': isConnected ? 1 : 0, // Add isConnected to map
+      'isLedOn': isLedOn ? 1 : 0,
+      'isConnected': isConnected ? 1 : 0,
       'isArchived': isArchived ? 1 : 0,
-      'lastLEDStateChange': lastLEDStateChange?.toIso8601String(), // Add lastLEDStateChange to map
+      'lastLEDStateChange': lastLEDStateChange?.toIso8601String(),
       'isHeartRateBasedReleaseEnabled': isHeartRateBasedReleaseEnabled ? 1 : 0,
       'highHeartRateThreshold': highHeartRateThreshold,
       'lowHeartRateThreshold': lowHeartRateThreshold,
@@ -125,6 +135,12 @@ class Necklace extends Equatable {
               jsonDecode(map['bleDevice']) as Map<String, dynamic> :
               map['bleDevice'] as Map<String, dynamic>
           ) : null,
+      heartRateMonitorDevice: map['heartRateMonitorDevice'] != null ? 
+          BleDevice.fromMap(
+            map['heartRateMonitorDevice'] is String ? 
+              jsonDecode(map['heartRateMonitorDevice']) as Map<String, dynamic> :
+              map['heartRateMonitorDevice'] as Map<String, dynamic>
+          ) : null,
       name: map['name'],
       autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
       emission1Duration: Duration(seconds: map['emission1Duration']),
@@ -132,10 +148,10 @@ class Necklace extends Equatable {
       periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
       isRelease1Active: map['isRelease1Active'] == 1,
       isLedOn: map['isLedOn'] == 1,
-      isConnected: map['isConnected'] == 1, // Add isConnected from map
+      isConnected: map['isConnected'] == 1,
       isArchived: map['isArchived'] == 1,
       lastLEDStateChange: map['lastLEDStateChange'] != null ? 
-          DateTime.parse(map['lastLEDStateChange']) : null, // Add lastLEDStateChange from map
+          DateTime.parse(map['lastLEDStateChange']) : null,
       isHeartRateBasedReleaseEnabled: map['isHeartRateBasedReleaseEnabled'] == 1,
       highHeartRateThreshold: map['highHeartRateThreshold'],
       lowHeartRateThreshold: map['lowHeartRateThreshold'],
