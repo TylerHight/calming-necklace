@@ -13,6 +13,7 @@ import '../widgets/duration_picker_dialog.dart';
 import '../widgets/heart_rate_settings_dialog.dart';
 import '../widgets/settings_help_dialog.dart';
 import '../widgets/ble_device_info.dart';
+import '../widgets/ble_device_info_dialog.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/ui/ui_constants.dart';
 import '../../../core/blocs/ble/ble_bloc.dart';
@@ -173,6 +174,7 @@ class _SettingsContentState extends State<SettingsContent> {
     );
   }
 
+  /// Builds the section displaying the necklace title, renaming option, and connected BLE device information.
   Widget _buildDeviceInfoSection(BuildContext context, SettingsState state) {
     return Card(
       child: Padding(
@@ -422,6 +424,18 @@ class _SettingsContentState extends State<SettingsContent> {
                   }
                 }),
             ),
+            ListTile(
+              title: const Text('View Heart Rate Monitor Info'),
+              subtitle: state.necklace.heartRateMonitorDevice != null
+                  ? Text('View detailed device information')
+                  : Text('No device connected'),
+              trailing: const Icon(Icons.info_outline),
+              onTap: () {
+                if (state.necklace.heartRateMonitorDevice != null) {
+                  _showDeviceInfoDialog(context, state.necklace.heartRateMonitorDevice!);
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -550,6 +564,18 @@ class _SettingsContentState extends State<SettingsContent> {
         );
       },
     );
+  }
+
+  void _showDeviceInfoDialog(BuildContext context, BleDevice device) {
+    _logger.logDebug('Showing device info dialog for ${device.name}');
+    showDialog(
+      context: context,
+      builder: (context) => BleDeviceInfoDialog(
+        device: device,
+      ),
+    ).then((_) {
+      _logger.logDebug('Device info dialog closed');
+    });
   }
 
   Future<void> _showDeleteConfirmation(BuildContext context, SettingsState state) async {
