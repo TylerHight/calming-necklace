@@ -5,16 +5,16 @@ import 'ble_device.dart';
 class Necklace extends Equatable {
   final String id;
   final String name;
-  final BleDevice? bleDevice; // Change type to BleDevice?
+  final BleDevice? bleDevice;
   final bool autoTurnOffEnabled;
   final bool periodicEmissionEnabled;
-  final bool isConnected; // Added isConnected field
+  final bool isConnected;
   final Duration emission1Duration;
   final Duration releaseInterval1;
   final bool isRelease1Active;
   final bool isArchived;
-  final bool isLedOn; // Added isLedOn field
-  final DateTime? lastLEDStateChange; // Added lastLEDStateChange field
+  final bool isLedOn;
+  final DateTime? lastLEDStateChange;
   final bool isHeartRateBasedReleaseEnabled;
   final int highHeartRateThreshold;
   final int lowHeartRateThreshold;

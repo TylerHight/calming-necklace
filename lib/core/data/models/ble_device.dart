@@ -1,3 +1,23 @@
+/// A model class representing a Bluetooth Low Energy (BLE) device.
+///
+/// This class is used to store and manage BLE device properties and their association
+/// with necklaces in the application. It handles both physical device properties
+/// (like address and RSSI) and logical properties (like device type and connection status).
+///
+/// The model supports two types of devices:
+/// - Necklaces: The main device type that can be controlled by the app
+/// - Heart Rate Monitors: External devices that can be paired with necklaces
+///
+/// Key features:
+/// - Serializable for persistence (toMap/fromMap)
+/// - Immutable with copyWith support
+/// - Equatable for easy comparison
+/// - Safe handling of parsing errors
+/// - Optional BluetoothDevice instance for direct BLE operations
+///
+/// The necklaceId field creates a link between this BLE device and a Necklace model,
+/// allowing for bi-directional reference between the two models.
+///
 import 'package:equatable/equatable.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'dart:convert';
@@ -14,7 +34,7 @@ class BleDevice extends Equatable {
   final int rssi;
   final BleDeviceType deviceType;
   final bool isConnected;
-  final String? necklaceId; 
+  final String? necklaceId; // should be the same as the "id" field in the Necklace model
   final String? advertisedName;
   final BluetoothDevice? device;
 
