@@ -47,12 +47,11 @@ class _DeviceSelectorState extends State<DeviceSelector> {
   }
 
   bool _isDeviceTypeMatch(BleDevice device) {
+    // Add filters for the results
     if (widget.deviceType == BleDeviceType.necklace) {
-      return device.name.toLowerCase().contains('necklace') ||
-             device.name.toLowerCase().contains('calm');
+      return device.name.toLowerCase().contains('');
     } else {
-      return device.name.toLowerCase().contains('hr') ||
-             device.name.toLowerCase().contains('heart');
+      return device.name.toLowerCase().contains('');
     }
   }
 

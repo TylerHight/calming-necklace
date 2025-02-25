@@ -13,7 +13,13 @@ import 'device_selector.dart';
 
 class DeviceSelectorDialog extends StatelessWidget {
   final BleDeviceType deviceType;
-  const DeviceSelectorDialog({Key? key, required this.deviceType}) : super(key: key);
+  final String? title;
+
+  const DeviceSelectorDialog({
+    Key? key,
+    required this.deviceType,
+    this.title,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +37,7 @@ class DeviceSelectorDialog extends StatelessWidget {
           horizontal: UIConstants.deviceSelectorDialogPadding,
           vertical: UIConstants.deviceSelectorDialogVerticalPadding,
         ),
-        child: _DialogContent(deviceType: deviceType),
+        child: _DialogContent(deviceType: deviceType, title: title),
       ),
     );
   }
@@ -39,8 +45,9 @@ class DeviceSelectorDialog extends StatelessWidget {
 
 class _DialogContent extends StatelessWidget {
   final BleDeviceType deviceType;
+  final String? title;
 
-  const _DialogContent({Key? key, required this.deviceType}) : super(key: key);
+  const _DialogContent({Key? key, required this.deviceType, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -55,9 +62,7 @@ class _DialogContent extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  deviceType == BleDeviceType.necklace
-                    ? 'Select Necklace'
-                    : 'Select Monitor',
+                  title ?? (deviceType == BleDeviceType.necklace ? 'Select Necklace' : 'Select Heart Rate Monitor'),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
               ),

@@ -10,11 +10,14 @@ import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/heart_rate_settings_dialog.dart';
-import '../widgets/device_selection_dialog.dart';
 import '../widgets/settings_help_dialog.dart';
 import '../widgets/ble_device_info.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/ui/ui_constants.dart';
+import '../../../core/blocs/ble/ble_bloc.dart';
+import '../../../core/data/repositories/ble_repository.dart';
+import '../../../features/add_device_dialog/widgets/device_selector_dialog.dart';
+import '../../../features/add_device_dialog/blocs/device_selector/device_selector_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Necklace necklace;
@@ -346,12 +349,12 @@ class _SettingsContentState extends State<SettingsContent> {
               },
             ),
             ListTile(
-              title: Text('Adjust Heart Rate Thresholds'),
+              title: const Text('Adjust Heart Rate Thresholds'),
               subtitle: Text(
                 'High: ${state.necklace.highHeartRateThreshold} BPM, ' +
                 'Low: ${state.necklace.lowHeartRateThreshold} BPM'
               ),
-              trailing: Icon(Icons.arrow_forward_ios),
+              trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => HeartRateSettingsDialog(
@@ -364,6 +367,34 @@ class _SettingsContentState extends State<SettingsContent> {
                   _refreshSettings();
                 }
               }),
+            ),
+            ListTile(
+              title: const Text('Change Heart Rate Monitor'),
+              trailing: const Icon(Icons.heart_broken),
+              onTap: () => showDialog<BleDevice>(
+                  context: context,
+                  builder: (context) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) => DeviceSelectorBloc(
+                          bleRepository: context.read<BleRepository>(),
+                          bleBloc: context.read<BleBloc>(),
+                        ),
+                      ),
+                    ],
+                    child: DeviceSelectorDialog(
+                      deviceType: BleDeviceType.heartRateMonitor,
+                      title: 'Select Heart Rate Monitor',
+                    ),
+                  ),
+                ).then((device) async {
+                  if (device != null) {
+                    // TODO: Implement device change logic
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Selected device: ${device.name}')),
+                    );
+                  }
+                }),
             ),
           ],
         ),
@@ -393,49 +424,40 @@ class _SettingsContentState extends State<SettingsContent> {
                 final bleService = BleService();
                 showDialog(
                   context: context,
-                  builder: (context) => DeviceSelectionDialog(
-                    deviceType: BleDeviceType.necklace,
-                    title: 'Select Necklace Device',
-                    onDeviceSelected: (device) async {
-                      try {
-                        // Update necklace in database with new device
-                        await widget.databaseService.updateNecklaceSettings(
-                          widget.necklace.id,
-                          {'bleDevice': device.toMap()},
-                        );
-
-                        // Notify the necklaces bloc to refresh
-                        context.read<NecklacesBloc>().add(FetchNecklacesEvent());
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Connected to ${device.name}')),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error updating device: $e')),
-                        );
-                      }
-                    },
+                  builder: (context) => MultiBlocProvider(
+                    providers: [
+                      BlocProvider(
+                        create: (context) => DeviceSelectorBloc(
+                          bleRepository: context.read<BleRepository>(),
+                          bleBloc: context.read<BleBloc>(),
+                        ),
+                      ),
+                    ],
+                    child: DeviceSelectorDialog(
+                      deviceType: BleDeviceType.necklace,
+                      title: 'Select Necklace Device',
+                    ),
                   ),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Change Heart Rate Monitor'),
-              trailing: const Icon(Icons.heart_broken),
-              onTap: () {
-                showDialog<BleDevice>(
-                  context: context,
-                  builder: (context) => DeviceSelectionDialog(
-                    deviceType: BleDeviceType.heartRateMonitor,
-                    title: 'Select Heart Rate Monitor',
-                  ),
-                ).then((device) {
+                ).then((device) async {
                   if (device != null) {
-                    // TODO: Implement device change logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Selected device: ${device.name}')),
-                    );
+                    try {
+                      // Update necklace in database with new device
+                      await widget.databaseService.updateNecklaceSettings(
+                        widget.necklace.id,
+                        {'bleDevice': device.toMap()},
+                      );
+
+                      // Notify the necklaces bloc to refresh
+                      context.read<NecklacesBloc>().add(FetchNecklacesEvent());
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Connected to ${device.name}')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error updating device: $e')),
+                      );
+                    }
                   }
                 });
               },
