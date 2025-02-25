@@ -453,7 +453,8 @@ class _SettingsContentState extends State<SettingsContent> {
                   builder: (context) => MultiBlocProvider(
                     providers: [
                       BlocProvider(
-                        create: (context) => DeviceSelectorBloc(
+                        create: (context)
+                            => DeviceSelectorBloc(
                           bleRepository: context.read<BleRepository>(),
                           bleBloc: context.read<BleBloc>(),
                         ),
@@ -580,12 +581,19 @@ class _SettingsContentState extends State<SettingsContent> {
     if (confirm == true) {
       try {
         // First disconnect from the BLE device if it exists
+        final bleBloc = context.read<BleBloc>();
         if (state.necklace.bleDevice != null) {
-          context.read<BleBloc>().add(
-            BleDisconnectRequest(state.necklace.bleDevice!.id),
-          );
+          // Ensure device is properly disconnected before deletion
+          await Future.wait([
+            Future(() => bleBloc.add(
+              BleDisconnectRequest(state.necklace.bleDevice!.id),
+            )),
+            // Wait for disconnect to complete
+            Future.delayed(const Duration(seconds: 1)),
+          ]);
         }
 
+        // Archive the necklace only after disconnect is complete
         context.read<SettingsBloc>().add(ArchiveNecklace(state.necklace.id));
         // Refresh the necklaces list
         context.read<NecklacesBloc>().add(FetchNecklacesEvent());

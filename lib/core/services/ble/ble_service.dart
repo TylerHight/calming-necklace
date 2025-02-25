@@ -158,6 +158,20 @@ class BleService {
     try {
       _logger.logBleInfo('Starting service and characteristic discovery for device: ${device.id}');
       final services = await device.discoverServices();
+      
+      // Find the LED service and characteristic
+      for (var service in services) {
+        if (service.uuid.toString().toLowerCase() == BleConstants.LED_SERVICE_UUID.toLowerCase()) {
+          for (var char in service.characteristics) {
+            if (char.uuid.toString().toLowerCase() == BleConstants.switchCharacteristicUuid.toLowerCase()) {
+              _switchCharacteristic = char;
+              _logger.logBleDebug('Found LED characteristic: ${char.uuid}');
+              break;
+            }
+          }
+        }
+      }
+
       _logger.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
 
       List<BleServiceInfo> discoveredServices = [];
@@ -244,17 +258,17 @@ class BleService {
   Future<void> setLedState(bool turnOn) async {
     await ensureConnected();
     _logger.logDebug('Sending setLedState command: ${turnOn ? 'ON' : 'OFF'}');
-    _logger.logDebug('Connection state before command: ${await isDeviceConnected(_connectedDevice?.id.toString() ?? "")}');
     try {
-      // Add connection verification before sending command
-      if (!await isDeviceConnected(_connectedDevice?.id.toString() ?? "")) {
-        throw BleException('Device connection lost before sending command');
+      if (_switchCharacteristic == null) {
+        _logger.logBleError('LED characteristic not initialized');
+        await _initializeCharacteristics(_connectedDevice!, forceRediscovery: true);
+        if (_switchCharacteristic == null) {
+          throw BleException('Failed to initialize LED characteristic');
+        }
       }
 
       await _writeCommand(turnOn ? BleCommand.ledOn.value : BleCommand.ledOff.value, 0);
       _logger.logDebug('LED state command sent successfully');
-      // Verify command was successful
-      await Future.delayed(Duration(milliseconds: 100));
       return;
     } catch (e) {
       _logger.logBleError('Failed to set LED state: ${e.toString()} - Attempting recovery', e);

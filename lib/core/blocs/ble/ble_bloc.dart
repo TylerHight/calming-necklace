@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/ble_device.dart';
 import '../../data/repositories/ble_repository.dart';
+import '../../data/repositories/necklace_repository.dart';
 import '../../services/ble/ble_service.dart';
 import '../../services/logging_service.dart';
 import 'ble_event.dart';
@@ -10,16 +11,21 @@ import 'ble_state.dart';
 class BleBloc extends Bloc<BleEvent, BleState> {
   final BleService _bleService;
   final BleRepository _bleRepository;
+  final NecklaceRepository _necklaceRepository;
   final LoggingService _logger = LoggingService.instance;
   StreamSubscription<String>? _deviceStateSubscription;
   StreamSubscription<bool>? _connectionStatusSubscription;
   StreamSubscription<int>? _rssiSubscription;
   StreamSubscription<int>? _reconnectionAttemptsSubscription;
 
-  BleBloc({required BleService bleService, required BleRepository bleRepository})
-      : _bleService = bleService,
-        _bleRepository = bleRepository,
-        super(BleState.initial()) {
+  BleBloc({
+    required BleService bleService,
+    required BleRepository bleRepository,
+    required NecklaceRepository necklaceRepository,
+  }) : _bleService = bleService,
+       _bleRepository = bleRepository,
+       _necklaceRepository = necklaceRepository,
+       super(BleState.initial()) {
     on<BleConnectRequest>(_onConnectRequest);
     on<BleDisconnectRequest>(_onDisconnectRequest);
     on<BleConnectionStatusChanged>((event, emit) => _onConnectionStatusChanged(event.isConnected));
@@ -98,10 +104,29 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   Future<void> _onDisconnectRequest(BleDisconnectRequest event, Emitter<BleState> emit) async {
     try {
       _logger.logBleInfo('Attempting to disconnect from device: ${event.deviceId}');
+      
+      // Update state to show disconnecting
+      emit(state.copyWith(
+        deviceState: 'Disconnecting...',
+        deviceConnectionStates: Map.from(state.deviceConnectionStates)..update(event.deviceId, (_) => false),
+      ));
+
+      // Ensure all subscriptions are cancelled
+      _deviceStateSubscription?.cancel();
+      _connectionStatusSubscription?.cancel();
+      _reconnectionAttemptsSubscription?.cancel();
+      _rssiSubscription?.cancel();
+
+      // Perform disconnect
       await _bleService.disconnectFromDevice();
-      final updatedStates = Map<String, bool>.from(state.deviceConnectionStates);
-      updatedStates[event.deviceId] = false;
-      emit(state.copyWith(deviceConnectionStates: updatedStates));
+      
+      // Clear device state completely
+      emit(state.copyWith(
+        deviceState: 'Disconnected',
+        isConnecting: false,
+        deviceConnectionStates: Map.from(state.deviceConnectionStates)..remove(event.deviceId),
+      ));
+      
       _logger.logBleInfo('Successfully disconnected from device: ${event.deviceId}');
     } catch (e) {
       _logger.logBleError('Disconnect error: ${e.toString()}', e);
@@ -178,6 +203,13 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   Future<void> _tryConnectDevice(BleDevice device, Emitter<BleState> emit) async {
     try {
       if (device.device != null && !state.deviceConnectionStates.containsKey(device.id)) {
+        // Check if the device belongs to an archived necklace
+        final necklace = await _necklaceRepository.getNecklaceByBleDeviceId(device.id);
+        if (necklace?.isArchived ?? false) {
+          _logger.logDebug('Skipping connection attempt for archived device: ${device.id}');
+          return;
+        }
+
         _logger.logBleInfo('Attempting to connect to discovered device: ${device.id}');
         await _bleService.connectAndInitializeDevice(device.device!);
         

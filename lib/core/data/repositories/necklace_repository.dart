@@ -15,6 +15,7 @@ abstract class NecklaceRepository {
   Future<void> archiveNecklace(String id);
   Future<String> getDeviceNameById(String deviceId);
   Future<void> addNecklace(String name, String bleDeviceId);
+  Future<Necklace?> getNecklaceByBleDeviceId(String bleDeviceId);
   Stream<bool> getEmissionStream(String necklaceId);
   Future<Necklace?> getNecklaceById(String id);
 }
@@ -153,6 +154,20 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
       return necklace.name;
     } catch (e) {
       return 'Unknown Device';
+    }
+  }
+
+  @override
+  Future<Necklace?> getNecklaceByBleDeviceId(String bleDeviceId) async {
+    try {
+      final necklaces = await _dbService.getNecklaces();
+      return necklaces.firstWhere(
+        (necklace) => necklace.bleDevice?.id == bleDeviceId,
+        orElse: () => throw Exception('No necklace found for device ID: $bleDeviceId'),
+      );
+    } catch (e) {
+      _logger.logError('Error getting necklace by BLE device ID: $e');
+      return null;
     }
   }
 

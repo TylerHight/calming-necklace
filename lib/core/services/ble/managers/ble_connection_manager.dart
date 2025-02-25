@@ -1,5 +1,3 @@
-// lib/core/services/ble/managers/ble_connection_manager.dart
-
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -154,7 +152,7 @@ class BleConnectionManager {
         await _currentDevice!.connect(
             mtu:null,
             timeout: const Duration(seconds: 5),
-            autoConnect: true
+            autoConnect: false
         );
 
         final isConnected = await _currentDevice!.connectionState.first ==
@@ -311,13 +309,40 @@ class BleConnectionManager {
   Future<void> disconnect() async {
     try {
       if (_currentDevice != null) {
+        _logger.logBleInfo('Starting disconnect sequence');
         onStateChange(BleConnectionState.disconnecting);
+
+        // Cancel all active subscriptions and timers
+        _cleanupMonitoring();
+
+        // Disable notifications and disconnect from characteristics
+        await _disableNotifications();
+
         await _currentDevice!.disconnect();
+        // Wait for disconnect to complete and verify
+        await Future.delayed(Duration(milliseconds: 1000));
+
+        _currentDevice = null;
+        onStateChange(BleConnectionState.disconnected);
       }
-    } finally {
-      _cleanupMonitoring();
-      _currentDevice = null;
-      onStateChange(BleConnectionState.disconnected);
+    } catch (e) {
+      _logger.logBleError('Disconnect error', e);
+      rethrow;
+    }
+  }
+
+  Future<void> _disableNotifications() async {
+    try {
+      if (_keepAliveCharacteristic != null) {
+        await _keepAliveCharacteristic!.setNotifyValue(false);
+      }
+
+      // Cancel any pending GATT operations
+      if (_currentDevice != null) {
+        await _currentDevice!.requestMtu(23); // Reset MTU to default
+      }
+    } catch (e) {
+      _logger.logBleError('Error disabling notifications', e);
     }
   }
 

@@ -52,6 +52,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             create: (context) => BleBloc(
               bleService: context.read<BleService>(),
               bleRepository: context.read<BleRepository>(),
+              necklaceRepository: context.read<NecklaceRepository>(),
             ),
           ),
           BlocProvider(
