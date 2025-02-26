@@ -16,6 +16,9 @@ BLELongCharacteristic emission1Characteristic("2A19", BLERead | BLEWrite | BLENo
 BLELongCharacteristic interval1Characteristic("2A1B", BLERead | BLEWrite | BLENotify);
 BLEByteCharacteristic periodic1Characteristic("2A1D", BLERead | BLEWrite | BLENotify);
 BLEByteCharacteristic heartrateCharacteristic("2A1F", BLERead | BLEWrite | BLENotify);
+BLEByteCharacteristic heartRateEnabledCharacteristic("19B10002-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify);
+BLEByteCharacteristic highHeartRateThresholdCharacteristic("19B10003-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify);
+BLEByteCharacteristic lowHeartRateThresholdCharacteristic("19B10004-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite | BLENotify);
 
 bool isConnected = false;
 
@@ -45,6 +48,9 @@ void setupServices() {
     settingsService.addCharacteristic(interval1Characteristic);
     settingsService.addCharacteristic(periodic1Characteristic);
     settingsService.addCharacteristic(heartrateCharacteristic);
+    settingsService.addCharacteristic(heartRateEnabledCharacteristic);
+    settingsService.addCharacteristic(highHeartRateThresholdCharacteristic);
+    settingsService.addCharacteristic(lowHeartRateThresholdCharacteristic);
 
     BLE.addService(ledService);
     BLE.addService(settingsService);
@@ -59,6 +65,9 @@ void initializeCharacteristics() {
     interval1Characteristic.writeValue(getInterval1());
     periodic1Characteristic.writeValue(getPeriodic1Enabled());
     heartrateCharacteristic.writeValue(getCurrentHeartRate());
+    heartRateEnabledCharacteristic.writeValue(0);
+    highHeartRateThresholdCharacteristic.writeValue(highHeartRateThreshold);
+    lowHeartRateThresholdCharacteristic.writeValue(lowHeartRateThreshold);
 }
 
 void onCentralConnected(BLEDevice central) {

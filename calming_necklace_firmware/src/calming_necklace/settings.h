@@ -6,26 +6,26 @@
 #include "debug.h"
 
 // External variable declarations
-extern int emission1Duration;
-extern int releaseInterval1;
+extern unsigned long emission1Duration;
+extern unsigned long releaseInterval1;
 extern bool periodicEmissionEnabled;
+extern byte heartrateThreshold;
 extern bool heartRateBasedReleaseEnabled;
 extern int highHeartRateThreshold;
 extern int lowHeartRateThreshold;
 
-// Settings getters
+// Function declarations
 unsigned long getEmission1Duration();
-unsigned long getEmission2Duration();
 unsigned long getInterval1();
-unsigned long getInterval2();
 bool getPeriodic1Enabled();
-bool getPeriodic2Enabled();
 byte getHeartrateThreshold();
+void handleSettingsUpdate();
+void checkPeriodicEmissions();
+void handleSwitchCommand(int command, int value);
 
 // Settings handlers
 void handleSettingsUpdate();
 void checkPeriodicEmissions();
 void setupPins();
-void handlePeripheralLoop(BLEDevice central);
 
 #endif // SETTINGS_H

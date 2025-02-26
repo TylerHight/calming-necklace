@@ -2,14 +2,15 @@
 #include "heart_rate.h"
 #include <math.h>
 #include "debug.h"
+#include "led_control.h"
 
 // Variables for heart rate simulation
 byte currentHeartRate = MIN_HEART_RATE;
 unsigned long lastHeartRateUpdateTime = 0;
 static const unsigned long HEART_RATE_UPDATE_INTERVAL = 10000; // 10 seconds
-bool heartRateBasedReleaseEnabled = false;
-int highHeartRateThreshold = 100;  // Default: 100 BPM
-int lowHeartRateThreshold = 60;    // Default: 60 BPM
+extern bool heartRateBasedReleaseEnabled;
+extern int highHeartRateThreshold;
+extern int lowHeartRateThreshold;
 
 void initHeartRate() {
     debugPrintln(DEBUG_HEART, "Initializing heart rate simulation");
@@ -56,6 +57,7 @@ byte getCurrentHeartRate() {
 void triggerEmissionBasedOnHeartRate() {
     // Trigger the LED to turn on for the configured duration
     debugPrintln(DEBUG_HEART, "Triggering emission based on heart rate");
-    setLedState(true);
+    // Turn on the LED
+    handleLEDs(CMD_LED_RED);
     // The LED will be turned off after the emission duration by the main loop
 }

@@ -5,21 +5,21 @@
 #include "debug.h"
 
 // Settings storage
-static unsigned long emission1Duration = 10000;  // 10 seconds
-static unsigned long interval1 = 300000;         // 5 minutes
-static bool periodic1Enabled = false;
-static byte heartrateThreshold = 90;            // Default 90 BPM
-static bool heartRateBasedReleaseEnabled = false;
-static int highHeartRateThreshold = 100;        // Default: 100 BPM
-static int lowHeartRateThreshold = 60;          // Default: 60 BPM
+unsigned long emission1Duration = 10000;  // 10 seconds
+unsigned long releaseInterval1 = 300000;  // 5 minutes
+bool periodicEmissionEnabled = false;
+byte heartrateThreshold = 90;            // Default 90 BPM
+bool heartRateBasedReleaseEnabled = false;
+int highHeartRateThreshold = 100;        // Default: 100 BPM
+int lowHeartRateThreshold = 60;          // Default: 60 BPM
 
 // Timing variables for periodic emissions
 static unsigned long lastEmission1Time = 0;
 
 // Getters
 unsigned long getEmission1Duration() { return emission1Duration; }
-unsigned long getInterval1() { return interval1; }
-bool getPeriodic1Enabled() { return periodic1Enabled; }
+unsigned long getInterval1() { return releaseInterval1; }
+bool getPeriodic1Enabled() { return periodicEmissionEnabled; }
 byte getHeartrateThreshold() { return heartrateThreshold; }
 
 void handleSettingsUpdate() {
@@ -30,15 +30,15 @@ void handleSettingsUpdate() {
     }
 
     if (interval1Characteristic.written()) {
-        interval1 = interval1Characteristic.value();
+        releaseInterval1 = interval1Characteristic.value();
         debugPrint(DEBUG_SETTINGS, "Updated interval1: ");
-        debugPrintf(DEBUG_SETTINGS, "%lu\n", interval1);
+        debugPrintf(DEBUG_SETTINGS, "%lu\n", releaseInterval1);
     }
 
     if (periodic1Characteristic.written()) {
-        periodic1Enabled = periodic1Characteristic.value();
+        periodicEmissionEnabled = periodic1Characteristic.value();
         debugPrint(DEBUG_SETTINGS, "Updated periodic1Enabled: ");
-        debugPrintf(DEBUG_SETTINGS, "%d\n", periodic1Enabled ? 1 : 0);
+        debugPrintf(DEBUG_SETTINGS, "%d\n", periodicEmissionEnabled ? 1 : 0);
     }
 
     if (heartrateCharacteristic.written()) {
@@ -69,9 +69,9 @@ void handleSettingsUpdate() {
 void checkPeriodicEmissions() {
     unsigned long currentTime = millis();
 
-    if (periodic1Enabled && (currentTime - lastEmission1Time >= interval1)) {
+    if (periodicEmissionEnabled && (currentTime - lastEmission1Time >= releaseInterval1)) {
         handleLEDs(CMD_LED_RED);
-        delay(emission1Duration);
+        delay(getEmission1Duration());
         handleLEDs(CMD_LED_OFF);
         lastEmission1Time = currentTime;
     }
@@ -79,16 +79,16 @@ void checkPeriodicEmissions() {
 
 void handleSwitchCommand(int command, int value) {
     switch (command) {
-        case CMD_EMISSION1_DURATION:
+        case 4: // CMD_EMISSION1_DURATION
             emission1Duration = value;
             break;
-        case CMD_INTERVAL1:
+        case 6: // CMD_INTERVAL1
             releaseInterval1 = value;
             break;
-        case CMD_PERIODIC1:
+        case 8: // CMD_PERIODIC1
             periodicEmissionEnabled = (value == 1);
             break;
-        case CMD_HEART_RATE_ENABLED:
+        case 10: // CMD_HEART_RATE_ENABLED
             heartRateBasedReleaseEnabled = (value == 1);
             break;
         case CMD_HIGH_HEART_RATE_THRESHOLD:

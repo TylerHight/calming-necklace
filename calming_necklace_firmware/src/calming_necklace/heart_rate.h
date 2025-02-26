@@ -13,10 +13,14 @@
 // Variables for heart rate simulation
 extern byte currentHeartRate;
 extern unsigned long lastHeartRateUpdateTime;
+extern bool heartRateBasedReleaseEnabled;
+extern int highHeartRateThreshold;
+extern int lowHeartRateThreshold;
 
 // Function declarations
 void initHeartRate();
 void updateHeartRate();
 byte getCurrentHeartRate();
+void triggerEmissionBasedOnHeartRate();
 
 #endif // HEART_RATE_H
