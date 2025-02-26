@@ -23,22 +23,30 @@ BLEByteCharacteristic lowHeartRateThresholdCharacteristic("19B10004-E8F2-537E-4F
 
 bool isConnected = false;
 
-void setupBLE() {
+bool setupBLE(uint8_t maxAttempts = 3) {
     debugPrintln(DEBUG_BLE, "\nInitializing BLE...");
 
-    if (!BLE.begin()) {
-        debugPrintln(DEBUG_BLE, "ERROR: Starting BLE failed!");
-        while (1);
+    uint8_t attempts = 0;
+    while (attempts < maxAttempts) {
+        if (BLE.begin()) {
+            setupServices();
+            BLE.setDeviceName("Calming Necklace");
+            BLE.setLocalName("Calming Necklace");
+            BLE.setAdvertisedService(ledService);
+            BLE.advertise();
+            debugPrintln(DEBUG_BLE, "Advertising as 'Calming Necklace'");
+            return true;
+        }
+
+        attempts++;
+        debugPrint(DEBUG_BLE, "BLE initialization failed. Attempt ");
+        debugPrintf(DEBUG_BLE, "%d of %d\n", attempts, maxAttempts);
+        delay(1000);  // Wait before retry
     }
-    
-    setupServices();
 
-    BLE.setDeviceName("Calming Necklace");
-    BLE.setLocalName("Calming Necklace");
-    BLE.setAdvertisedService(ledService);  // Advertise our LED service
-
-    BLE.advertise();
-    debugPrintln(DEBUG_BLE, "Advertising as 'Calming Necklace'");
+    debugPrintln(DEBUG_BLE, "ERROR: BLE initialization failed after max attempts");
+    handleLEDs(CMD_LED_RED);  // Visual error indication
+    return false;
 }
 
 void setupServices() {

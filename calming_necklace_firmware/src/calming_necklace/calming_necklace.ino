@@ -9,18 +9,19 @@
 
 void setup() {
     Serial.begin(9600);
-
-    // Initialize debug system
     debugInit();
-
     debugPrintln(DEBUG_GENERAL, "\n=== Calming Necklace Startup ===");
 
     setupPins();
     setupEmissionControl();
     initHeartRate();
-    setupBLE();
-    resetHeartRateTimer(); // Initialize heart rate timer at startup
 
+    if (!setupBLE()) {
+        // Continue with limited functionality if BLE fails
+        debugPrintln(DEBUG_GENERAL, "Operating in limited mode without BLE");
+    }
+
+    resetHeartRateTimer();
     debugPrintln(DEBUG_GENERAL, "\nDevice Ready!");
     debugPrintln(DEBUG_GENERAL, "=== Setup Complete ===\n");
 }
