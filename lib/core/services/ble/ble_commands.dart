@@ -1,11 +1,14 @@
 // lib/core/services/ble/ble_commands.dart
 
 enum BleCommand {
-  ledOff(0),
   ledOn(1),
-  emission1Duration(2),
-  interval1(3),
-  periodic1(4);
+  ledOff(2),
+  emission1Duration(3),
+  interval1(4),
+  periodic1(5),
+  heartRateEnabled(6),
+  highHeartRateThreshold(7),
+  lowHeartRateThreshold(8);
 
   final int value;
   const BleCommand(this.value);

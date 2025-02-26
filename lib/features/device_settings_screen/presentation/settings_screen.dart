@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/services/ble/ble_settings_sync_service.dart';
 import '../../../core/blocs/ble/ble_event.dart';
 import '../../../core/blocs/necklaces/necklaces_bloc.dart';
 import '../../../core/data/models/ble_device.dart';
@@ -40,6 +41,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   late LoggingService _logger;
+  final BleSettingsSyncService _settingsSyncService = BleSettingsSyncService();
 
   @override
   void initState() {
@@ -72,41 +74,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      lazy: false,
-      create: (context) => SettingsBloc(
-        widget.necklace,
-        widget.repository,
-        widget.databaseService,
-      )..add(RefreshSettings(widget.necklace)),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Device Settings',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          elevation: 0,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.help_outline, color: Colors.black87),
-              onPressed: () => showDialog(
-                context: context,
-                builder: (context) => const SettingsHelpDialog(),
+    return WillPopScope(
+      onWillPop: () async {
+        await _syncSettingsWithDevice(context);
+        return true;
+      },
+      child: BlocProvider(
+        lazy: false,
+        create: (context) => SettingsBloc(
+          widget.necklace,
+          widget.repository,
+          widget.databaseService,
+        )..add(RefreshSettings(widget.necklace)),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Device Settings',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
             ),
-          ],
-          backgroundColor: Colors.transparent,
-        ),
-        body: SettingsContent(
-          databaseService: widget.databaseService,
-          necklace: widget.necklace,
+            elevation: 0,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.help_outline, color: Colors.black87),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const SettingsHelpDialog(),
+                ),
+              ),
+            ],
+            backgroundColor: Colors.transparent,
+          ),
+          body: SettingsContent(
+            databaseService: widget.databaseService,
+            necklace: widget.necklace,
+          ),
         ),
       ),
     );
+  }
+
+  /// Synchronizes changed settings with the BLE device when leaving the settings screen
+  Future<void> _syncSettingsWithDevice(BuildContext context) async {
+    final settingsBloc = context.read<SettingsBloc>();
+    final currentState = settingsBloc.state;
+    final originalNecklace = settingsBloc.originalNecklace;
+
+    if (originalNecklace == null || currentState.necklace.bleDevice == null) {
+      _logger.logWarning('Cannot sync settings: Missing original necklace or BLE device');
+      return;
+    }
+
+    // Check if any settings have changed
+    if (_haveSettingsChanged(originalNecklace, currentState.necklace)) {
+      _logger.logInfo('Settings have changed, syncing with device');
+
+      try {
+        // Show a loading indicator
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Syncing settings with device...'))
+        );
+
+        // Sync the changed settings with the device
+        await _settingsSyncService.syncChangedSettings(originalNecklace, currentState.necklace);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Settings synced successfully'))
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to sync settings: $e'))
+        );
+      }
+    }
+  }
+
+  /// Checks if any settings have changed between the original and current necklace
+  bool _haveSettingsChanged(Necklace original, Necklace current) {
+    return original.emission1Duration != current.emission1Duration ||
+           original.releaseInterval1 != current.releaseInterval1 ||
+           original.periodicEmissionEnabled != current.periodicEmissionEnabled ||
+           original.isHeartRateBasedReleaseEnabled != current.isHeartRateBasedReleaseEnabled ||
+           original.highHeartRateThreshold != current.highHeartRateThreshold ||
+           original.lowHeartRateThreshold != current.lowHeartRateThreshold;
   }
 }
 

@@ -30,6 +30,7 @@ void loop() {
     if (isHeartRateUpdateTime()) {
         updateHeartRate();
         heartrateCharacteristic.writeValue(getCurrentHeartRate());
+        Serial.print("Heart rate: "); Serial.print(getCurrentHeartRate()); Serial.println(" BPM");
     }
 
     if (central) {

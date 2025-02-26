@@ -425,6 +425,17 @@ class BleService {
     await _writeCommand(BleCommand.periodic1.value, enabled ? 1 : 0);
   }
 
+  Future<void> updateHeartRateSettings(String deviceId, bool enabled, int highThreshold, int lowThreshold) async {
+    await ensureConnected();
+    
+    // Send heart rate enabled/disabled command
+    await _writeCommand(BleCommand.heartRateEnabled.value, enabled ? 1 : 0);
+    
+    // Send heart rate thresholds
+    await _writeCommand(BleCommand.highHeartRateThreshold.value, highThreshold);
+    await _writeCommand(BleCommand.lowHeartRateThreshold.value, lowThreshold);
+  }
+
   Future<void> updateDeviceSettings(String deviceId, Map<String, dynamic> settings) async {
     await ensureConnected();
 
@@ -438,6 +449,15 @@ class BleService {
           break;
         case 'periodic1':
           await updatePeriodicEmission1(deviceId, entry.value == 1);
+          break;
+        case 'heartRateEnabled':
+          await _writeCommand(BleCommand.heartRateEnabled.value, entry.value);
+          break;
+        case 'highHeartRate':
+          await _writeCommand(BleCommand.highHeartRateThreshold.value, entry.value);
+          break;
+        case 'lowHeartRate':
+          await _writeCommand(BleCommand.lowHeartRateThreshold.value, entry.value);
           break;
       }
     }

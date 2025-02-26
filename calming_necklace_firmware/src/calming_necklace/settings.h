@@ -5,6 +5,14 @@
 #include <Arduino.h>
 #include "debug.h"
 
+// External variable declarations
+extern int emission1Duration;
+extern int releaseInterval1;
+extern bool periodicEmissionEnabled;
+extern bool heartRateBasedReleaseEnabled;
+extern int highHeartRateThreshold;
+extern int lowHeartRateThreshold;
+
 // Settings getters
 unsigned long getEmission1Duration();
 unsigned long getEmission2Duration();
@@ -17,5 +25,7 @@ byte getHeartrateThreshold();
 // Settings handlers
 void handleSettingsUpdate();
 void checkPeriodicEmissions();
+void setupPins();
+void handlePeripheralLoop(BLEDevice central);
 
 #endif // SETTINGS_H

@@ -4,6 +4,7 @@ import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
 import '../../../../core/services/database_service.dart';
 import '../../../../core/services/logging_service.dart';
+import '../../../../core/services/ble/ble_settings_sync_service.dart';
 
 // Events
 abstract class SettingsEvent extends Equatable {
@@ -87,12 +88,14 @@ class SettingsState extends Equatable {
   final bool isSaving;
   final bool isSaved;
   final String? error;
+  final Necklace? originalNecklace;
 
   const SettingsState({
     required this.necklace,
     this.isSaving = false,
     this.isSaved = false,
     this.error,
+    this.originalNecklace,
   });
 
   SettingsState copyWith({
@@ -100,23 +103,26 @@ class SettingsState extends Equatable {
     bool? isSaving,
     bool? isSaved,
     String? error,
+    Necklace? originalNecklace,
   }) {
     return SettingsState(
       necklace: necklace ?? this.necklace,
       isSaving: isSaving ?? this.isSaving,
       isSaved: isSaved ?? this.isSaved,
       error: error,
+      originalNecklace: originalNecklace ?? this.originalNecklace,
     );
   }
 
   @override
-  List<Object?> get props => [necklace, isSaving, isSaved, error];
+  List<Object?> get props => [necklace, isSaving, isSaved, error, originalNecklace];
 }
 
 // Bloc
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final NecklaceRepository _repository;
   final DatabaseService _databaseService;
+  Necklace? _originalNecklace;
   final LoggingService _logger = LoggingService.instance;
 
   SettingsBloc(Necklace necklace, this._repository, this._databaseService) 
@@ -131,7 +137,12 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateHeartRateBasedRelease>(_onUpdateHeartRateBasedRelease);
     on<UpdateHighHeartRateThreshold>(_onUpdateHighHeartRateThreshold);
     on<UpdateLowHeartRateThreshold>(_onUpdateLowHeartRateThreshold);
+
+    // Store the original necklace state for comparison
+    _originalNecklace = necklace.copyWith();
   }
+
+  Necklace? get originalNecklace => _originalNecklace;
 
   Future<void> _onSaveSettings(
       SaveSettings event,
@@ -256,6 +267,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   void _onRefreshSettings(RefreshSettings event, Emitter<SettingsState> emit) {
+    _originalNecklace = event.necklace.copyWith();
     emit(state.copyWith(necklace: event.necklace));
   }
 

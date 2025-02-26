@@ -9,6 +9,9 @@ static unsigned long emission1Duration = 10000;  // 10 seconds
 static unsigned long interval1 = 300000;         // 5 minutes
 static bool periodic1Enabled = false;
 static byte heartrateThreshold = 90;            // Default 90 BPM
+static bool heartRateBasedReleaseEnabled = false;
+static int highHeartRateThreshold = 100;        // Default: 100 BPM
+static int lowHeartRateThreshold = 60;          // Default: 60 BPM
 
 // Timing variables for periodic emissions
 static unsigned long lastEmission1Time = 0;
@@ -43,6 +46,24 @@ void handleSettingsUpdate() {
         debugPrint(DEBUG_SETTINGS, "Updated heartrateThreshold: ");
         debugPrintf(DEBUG_SETTINGS, "%d\n", heartrateThreshold);
     }
+
+    if (heartRateEnabledCharacteristic.written()) {
+        heartRateBasedReleaseEnabled = heartRateEnabledCharacteristic.value();
+        debugPrint(DEBUG_SETTINGS, "Updated heartRateBasedReleaseEnabled: ");
+        debugPrintf(DEBUG_SETTINGS, "%d\n", heartRateBasedReleaseEnabled ? 1 : 0);
+    }
+
+    if (highHeartRateThresholdCharacteristic.written()) {
+        highHeartRateThreshold = highHeartRateThresholdCharacteristic.value();
+        debugPrint(DEBUG_SETTINGS, "Updated highHeartRateThreshold: ");
+        debugPrintf(DEBUG_SETTINGS, "%d\n", highHeartRateThreshold);
+    }
+
+    if (lowHeartRateThresholdCharacteristic.written()) {
+        lowHeartRateThreshold = lowHeartRateThresholdCharacteristic.value();
+        debugPrint(DEBUG_SETTINGS, "Updated lowHeartRateThreshold: ");
+        debugPrintf(DEBUG_SETTINGS, "%d\n", lowHeartRateThreshold);
+    }
 }
 
 void checkPeriodicEmissions() {
@@ -53,5 +74,28 @@ void checkPeriodicEmissions() {
         delay(emission1Duration);
         handleLEDs(CMD_LED_OFF);
         lastEmission1Time = currentTime;
+    }
+}
+
+void handleSwitchCommand(int command, int value) {
+    switch (command) {
+        case CMD_EMISSION1_DURATION:
+            emission1Duration = value;
+            break;
+        case CMD_INTERVAL1:
+            releaseInterval1 = value;
+            break;
+        case CMD_PERIODIC1:
+            periodicEmissionEnabled = (value == 1);
+            break;
+        case CMD_HEART_RATE_ENABLED:
+            heartRateBasedReleaseEnabled = (value == 1);
+            break;
+        case CMD_HIGH_HEART_RATE_THRESHOLD:
+            highHeartRateThreshold = value;
+            break;
+        case CMD_LOW_HEART_RATE_THRESHOLD:
+            lowHeartRateThreshold = value;
+            break;
     }
 }

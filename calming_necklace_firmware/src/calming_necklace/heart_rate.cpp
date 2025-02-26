@@ -7,6 +7,9 @@
 byte currentHeartRate = MIN_HEART_RATE;
 unsigned long lastHeartRateUpdateTime = 0;
 static const unsigned long HEART_RATE_UPDATE_INTERVAL = 10000; // 10 seconds
+bool heartRateBasedReleaseEnabled = false;
+int highHeartRateThreshold = 100;  // Default: 100 BPM
+int lowHeartRateThreshold = 60;    // Default: 60 BPM
 
 void initHeartRate() {
     debugPrintln(DEBUG_HEART, "Initializing heart rate simulation");
@@ -21,21 +24,38 @@ void updateHeartRate() {
     float amplitude = (MAX_HEART_RATE - MIN_HEART_RATE) / 2.0;
     float offset = MIN_HEART_RATE + amplitude;
     float phase = (float)(currentTime % OSCILLATION_PERIOD) / OSCILLATION_PERIOD;
-    
+
     // Calculate the heart rate using sine wave
     float sineValue = sin(2 * PI * phase);
     currentHeartRate = (byte)(offset + amplitude * sineValue);
+
+    // Log the updated heart rate
+    debugPrintf(DEBUG_HEART, "Heart rate: %d BPM\n", currentHeartRate);
+
+    // Check if heart rate based release is enabled
+    if (heartRateBasedReleaseEnabled) {
+        // Trigger emission if heart rate is outside the threshold range
+        if (currentHeartRate > highHeartRateThreshold || currentHeartRate < lowHeartRateThreshold) {
+            debugPrintf(DEBUG_HEART, "Heart rate outside threshold range. Triggering emission.\n");
+            // Call function to trigger emission based on heart rate
+            triggerEmissionBasedOnHeartRate();
+        }
+    }
 
     // Update the last update time
     lastHeartRateUpdateTime = currentTime;
 
     // Log the last update time
-    debugPrintf(DEBUG_HEART, "Last heart rate update time: %d \n", lastHeartRateUpdateTime);
-
-    // Log the updated heart rate
-    debugPrintf(DEBUG_HEART, "Heart rate: %d BPM\n", currentHeartRate);
+    debugPrintf(DEBUG_HEART, "Last heart rate update time: %lu\n", lastHeartRateUpdateTime);
 }
 
 byte getCurrentHeartRate() {
     return currentHeartRate;
+}
+
+void triggerEmissionBasedOnHeartRate() {
+    // Trigger the LED to turn on for the configured duration
+    debugPrintln(DEBUG_HEART, "Triggering emission based on heart rate");
+    setLedState(true);
+    // The LED will be turned off after the emission duration by the main loop
 }
