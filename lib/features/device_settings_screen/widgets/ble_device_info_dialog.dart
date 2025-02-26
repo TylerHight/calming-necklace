@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/data/models/ble_device.dart';
 import '../../../core/services/logging_service.dart';
+import '../../../core/services/database_service.dart';
 
 class BleDeviceInfoDialog extends StatelessWidget {
   final BleDevice device;
   final LoggingService _logger = LoggingService.instance;
+  final DatabaseService _databaseService = DatabaseService();
 
   BleDeviceInfoDialog({
     Key? key,
@@ -78,43 +80,51 @@ class BleDeviceInfoDialog extends StatelessWidget {
   }
 
   Widget _buildServicesList() {
-    _logger.logDebug('Device services before dialog: ${device.services?.length ?? 0}');
-
-    if (device.services == null) {
-      _logger.logDebug('No services data available for device: ${device.id}');
-      return const Text(
-        'No services information available',
-        style: TextStyle(fontStyle: FontStyle.italic),
-      );
-    }
-
-    final services = device.services!.where((s) => s.uuid.isNotEmpty).toList();
-    if (services.isEmpty) {
-      return const Text(
-        'No valid services discovered',
-        style: TextStyle(fontStyle: FontStyle.italic),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Services (${services.length})',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: services.map((service) => _buildServiceItem(service)).toList(),
+    return FutureBuilder<List<BleServiceInfo>>(
+      future: _databaseService.getDeviceServices(device.id),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (snapshot.hasError) {
+          _logger.logError('Error loading services: ${snapshot.error}');
+          return Text(
+            'Error loading services: ${snapshot.error}',
+            style: const TextStyle(color: Colors.red),
+          );
+        }
+        
+        final services = snapshot.data ?? [];
+        
+        if (services.isEmpty) {
+          return const Text(
+            'No services discovered for this device',
+            style: TextStyle(fontStyle: FontStyle.italic),
+          );
+        }
+        
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Services (${services.length})',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-          ),
-        ),
-      ],
+            const SizedBox(height: 8),
+            Container(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: services.map((service) => _buildServiceItem(service)).toList(),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 

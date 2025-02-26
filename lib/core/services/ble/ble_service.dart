@@ -177,6 +177,7 @@ class BleService {
       _logger.logBleDebug('Discovered ${services.length} services for device: ${device.id}');
 
       List<BleServiceInfo> discoveredServices = [];
+      final databaseService = DatabaseService();
 
       for (var service in services) {
         _logger.logBleDebug('Service UUID: ${service.uuid}');
@@ -200,16 +201,9 @@ class BleService {
         ));
       }
 
-      // Update the BleDevice model with discovered services
-      final bleDevice = BleDevice(
-        id: device.id.id,
-        name: device.name,
-        address: device.id.id,
-        rssi: await device.readRssi(),
-        deviceType: BleDeviceType.necklace, // Update with actual type if available
-        services: discoveredServices,
-        device: device,
-      );
+      // Save the discovered services to the database
+      await databaseService.saveDeviceServices(device.id.id, discoveredServices);
+      _logger.logBleInfo('Saved ${discoveredServices.length} services to database for device: ${device.id}');
 
       _isInitialized = true;
       _logger.logBleInfo('Service and characteristic discovery completed for device: ${device.id}');
@@ -227,6 +221,7 @@ class BleService {
       final services = await device.discoverServices();
 
       List<BleServiceInfo> discoveredServices = [];
+      final databaseService = DatabaseService();
 
       for (var service in services) {
         List<BleCharacteristicInfo> characteristics = [];
@@ -248,6 +243,10 @@ class BleService {
           characteristics: characteristics,
         ));
       }
+
+      // Save the discovered services to the database
+      await databaseService.saveDeviceServices(device.id.id, discoveredServices);
+      _logger.logBleInfo('Saved ${discoveredServices.length} services to database for device: ${device.id}');
 
       return discoveredServices;
     } catch (e) {
@@ -275,28 +274,35 @@ class BleService {
         }
       }
 
-      // Create updated BleDevice with discovered services
+      // Create updated BleDevice
       final bleDevice = BleDevice(
         id: device.id.id,
         name: device.name,
         address: device.id.id,
         rssi: await device.readRssi(),
         deviceType: BleDeviceType.necklace,
-        services: services,
         device: device,
       );
-
-      // Log the complete BleDevice object
-      _logger.logBleInfo('Saving BleDevice to database: ${jsonEncode(bleDevice.toMap())}');
-
+      
       // Save the device info to database
-      final databaseService = await DatabaseService().database;
-      await databaseService.update(
+      final databaseService = DatabaseService();
+      final db = await databaseService.database;
+      
+      // Check if this device is already associated with a necklace
+      final necklaces = await db.query(
         'necklaces',
-        {'bleDevice': jsonEncode(bleDevice.toMap())},
         where: 'bleDevice LIKE ?',
         whereArgs: ['%${device.id.id}%'],
       );
+      
+      if (necklaces.isNotEmpty) {
+        await db.update(
+          'necklaces',
+          {'bleDevice': jsonEncode(bleDevice.toMap())},
+          where: 'bleDevice LIKE ?',
+          whereArgs: ['%${device.id.id}%'],
+        );
+      }
 
       await _initializeCharacteristics(device);
     }

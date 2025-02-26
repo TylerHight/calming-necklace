@@ -103,8 +103,8 @@ class Necklace extends Equatable {
     return {
       'id': id,
       'name': name,
-      'bleDevice': _serializeBleDevice(bleDevice),
-      'heartRateMonitorDevice': _serializeBleDevice(heartRateMonitorDevice),
+      'bleDevice': bleDevice != null ? jsonEncode(bleDevice?.toMap()) : null,
+      'heartRateMonitorDevice': heartRateMonitorDevice != null ? jsonEncode(heartRateMonitorDevice?.toMap()) : null,
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
       'releaseInterval1': releaseInterval1.inSeconds,
@@ -118,17 +118,6 @@ class Necklace extends Equatable {
       'highHeartRateThreshold': highHeartRateThreshold,
       'lowHeartRateThreshold': lowHeartRateThreshold,
     };
-  }
-
-  String? _serializeBleDevice(BleDevice? device) {
-    if (device == null) return null;
-    try {
-      return jsonEncode(device.toMap());
-    } catch (e) {
-      debugPrint('Error serializing BleDevice: $e');
-      LoggingService.instance.logError('Error serializing BleDevice: $e');
-      return null;
-    }
   }
 
   factory Necklace.fromMap(Map<String, dynamic> map) {

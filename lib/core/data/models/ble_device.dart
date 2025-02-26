@@ -1,7 +1,6 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:equatable/equatable.dart';
 import '../../services/logging_service.dart';
-import '../repositories/ble_repository.dart';
 
 enum BleDeviceType { necklace, heartRateMonitor }
 
@@ -79,7 +78,6 @@ class BleDevice extends Equatable {
   final int rssi;
   final BleDeviceType deviceType;
   final BluetoothDevice? device;
-  final List<BleServiceInfo>? services;
 
   const BleDevice({
     required this.id,
@@ -88,7 +86,6 @@ class BleDevice extends Equatable {
     required this.rssi,
     required this.deviceType,
     this.device,
-    this.services,
   });
 
   Map<String, dynamic> toMap() {
@@ -99,7 +96,6 @@ class BleDevice extends Equatable {
         'address': address,
         'rssi': rssi,
         'deviceType': deviceType.toString().split('.').last,
-        'services': services?.map((s) => s.toMap()).toList(),
       };
     } catch (e) {
       LoggingService.instance.logError('Error converting BleDevice to map: $e');
@@ -109,22 +105,12 @@ class BleDevice extends Equatable {
 
   factory BleDevice.fromMap(Map<String, dynamic> map) {
     try {
-      List<BleServiceInfo>? services;
-      if (map['services'] != null) {
-        if (map['services'] is List) {
-          services = (map['services'] as List).map((serviceMap) {
-            return BleServiceInfo.fromMap(Map<String, dynamic>.from(serviceMap));
-          }).toList();
-        }
-      }
-
       return BleDevice(
         id: map['id'] as String? ?? '',
         name: map['name'] as String? ?? '',
         address: map['address'] as String? ?? '',
         rssi: map['rssi'] as int? ?? 0,
         deviceType: _parseDeviceType(map['deviceType']),
-        services: services,
       );
     } catch (e) {
       LoggingService.instance.logError('Error parsing BleDevice from map: $e\nMap: $map');
@@ -139,7 +125,6 @@ class BleDevice extends Equatable {
     int? rssi,
     BleDeviceType? deviceType,
     BluetoothDevice? device,
-    List<BleServiceInfo>? services,
   }) {
     return BleDevice(
       id: id ?? this.id,
@@ -148,7 +133,6 @@ class BleDevice extends Equatable {
       rssi: rssi ?? this.rssi,
       deviceType: deviceType ?? this.deviceType,
       device: device ?? this.device,
-      services: services ?? this.services,
     );
   }
 
@@ -166,10 +150,10 @@ class BleDevice extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, address, rssi, deviceType, services];
+  List<Object?> get props => [id, name, address, rssi, deviceType];
 
   @override
   String toString() {
-    return 'BleDevice(id: $id, name: $name, address: $address, rssi: $rssi, type: $deviceType, services: ${services?.length ?? 0})';
+    return 'BleDevice(id: $id, name: $name, address: $address, rssi: $rssi, type: $deviceType)';
   }
 }

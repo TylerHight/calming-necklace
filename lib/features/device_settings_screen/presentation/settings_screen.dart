@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/blocs/ble/ble_event.dart';
@@ -402,9 +403,11 @@ class _SettingsContentState extends State<SettingsContent> {
                 ).then((device) async {
                   try {
                     if (device != null) {
+                        final deviceJson = jsonEncode(device.toMap());
+                        _logger.logDebug('Saving heart rate monitor device: ${deviceJson.substring(0, 100)}...');
                         await widget.databaseService.updateNecklaceSettings(
                           widget.necklace.id,
-                          {'heartRateMonitorDevice': device.toMap()},
+                          {'heartRateMonitorDevice': deviceJson},
                         );
                         // Refresh settings
                         context.read<SettingsBloc>().add(
@@ -481,9 +484,11 @@ class _SettingsContentState extends State<SettingsContent> {
                 ).then((device) async {
                   try {
                     if (device != null) {
+                        final deviceJson = jsonEncode(device.toMap());
+                        _logger.logDebug('Saving necklace device: ${deviceJson.substring(0, 100)}...');
                         await widget.databaseService.updateNecklaceSettings(
                           widget.necklace.id,
-                          {'bleDevice': device.toMap()},
+                          {'bleDevice': deviceJson},
                         );
 
                         // Notify the necklaces bloc to refresh

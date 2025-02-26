@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import '../data/models/ble_device.dart';
 import '../data/models/necklace.dart';
 import '../data/models/note.dart';
 import 'logging_service.dart';
@@ -28,7 +29,7 @@ class DatabaseService {
     String path = join(await getDatabasesPath(), 'necklaces.db');
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -63,6 +64,34 @@ class DatabaseService {
       isHeartRateBasedReleaseEnabled INTEGER DEFAULT 0,
       highHeartRateThreshold INTEGER DEFAULT 120,
       lowHeartRateThreshold INTEGER DEFAULT 60
+    )
+  ''');
+
+    // Create tables for BLE services, characteristics, and properties
+    await db.execute('''
+    CREATE TABLE ble_services(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      device_id TEXT NOT NULL,
+      uuid TEXT NOT NULL,
+      FOREIGN KEY (device_id) REFERENCES necklaces(id)
+    )
+  ''');
+
+    await db.execute('''
+    CREATE TABLE ble_characteristics(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      service_id INTEGER NOT NULL,
+      uuid TEXT NOT NULL,
+      FOREIGN KEY (service_id) REFERENCES ble_services(id)
+    )
+  ''');
+
+    await db.execute('''
+    CREATE TABLE characteristic_properties(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      characteristic_id INTEGER NOT NULL,
+      property TEXT NOT NULL,
+      FOREIGN KEY (characteristic_id) REFERENCES ble_characteristics(id)
     )
   ''');
   }
@@ -134,6 +163,46 @@ class DatabaseService {
       ALTER TABLE necklaces
       ADD COLUMN heartRateMonitorDevice TEXT
     ''');
+    }
+    
+    if (oldVersion < 7) {
+      // Create tables for BLE services, characteristics, and properties
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS ble_services(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        device_id TEXT NOT NULL,
+        uuid TEXT NOT NULL,
+        FOREIGN KEY (device_id) REFERENCES necklaces(id)
+      )
+    ''');
+
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS ble_characteristics(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        service_id INTEGER NOT NULL,
+        uuid TEXT NOT NULL,
+        FOREIGN KEY (service_id) REFERENCES ble_services(id)
+      )
+    ''');
+
+      await db.execute('''
+      CREATE TABLE IF NOT EXISTS characteristic_properties(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        characteristic_id INTEGER NOT NULL,
+        property TEXT NOT NULL,
+        FOREIGN KEY (characteristic_id) REFERENCES ble_characteristics(id)
+      )
+    ''');
+
+      // Migrate existing data if possible
+      try {
+        final List<Map<String, dynamic>> necklaces = await db.query('necklaces');
+        for (var necklace in necklaces) {
+          await _migrateDeviceServicesData(db, necklace);
+        }
+      } catch (e) {
+        LoggingService.instance.logError('Error migrating BLE service data: $e');
+      }
     }
   }
 
@@ -237,45 +306,45 @@ class DatabaseService {
   Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
     try {
       final db = await database;
-      
+      Map<String, dynamic> sanitizedSettings = Map.from(settings);
+
       // Handle BLE device data if present
-      if (settings.containsKey('bleDevice') && settings['bleDevice'] is Map) {
+      if (sanitizedSettings.containsKey('bleDevice') && sanitizedSettings['bleDevice'] is Map) {
         try {
           // Convert the BleDevice map to a JSON string
-          final bleDeviceMap = settings['bleDevice'] as Map<String, dynamic>;
-          final services = bleDeviceMap['services'] as List<dynamic>?;
+          final bleDeviceMap = sanitizedSettings['bleDevice'] as Map<String, dynamic>;
+          _logger.logDebug('Converting BleDevice map to JSON string: ${bleDeviceMap.toString().substring(0, 100)}...');
 
-          if (services != null) {
-            for (var service in services) {
-              _logger.logDebug('Service UUID: ${service['uuid']}');
-              final characteristics = service['characteristics'] as List<dynamic>?;
-              if (characteristics != null) {
-                for (var characteristic in characteristics) {
-                  _logger.logDebug('Characteristic UUID: ${characteristic['uuid']}');
-                  _logger.logDebug('Properties: ${characteristic['properties']}');
-                }
+          // Log the services if they exist
+          if (bleDeviceMap.containsKey('services')) {
+            final services = bleDeviceMap['services'];
+            if (services != null) {
+              _logger.logDebug('Services found: ${services.length}');
+              for (var service in services) {
+                _logger.logDebug('Service UUID: ${service['uuid']}');
               }
+            } else {
+              _logger.logDebug('Services are null.');
             }
-          } else {
-            _logger.logDebug('Services are null.');
           }
           
           // Convert to JSON string for storage
-          settings['bleDevice'] = jsonEncode(bleDeviceMap);
+          sanitizedSettings['bleDevice'] = jsonEncode(bleDeviceMap);
         } catch (e) {
           _logger.logError('Error serializing BLE device data: $e');
           // If there's an error, remove the bleDevice field to prevent database errors
-          settings.remove('bleDevice');
+          sanitizedSettings.remove('bleDevice');
         }
-      } else if (settings.containsKey('bleDevice') && settings['bleDevice'] is String) {
+      } else if (sanitizedSettings.containsKey('bleDevice') && sanitizedSettings['bleDevice'] is String) {
         // Already a JSON string, no need to convert
+        _logger.logDebug('BleDevice is already a JSON string');
       } else {
         _logger.logDebug('BleDevice data not present or in unexpected format');
       }
 
       await db.update(
         'necklaces',
-        settings,
+        sanitizedSettings,
         where: 'id = ?',
         whereArgs: [id],
       );
@@ -296,7 +365,6 @@ class DatabaseService {
 
     if (maps.isNotEmpty) {
       final necklace = Necklace.fromMap(maps.first);
-      _logger.logDebug('Retrieved necklace services: ${necklace.bleDevice?.services?.length ?? 0}');
       return necklace;
     }
     return null;
@@ -355,6 +423,194 @@ class DatabaseService {
       _logger.logError('Error removing heart rate monitor: $e');
       rethrow;
     }
+  }
+
+  // New methods for BLE services, characteristics, and properties
+  Future<void> _migrateDeviceServicesData(Database db, Map<String, dynamic> necklace) async {
+    try {
+      if (necklace['bleDevice'] == null) return;
+      
+      final deviceId = necklace['id'];
+      final bleDeviceJson = necklace['bleDevice'];
+      
+      if (bleDeviceJson == null) return;
+      
+      Map<String, dynamic>? bleDeviceMap;
+      try {
+        bleDeviceMap = jsonDecode(bleDeviceJson);
+      } catch (e) {
+        LoggingService.instance.logError('Error decoding BLE device JSON: $e');
+        return;
+      }
+      
+      // Check if bleDeviceMap is null or doesn't contain services data
+      if (bleDeviceMap == null) return;
+      
+      // Check if the map contains a 'services' key - older versions might not have this
+      if (!bleDeviceMap.containsKey('services')) {
+        LoggingService.instance.logDebug('No services data found in device map for migration');
+        return;
+      }
+     
+     final services = bleDeviceMap['services'] as List?;
+     if (services == null) return;
+     
+     for (var service in services) {
+       final serviceUuid = service['uuid'];
+       if (serviceUuid == null) continue;
+       
+       // Insert service
+       final serviceId = await db.insert('ble_services', {
+         'device_id': deviceId,
+         'uuid': serviceUuid,
+       });
+       
+       // Process characteristics
+       final characteristics = service['characteristics'] as List?;
+       if (characteristics == null) continue;
+       
+       for (var characteristic in characteristics) {
+         final characteristicUuid = characteristic['uuid'];
+         if (characteristicUuid == null) continue;
+         
+         // Insert characteristic
+         final characteristicId = await db.insert('ble_characteristics', {
+           'service_id': serviceId,
+           'uuid': characteristicUuid,
+         });
+         
+         // Process properties
+         final properties = characteristic['properties'] as List?;
+         if (properties == null) continue;
+         
+         for (var property in properties) {
+           await db.insert('characteristic_properties', {
+             'characteristic_id': characteristicId,
+             'property': property,
+           });
+         }
+       }
+     }
+    } catch (e) {
+      LoggingService.instance.logError('Error migrating device services data: $e');
+    }
+  }
+
+  Future<void> saveDeviceServices(String deviceId, List<BleServiceInfo> services) async {
+    final db = await database;
+    
+    await db.transaction((txn) async {
+      // First, delete existing services for this device
+      await _deleteDeviceServices(txn, deviceId);
+      
+      // Then insert the new services
+      for (var service in services) {
+        final serviceId = await txn.insert('ble_services', {
+          'device_id': deviceId,
+          'uuid': service.uuid,
+        });
+        
+        if (service.characteristics != null) {
+          for (var characteristic in service.characteristics!) {
+            final characteristicId = await txn.insert('ble_characteristics', {
+              'service_id': serviceId,
+              'uuid': characteristic.uuid,
+            });
+            
+            for (var property in characteristic.properties) {
+              await txn.insert('characteristic_properties', {
+                'characteristic_id': characteristicId,
+                'property': property,
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> _deleteDeviceServices(DatabaseExecutor db, String deviceId) async {
+    // Get all services for this device
+    final services = await db.query(
+      'ble_services',
+      where: 'device_id = ?',
+      whereArgs: [deviceId],
+    );
+    
+    for (var service in services) {
+      final serviceId = service['id'];
+      
+      // Get all characteristics for this service
+      final characteristics = await db.query(
+        'ble_characteristics',
+        where: 'service_id = ?',
+        whereArgs: [serviceId],
+      );
+      
+      for (var characteristic in characteristics) {
+        final characteristicId = characteristic['id'];
+        
+        // Delete properties for this characteristic
+        await db.delete('characteristic_properties', where: 'characteristic_id = ?', whereArgs: [characteristicId]);
+      }
+      
+      // Delete characteristics for this service
+      await db.delete('ble_characteristics', where: 'service_id = ?', whereArgs: [serviceId]);
+    }
+    
+    // Delete services for this device
+    await db.delete('ble_services', where: 'device_id = ?', whereArgs: [deviceId]);
+  }
+
+  Future<List<BleServiceInfo>> getDeviceServices(String deviceId) async {
+    final db = await database;
+    final List<BleServiceInfo> result = [];
+    
+    final services = await db.query(
+      'ble_services',
+      where: 'device_id = ?',
+      whereArgs: [deviceId],
+    );
+    
+    for (var service in services) {
+      final serviceId = service['id'];
+      final serviceUuid = service['uuid'] as String;
+      
+      final characteristics = await db.query(
+        'ble_characteristics',
+        where: 'service_id = ?',
+        whereArgs: [serviceId],
+      );
+      
+      List<BleCharacteristicInfo> characteristicsList = [];
+      
+      for (var characteristic in characteristics) {
+        final characteristicId = characteristic['id'];
+        final characteristicUuid = characteristic['uuid'] as String;
+        
+        final properties = await db.query(
+          'characteristic_properties',
+          where: 'characteristic_id = ?',
+          whereArgs: [characteristicId],
+        );
+        
+        List<String> propertiesList = properties
+            .map((p) => p['property'] as String)
+            .toList();
+        
+        characteristicsList.add(BleCharacteristicInfo(
+          uuid: characteristicUuid,
+          properties: propertiesList,
+        ));
+      }
+      
+      result.add(BleServiceInfo(
+        uuid: serviceUuid,
+        characteristics: characteristicsList,
+      ));
+    }
+    
+    return result;
   }
 
   void dispose() {
