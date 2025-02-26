@@ -5,17 +5,18 @@
 #include "timing.h"
 #include "heart_rate.h"
 #include "debug.h"
+#include "emission_control.h"
 
 void setup() {
     Serial.begin(9600);
-    while (!Serial);
-    
+
     // Initialize debug system
     debugInit();
 
     debugPrintln(DEBUG_GENERAL, "\n=== Calming Necklace Startup ===");
 
     setupPins();
+    setupEmissionControl();
     initHeartRate();
     setupBLE();
     resetHeartRateTimer(); // Initialize heart rate timer at startup
@@ -33,6 +34,7 @@ void loop() {
         //Serial.print("Heart rate: "); Serial.print(getCurrentHeartRate()); Serial.println(" BPM");
     }
 
+    updateEmissionState();
     if (central) {
         onCentralConnected(central);
 

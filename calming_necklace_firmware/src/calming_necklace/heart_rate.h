@@ -21,6 +21,5 @@ extern int lowHeartRateThreshold;
 void initHeartRate();
 void updateHeartRate();
 byte getCurrentHeartRate();
-void triggerEmissionBasedOnHeartRate();
 
 #endif // HEART_RATE_H

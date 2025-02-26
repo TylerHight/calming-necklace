@@ -1,6 +1,7 @@
 // heart_rate.cpp
 #include "heart_rate.h"
 #include <math.h>
+#include "emission_control.h"
 #include "debug.h"
 #include "led_control.h"
 
@@ -36,11 +37,7 @@ void updateHeartRate() {
     // Check if heart rate based release is enabled
     if (heartRateBasedReleaseEnabled) {
         // Trigger emission if heart rate is outside the threshold range
-        if (currentHeartRate > highHeartRateThreshold || currentHeartRate < lowHeartRateThreshold) {
-            debugPrintf(DEBUG_HEART, "Heart rate outside threshold range. Triggering emission.\n");
-            // Call function to trigger emission based on heart rate
-            triggerEmissionBasedOnHeartRate();
-        }
+        checkHeartRateBasedEmission(currentHeartRate);
     }
 
     // Update the last update time
@@ -52,12 +49,4 @@ void updateHeartRate() {
 
 byte getCurrentHeartRate() {
     return currentHeartRate;
-}
-
-void triggerEmissionBasedOnHeartRate() {
-    // Trigger the LED to turn on for the configured duration
-    debugPrintln(DEBUG_HEART, "Triggering emission based on heart rate");
-    // Turn on the LED
-    handleLEDs(CMD_LED_RED);
-    // The LED will be turned off after the emission duration by the main loop
 }

@@ -6,6 +6,7 @@
 #include "timing.h"
 #include "heart_rate.h"
 #include "debug.h"
+#include "emission_control.h"
 
 BLEService settingsService("19B10000-E8F2-537E-4F6C-D104768A1214");  // Settings service
 BLEService ledService("19b10000-e8f2-537e-4f6c-d104768a1214");  // LED control service
@@ -92,7 +93,13 @@ void onCentralDisconnected(BLEDevice central) {
 void handlePeripheralLoop(BLEDevice central) {
     if (switchCharacteristic.written()) {
         resetActivityTimer();
-        handleLEDs(switchCharacteristic.value());
+        byte command = switchCharacteristic.value();
+        
+        if (command == CMD_LED_RED) {
+            triggerEmission(TRIGGER_MANUAL);
+        } else {
+            handleLEDs(command);
+        }
     }
 
     if (keepAliveCharacteristic.written()) {
@@ -101,7 +108,7 @@ void handlePeripheralLoop(BLEDevice central) {
     }
 
     handleSettingsUpdate();
-    checkPeriodicEmissions();
+    updateEmissionState();
 
     if (isConnectionTimedOut() || isKeepAliveTimedOut()) {
         if (isConnected) {

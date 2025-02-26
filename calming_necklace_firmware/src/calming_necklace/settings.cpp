@@ -2,11 +2,12 @@
 #include "settings.h"
 #include "ble_config.h"
 #include "led_control.h"
+#include "emission_control.h"
 #include "debug.h"
 
 // Settings storage
 unsigned long emission1Duration = 10000;  // 10 seconds
-unsigned long releaseInterval1 = 300000;  // 5 minutes
+unsigned long releaseInterval1 = 30000;  // 30 seconds
 bool periodicEmissionEnabled = false;
 byte heartrateThreshold = 90;            // Default 90 BPM
 bool heartRateBasedReleaseEnabled = false;
@@ -70,10 +71,7 @@ void checkPeriodicEmissions() {
     unsigned long currentTime = millis();
 
     if (periodicEmissionEnabled && (currentTime - lastEmission1Time >= releaseInterval1)) {
-        handleLEDs(CMD_LED_RED);
-        delay(getEmission1Duration());
-        handleLEDs(CMD_LED_OFF);
-        lastEmission1Time = currentTime;
+        triggerEmission(TRIGGER_PERIODIC);
     }
 }
 
