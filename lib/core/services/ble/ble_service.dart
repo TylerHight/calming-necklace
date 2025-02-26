@@ -138,19 +138,31 @@ class BleService {
     _rssiTimer = null;
   }
 
-  Future<void> disconnectFromDevice() async {
+  Future<void> disconnectFromDevice([String? deviceId]) async {
+    // If a specific device ID is provided, verify it matches the currently connected device
+    if (deviceId != null && _connectedDevice != null && 
+        _connectedDevice!.id.id != deviceId) {
+      _logger.logBleError('Disconnect error: Invalid argument (key): Key not in map.: "$deviceId"');
+      _logger.logBleWarning('Attempted to disconnect from device $deviceId but currently connected to ${_connectedDevice!.id.id}');
+      return;
+    }
+    
     if (_connectedDevice != null) {
       try {
+        _logger.logBleInfo('Attempting to disconnect from device: ${_connectedDevice!.id.id}');
         await _connectionManager.disconnect();
         _connectedDevice = null;
         _switchCharacteristic = null;
         _isInitialized = false; // Ensure characteristics can be re-initialized
         _stopRssiUpdates();
+        _logger.logBleInfo('Successfully disconnected from device');
       } catch (e) {
-        _logger.logBleError('Disconnect error', e);
+        _logger.logBleError('Disconnect error: $e');
         _deviceStateController.add('Disconnect error: $e');
         rethrow;
       }
+    } else {
+      _logger.logBleWarning('Disconnect called but no device is currently connected');
     }
   }
 

@@ -1,5 +1,6 @@
 // led_control.cpp
 #include "led_control.h"
+#include "debug.h"
 
 void setupPins() {
     pinMode(LEDR, OUTPUT);
@@ -14,30 +15,30 @@ void setupPins() {
 }
 
 void handleLEDs(byte command) {
-    Serial.print("\nHandling LED command: ");
-    Serial.println(command);
+    debugPrint(DEBUG_LED, "\nHandling LED command: ");
+    debugPrintf(DEBUG_LED, "%d\n", command);
 
     switch (command) {
         case CMD_LED_RED:
-            Serial.println("Red LED on");
+            debugPrintln(DEBUG_LED, "Red LED on");
             digitalWrite(LEDR, LOW);
             digitalWrite(LEDG, HIGH);
             digitalWrite(LEDB, HIGH);
             break;
         case CMD_LED_GREEN:
-            Serial.println("Green LED on");
+            debugPrintln(DEBUG_LED, "Green LED on");
             digitalWrite(LEDR, HIGH);
             digitalWrite(LEDG, LOW);
             digitalWrite(LEDB, HIGH);
             break;
         case CMD_LED_BLUE:
-            Serial.println("Blue LED on");
+            debugPrintln(DEBUG_LED, "Blue LED on");
             digitalWrite(LEDR, HIGH);
             digitalWrite(LEDG, HIGH);
             digitalWrite(LEDB, LOW);
             break;
         default:
-            Serial.println("LEDs off");
+            debugPrintln(DEBUG_LED, "LEDs off");
             digitalWrite(LEDR, HIGH);
             digitalWrite(LEDG, HIGH);
             digitalWrite(LEDB, HIGH);

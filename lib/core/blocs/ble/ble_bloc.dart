@@ -104,29 +104,37 @@ class BleBloc extends Bloc<BleEvent, BleState> {
   Future<void> _onDisconnectRequest(BleDisconnectRequest event, Emitter<BleState> emit) async {
     try {
       _logger.logBleInfo('Attempting to disconnect from device: ${event.deviceId}');
-      
+
+      // Check if we're actually connected to this device
+      if (!state.deviceConnectionStates.containsKey(event.deviceId)) {
+        _logger.logBleInfo('Device ${event.deviceId} is not currently connected');
+        return;
+      }
+
       // Update state to show disconnecting
       emit(state.copyWith(
         deviceState: 'Disconnecting...',
         deviceConnectionStates: Map.from(state.deviceConnectionStates)..update(event.deviceId, (_) => false),
       ));
 
-      // Ensure all subscriptions are cancelled
-      _deviceStateSubscription?.cancel();
-      _connectionStatusSubscription?.cancel();
-      _reconnectionAttemptsSubscription?.cancel();
-      _rssiSubscription?.cancel();
+      // Clean up device-specific subscriptions if needed
+      if (_bleService.connectedDevice?.id.toString() == event.deviceId) {
+        _deviceStateSubscription?.cancel();
+        _connectionStatusSubscription?.cancel();
+        _reconnectionAttemptsSubscription?.cancel();
+        _rssiSubscription?.cancel();
+      }
 
-      // Perform disconnect
-      await _bleService.disconnectFromDevice();
-      
-      // Clear device state completely
+      // Perform disconnect with specific device ID
+      await _bleService.disconnectFromDevice(event.deviceId);
+
+      // Remove this device from state
       emit(state.copyWith(
         deviceState: 'Disconnected',
         isConnecting: false,
         deviceConnectionStates: Map.from(state.deviceConnectionStates)..remove(event.deviceId),
       ));
-      
+
       _logger.logBleInfo('Successfully disconnected from device: ${event.deviceId}');
     } catch (e) {
       _logger.logBleError('Disconnect error: ${e.toString()}', e);

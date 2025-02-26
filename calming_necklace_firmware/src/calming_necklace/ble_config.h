@@ -4,6 +4,7 @@
 #define BLE_CONFIG_H
 
 #include <ArduinoBLE.h>
+#include "debug.h"
 
 // Services
 extern BLEService ledService;

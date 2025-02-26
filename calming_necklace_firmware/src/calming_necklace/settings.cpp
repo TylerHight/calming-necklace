@@ -2,6 +2,7 @@
 #include "settings.h"
 #include "ble_config.h"
 #include "led_control.h"
+#include "debug.h"
 
 // Settings storage
 static unsigned long emission1Duration = 10000;  // 10 seconds
@@ -21,26 +22,26 @@ byte getHeartrateThreshold() { return heartrateThreshold; }
 void handleSettingsUpdate() {
     if (emission1Characteristic.written()) {
         emission1Duration = emission1Characteristic.value();
-        Serial.print("Updated emission1Duration: ");
-        Serial.println(emission1Duration);
+        debugPrint(DEBUG_SETTINGS, "Updated emission1Duration: ");
+        debugPrintf(DEBUG_SETTINGS, "%lu\n", emission1Duration);
     }
 
     if (interval1Characteristic.written()) {
         interval1 = interval1Characteristic.value();
-        Serial.print("Updated interval1: ");
-        Serial.println(interval1);
+        debugPrint(DEBUG_SETTINGS, "Updated interval1: ");
+        debugPrintf(DEBUG_SETTINGS, "%lu\n", interval1);
     }
 
     if (periodic1Characteristic.written()) {
         periodic1Enabled = periodic1Characteristic.value();
-        Serial.print("Updated periodic1Enabled: ");
-        Serial.println(periodic1Enabled);
+        debugPrint(DEBUG_SETTINGS, "Updated periodic1Enabled: ");
+        debugPrintf(DEBUG_SETTINGS, "%d\n", periodic1Enabled ? 1 : 0);
     }
 
     if (heartrateCharacteristic.written()) {
         heartrateThreshold = heartrateCharacteristic.value();
-        Serial.print("Updated heartrateThreshold: ");
-        Serial.println(heartrateThreshold);
+        debugPrint(DEBUG_SETTINGS, "Updated heartrateThreshold: ");
+        debugPrintf(DEBUG_SETTINGS, "%d\n", heartrateThreshold);
     }
 }
 

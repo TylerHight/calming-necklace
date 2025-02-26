@@ -309,7 +309,7 @@ class BleConnectionManager {
   Future<void> disconnect() async {
     try {
       if (_currentDevice != null) {
-        _logger.logBleInfo('Starting disconnect sequence');
+        _logger.logBleInfo('Starting disconnect sequence for device: ${_currentDevice!.platformName}');
         onStateChange(BleConnectionState.disconnecting);
 
         // Cancel all active subscriptions and timers
@@ -318,7 +318,13 @@ class BleConnectionManager {
         // Disable notifications and disconnect from characteristics
         await _disableNotifications();
 
-        await _currentDevice!.disconnect();
+        try {
+          await _currentDevice!.disconnect();
+        } catch (e) {
+          _logger.logBleWarning('Error during device disconnect: $e - continuing cleanup anyway');
+          // Continue with cleanup even if disconnect fails
+        }
+        
         // Wait for disconnect to complete and verify
         await Future.delayed(Duration(milliseconds: 1000));
 
@@ -326,7 +332,9 @@ class BleConnectionManager {
         onStateChange(BleConnectionState.disconnected);
       }
     } catch (e) {
-      _logger.logBleError('Disconnect error', e);
+      _logger.logBleError('Disconnect error: $e');
+      // Clean up resources even if disconnect fails
+      _cleanupMonitoring();
       rethrow;
     }
   }

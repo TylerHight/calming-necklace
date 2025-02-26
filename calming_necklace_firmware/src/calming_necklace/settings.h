@@ -3,6 +3,7 @@
 #define SETTINGS_H
 
 #include <Arduino.h>
+#include "debug.h"
 
 // Settings getters
 unsigned long getEmission1Duration();

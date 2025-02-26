@@ -3,6 +3,7 @@
 #define LED_CONTROL_H
 
 #include <Arduino.h>
+#include "debug.h"
 
 // Command definitions
 #define CMD_LED_OFF 0

@@ -4,6 +4,8 @@
 #include "led_control.h"
 #include "settings.h"
 #include "timing.h"
+#include "heart_rate.h"
+#include "debug.h"
 
 BLEService settingsService("19B10000-E8F2-537E-4F6C-D104768A1214");  // Settings service
 BLEService ledService("19b10000-e8f2-537e-4f6c-d104768a1214");  // LED control service
@@ -18,13 +20,13 @@ BLEByteCharacteristic heartrateCharacteristic("2A1F", BLERead | BLEWrite | BLENo
 bool isConnected = false;
 
 void setupBLE() {
-    Serial.println("\nInitializing BLE...");
+    debugPrintln(DEBUG_BLE, "\nInitializing BLE...");
 
     if (!BLE.begin()) {
-        Serial.println("ERROR: Starting BLE failed!");
+        debugPrintln(DEBUG_BLE, "ERROR: Starting BLE failed!");
         while (1);
     }
-
+    
     setupServices();
 
     BLE.setDeviceName("Calming Necklace");
@@ -32,7 +34,7 @@ void setupBLE() {
     BLE.setAdvertisedService(ledService);  // Advertise our LED service
 
     BLE.advertise();
-    Serial.println("Advertising as 'Calming Necklace'");
+    debugPrintln(DEBUG_BLE, "Advertising as 'Calming Necklace'");
 }
 
 void setupServices() {
@@ -56,21 +58,22 @@ void initializeCharacteristics() {
     emission1Characteristic.writeValue(getEmission1Duration());
     interval1Characteristic.writeValue(getInterval1());
     periodic1Characteristic.writeValue(getPeriodic1Enabled());
-    heartrateCharacteristic.writeValue(getHeartrateThreshold());
+    heartrateCharacteristic.writeValue(getCurrentHeartRate());
 }
 
 void onCentralConnected(BLEDevice central) {
-    Serial.print("Connected to central: ");
-    Serial.println(central.address());
+    debugPrint(DEBUG_BLE, "Connected to central: ");
+    debugPrintln(DEBUG_BLE, central.address().c_str());
     digitalWrite(LED_BUILTIN, HIGH);
     resetActivityTimer();
     resetKeepAliveTimer();
+    resetHeartRateTimer();
     isConnected = true;
 }
 
 void onCentralDisconnected(BLEDevice central) {
-    Serial.print("Disconnected from central: ");
-    Serial.println(central.address());
+    debugPrint(DEBUG_BLE, "Disconnected from central: ");
+    debugPrintln(DEBUG_BLE, central.address().c_str());
     digitalWrite(LED_BUILTIN, LOW);
     handleLEDs(CMD_LED_OFF);
     BLE.advertise();
@@ -93,7 +96,7 @@ void handlePeripheralLoop(BLEDevice central) {
 
     if (isConnectionTimedOut() || isKeepAliveTimedOut()) {
         if (isConnected) {
-            Serial.println("Connection or keep-alive timeout");
+            debugPrintln(DEBUG_BLE, "Connection or keep-alive timeout");
             central.disconnect();
         }
     }
@@ -109,4 +112,5 @@ void resetBLEState() {
     isConnected = false;
     resetActivityTimer();
     resetKeepAliveTimer();
+    resetHeartRateTimer();
 }
