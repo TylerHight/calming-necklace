@@ -4,18 +4,23 @@ import '../../../core/services/logging_service.dart';
 
 class BleDeviceInfoDialog extends StatelessWidget {
   final BleDevice device;
+  final LoggingService _logger = LoggingService.instance;
 
-  const BleDeviceInfoDialog({
+  BleDeviceInfoDialog({
     Key? key,
     required this.device,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    _logger.logDebug('Building BLE Device Info Dialog for device: ${device.id}');
     return Dialog(
       child: Container(
         padding: const EdgeInsets.all(16),
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(
+          maxWidth: 400,
+          maxHeight: 600,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +44,11 @@ class BleDeviceInfoDialog extends StatelessWidget {
             const SizedBox(height: 16),
             _buildDeviceDetails(),
             const SizedBox(height: 16),
-            _buildServicesList(),
+            Expanded(
+              child: SingleChildScrollView(
+                child: _buildServicesList(),
+              ),
+            ),
           ],
         ),
       ),
@@ -47,26 +56,42 @@ class BleDeviceInfoDialog extends StatelessWidget {
   }
 
   Widget _buildDeviceDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('Name', device.name),
-        const SizedBox(height: 8),
-        _buildInfoRow('ID', device.id),
-        const SizedBox(height: 8),
-        _buildInfoRow('Address', device.address),
-        const SizedBox(height: 8),
-        _buildInfoRow('RSSI', '${device.rssi} dBm'),
-        const SizedBox(height: 8),
-        _buildInfoRow('Type', device.deviceType.toString().split('.').last),
-      ],
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildInfoRow('Name', device.name),
+            const SizedBox(height: 8),
+            _buildInfoRow('ID', device.id),
+            const SizedBox(height: 8),
+            _buildInfoRow('Address', device.address),
+            const SizedBox(height: 8),
+            _buildInfoRow('RSSI', '${device.rssi} dBm'),
+            const SizedBox(height: 8),
+            _buildInfoRow('Type', device.deviceType.toString().split('.').last),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildServicesList() {
-    if (device.services == null || device.services!.isEmpty) {
+    _logger.logDebug('Device services before dialog: ${device.services?.length ?? 0}');
+
+    if (device.services == null) {
+      _logger.logDebug('No services data available for device: ${device.id}');
       return const Text(
-        'No services discovered',
+        'No services information available',
+        style: TextStyle(fontStyle: FontStyle.italic),
+      );
+    }
+
+    final services = device.services!.where((s) => s.uuid.isNotEmpty).toList();
+    if (services.isEmpty) {
+      return const Text(
+        'No valid services discovered',
         style: TextStyle(fontStyle: FontStyle.italic),
       );
     }
@@ -75,35 +100,46 @@ class BleDeviceInfoDialog extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Services (${device.services?.length ?? 0})',
+          'Services (${services.length})',
           style: const TextStyle(
-            fontSize: 16,
             fontWeight: FontWeight.bold,
+            fontSize: 16,
           ),
         ),
         const SizedBox(height: 8),
-        ...device.services?.map((service) => _buildServiceItem(service)) ?? [],
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: services.map((service) => _buildServiceItem(service)).toList(),
+            ),
+          ),
+        ),
       ],
     );
   }
 
   Widget _buildServiceItem(BleServiceInfo service) {
+    final characteristics = service.characteristics
+        ?.where((c) => c.uuid.isNotEmpty)
+        .toList() ?? [];
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4),
       child: ExpansionTile(
-        title: Text('Service: ${service.uuid}'),
-        children: [
-          if (service.characteristics != null && service.characteristics!.isNotEmpty)
-            ...service.characteristics!.map((characteristic) => ListTile(
-              dense: true,
-              title: Text('UUID: ${characteristic.uuid}'),
-              subtitle: Text(
-                'Properties: ${characteristic.properties.join(", ")}',
-                style: const TextStyle(fontSize: 12),
-              ),
-            )),
-        ],
+        title: Text('Service: ${_formatUuid(service.uuid)}'),
+        subtitle: Text('${characteristics.length} characteristics'),
+        children: characteristics
+            .map((c) => _buildCharacteristicItem(c))
+            .toList(),
       ),
+    );
+  }
+
+  Widget _buildCharacteristicItem(BleCharacteristicInfo characteristic) {
+    return ListTile(
+      dense: true,
+      title: Text('UUID: ${_formatUuid(characteristic.uuid)}'),
+      subtitle: Text('Properties: ${_formatProperties(characteristic.properties)}'),
     );
   }
 
@@ -126,5 +162,14 @@ class BleDeviceInfoDialog extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  String _formatUuid(String uuid) {
+    return uuid.toUpperCase();
+  }
+
+  String _formatProperties(List<String> properties) {
+    if (properties.isEmpty) return 'None';
+    return properties.map((p) => p.toUpperCase()).join(', ');
   }
 }

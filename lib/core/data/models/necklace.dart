@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import '../../services/logging_service.dart';
 import 'ble_device.dart';
 
@@ -101,13 +102,9 @@ class Necklace extends Equatable {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'bleDevice': bleDevice != null 
-          ? jsonEncode(bleDevice!.toMap())
-          : null,
-      'heartRateMonitorDevice': heartRateMonitorDevice != null 
-          ? jsonEncode(heartRateMonitorDevice!.toMap())
-          : null,
       'name': name,
+      'bleDevice': _serializeBleDevice(bleDevice),
+      'heartRateMonitorDevice': _serializeBleDevice(heartRateMonitorDevice),
       'autoTurnOffEnabled': autoTurnOffEnabled ? 1 : 0,
       'emission1Duration': emission1Duration.inSeconds,
       'releaseInterval1': releaseInterval1.inSeconds,
@@ -123,50 +120,70 @@ class Necklace extends Equatable {
     };
   }
 
-  factory Necklace.fromMap(Map<String, dynamic> map) {
-    BleDevice? parseDevice(dynamic deviceData) {
-      if (deviceData == null) return null;
-      try {
-        Map<String, dynamic> deviceMap;
-        if (deviceData is String) {
-          deviceMap = jsonDecode(deviceData) as Map<String, dynamic>;
-        } else if (deviceData is Map) {
-          deviceMap = Map<String, dynamic>.from(deviceData);
-        } else {
-          LoggingService.instance.logError('Invalid device data format: $deviceData');
-          return null;
-        }
-        
-        // Ensure deviceType is properly formatted
-        if (deviceMap['deviceType'] != null) {
-          deviceMap['deviceType'] = deviceMap['deviceType'].toString().toLowerCase();
-        }
-        
-        return BleDevice.fromMap(deviceMap);
-      } catch (e) {
-        LoggingService.instance.logError('Error parsing device data: $e');
-        return null;
-      }
+  String? _serializeBleDevice(BleDevice? device) {
+    if (device == null) return null;
+    try {
+      return jsonEncode(device.toMap());
+    } catch (e) {
+      debugPrint('Error serializing BleDevice: $e');
+      LoggingService.instance.logError('Error serializing BleDevice: $e');
+      return null;
     }
+  }
 
-    return Necklace(
-      id: map['id'],
-      bleDevice: parseDevice(map['bleDevice']),
-      heartRateMonitorDevice: parseDevice(map['heartRateMonitorDevice']),
-      name: map['name'],
-      autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
-      emission1Duration: Duration(seconds: map['emission1Duration']),
-      releaseInterval1: Duration(seconds: map['releaseInterval1']),
-      periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
-      isRelease1Active: map['isRelease1Active'] == 1,
-      isLedOn: map['isLedOn'] == 1,
-      isConnected: map['isConnected'] == 1,
-      isArchived: map['isArchived'] == 1,
-      lastLEDStateChange: map['lastLEDStateChange'] != null ? 
-          DateTime.parse(map['lastLEDStateChange']) : null,
-      isHeartRateBasedReleaseEnabled: map['isHeartRateBasedReleaseEnabled'] == 1,
-      highHeartRateThreshold: map['highHeartRateThreshold'],
-      lowHeartRateThreshold: map['lowHeartRateThreshold'],
-    );
+  factory Necklace.fromMap(Map<String, dynamic> map) {
+    try {
+      BleDevice? bleDevice;
+      BleDevice? heartRateMonitorDevice;
+
+      if (map['bleDevice'] != null) {
+        try {
+          if (map['bleDevice'] is String) {
+            final decoded = jsonDecode(map['bleDevice']);
+            bleDevice = BleDevice.fromMap(Map<String, dynamic>.from(decoded));
+          } else if (map['bleDevice'] is Map) {
+            bleDevice = BleDevice.fromMap(Map<String, dynamic>.from(map['bleDevice']));
+          }
+        } catch (e) {
+          LoggingService.instance.logError('Error parsing BLE device data: $e');
+        }
+      }
+
+      if (map['heartRateMonitorDevice'] != null) {
+        try {
+          if (map['heartRateMonitorDevice'] is String) {
+            final decoded = jsonDecode(map['heartRateMonitorDevice']);
+            heartRateMonitorDevice = BleDevice.fromMap(Map<String, dynamic>.from(decoded));
+          } else if (map['heartRateMonitorDevice'] is Map) {
+            heartRateMonitorDevice = BleDevice.fromMap(Map<String, dynamic>.from(map['heartRateMonitorDevice']));
+          }
+        } catch (e) {
+          LoggingService.instance.logError('Error parsing heart rate monitor data: $e');
+        }
+      }
+
+      return Necklace(
+        id: map['id'],
+        bleDevice: bleDevice,
+        heartRateMonitorDevice: heartRateMonitorDevice,
+        name: map['name'],
+        autoTurnOffEnabled: map['autoTurnOffEnabled'] == 1,
+        emission1Duration: Duration(seconds: map['emission1Duration']),
+        releaseInterval1: Duration(seconds: map['releaseInterval1']),
+        periodicEmissionEnabled: map['periodicEmissionEnabled'] == 1,
+        isRelease1Active: map['isRelease1Active'] == 1,
+        isLedOn: map['isLedOn'] == 1,
+        isConnected: map['isConnected'] == 1,
+        isArchived: map['isArchived'] == 1,
+        lastLEDStateChange: map['lastLEDStateChange'] != null ?
+        DateTime.parse(map['lastLEDStateChange']) : null,
+        isHeartRateBasedReleaseEnabled: map['isHeartRateBasedReleaseEnabled'] == 1,
+        highHeartRateThreshold: map['highHeartRateThreshold'],
+        lowHeartRateThreshold: map['lowHeartRateThreshold'],
+      );
+    } catch (e) {
+      LoggingService.instance.logError('Error creating Necklace from map: $e');
+      rethrow;
+    }
   }
 }

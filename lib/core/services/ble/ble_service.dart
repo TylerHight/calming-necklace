@@ -205,9 +205,10 @@ class BleService {
         id: device.id.id,
         name: device.name,
         address: device.id.id,
-        rssi: 0, // Update with actual RSSI if available
+        rssi: await device.readRssi(),
         deviceType: BleDeviceType.necklace, // Update with actual type if available
         services: discoveredServices,
+        device: device,
       );
 
       _isInitialized = true;
@@ -261,6 +262,19 @@ class BleService {
       final services = await discoverServices(device);
       _connectedDevice = device;
 
+      // Log discovered services
+      _logger.logBleInfo('Discovered services for device ${device.name}:');
+      for (var service in services) {
+        _logger.logBleInfo('Service UUID: ${service.uuid}');
+        // Add null check for characteristics
+        if (service.characteristics != null) {
+          for (var char in service.characteristics!) {
+            _logger.logBleInfo('  Characteristic UUID: ${char.uuid}');
+            _logger.logBleInfo('    Properties: ${char.properties.join(", ")}');
+          }
+        }
+      }
+
       // Create updated BleDevice with discovered services
       final bleDevice = BleDevice(
         id: device.id.id,
@@ -271,6 +285,9 @@ class BleService {
         services: services,
         device: device,
       );
+
+      // Log the complete BleDevice object
+      _logger.logBleInfo('Saving BleDevice to database: ${jsonEncode(bleDevice.toMap())}');
 
       // Save the device info to database
       final databaseService = await DatabaseService().database;

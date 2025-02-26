@@ -237,22 +237,40 @@ class DatabaseService {
   Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
     try {
       final db = await database;
-      final services = settings['services'] as List<dynamic>?;
+      
+      // Handle BLE device data if present
+      if (settings.containsKey('bleDevice') && settings['bleDevice'] is Map) {
+        try {
+          // Convert the BleDevice map to a JSON string
+          final bleDeviceMap = settings['bleDevice'] as Map<String, dynamic>;
+          final services = bleDeviceMap['services'] as List<dynamic>?;
 
-      if (services != null) {
-        for (var service in services) {
-          _logger.logDebug('Service UUID: ${service['uuid']}');
-          final characteristics = service['characteristics'] as List<dynamic>?;
-          if (characteristics != null) {
-            for (var characteristic in characteristics) {
-              _logger.logDebug('Characteristic UUID: ${characteristic['uuid']}');
-              _logger.logDebug('Properties: ${characteristic['properties']}');
+          if (services != null) {
+            for (var service in services) {
+              _logger.logDebug('Service UUID: ${service['uuid']}');
+              final characteristics = service['characteristics'] as List<dynamic>?;
+              if (characteristics != null) {
+                for (var characteristic in characteristics) {
+                  _logger.logDebug('Characteristic UUID: ${characteristic['uuid']}');
+                  _logger.logDebug('Properties: ${characteristic['properties']}');
+                }
+              }
             }
+          } else {
+            _logger.logDebug('Services are null.');
           }
+          
+          // Convert to JSON string for storage
+          settings['bleDevice'] = jsonEncode(bleDeviceMap);
+        } catch (e) {
+          _logger.logError('Error serializing BLE device data: $e');
+          // If there's an error, remove the bleDevice field to prevent database errors
+          settings.remove('bleDevice');
         }
-      }
-      else {
-        _logger.logDebug('Services are null.');
+      } else if (settings.containsKey('bleDevice') && settings['bleDevice'] is String) {
+        // Already a JSON string, no need to convert
+      } else {
+        _logger.logDebug('BleDevice data not present or in unexpected format');
       }
 
       await db.update(
@@ -275,8 +293,13 @@ class DatabaseService {
       where: 'id = ?',
       whereArgs: [id],
     );
-    if (maps.isEmpty) return null;
-    return Necklace.fromMap(maps.first);
+
+    if (maps.isNotEmpty) {
+      final necklace = Necklace.fromMap(maps.first);
+      _logger.logDebug('Retrieved necklace services: ${necklace.bleDevice?.services?.length ?? 0}');
+      return necklace;
+    }
+    return null;
   }
 
   Future<void> updateNecklaceLedState(String necklaceId, bool isOn) async {
