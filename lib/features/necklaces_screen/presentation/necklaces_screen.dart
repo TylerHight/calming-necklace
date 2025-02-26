@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/blocs/ble/ble_bloc.dart';
 import '../../../core/blocs/ble/ble_state.dart';
+import '../../../core/blocs/ble/ble_event.dart';
 import '../../../core/data/models/necklace.dart';
 import '../../../core/data/repositories/ble_repository.dart';
 import '../../../core/data/repositories/necklace_repository.dart';
@@ -142,6 +143,7 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
   Widget _buildEmptyState() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      width: double.infinity,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -176,6 +178,32 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 32),
+          BlocBuilder<BleBloc, BleState>(
+            builder: (context, state) {
+              final hasConnectedDevices = state.deviceConnectionStates.values.any((connected) => connected);
+              
+              if (hasConnectedDevices) {
+                return ElevatedButton.icon(
+                  onPressed: () {
+                    _showDisconnectAllConfirmation(context);
+                  },
+                  icon: const Icon(Icons.bluetooth_disabled),
+                  label: const Text('Disconnect All Devices'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[100],
+                    foregroundColor: Colors.red[800],
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
         ],
       ),
     );
@@ -197,6 +225,42 @@ class _NecklacesScreenState extends State<NecklacesScreen> {
             necklace: necklace,
             databaseService: _databaseService, // Pass DatabaseService
           ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showDisconnectAllConfirmation(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Disconnect All Devices'),
+          content: const Text(
+            'Are you sure you want to disconnect all Bluetooth devices? '
+            'You will need to reconnect them manually.',
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<BleBloc>().add(const BleDisconnectAllRequest());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Disconnecting all devices...'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              child: const Text('Disconnect All', style: TextStyle(color: Colors.red)),
+            ),
+          ],
         );
       },
     );

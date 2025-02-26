@@ -32,8 +32,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     required NecklaceRepository repository,
     required this.necklace,
   }) : _repository = repository,
-        _ticker = Ticker(),
-        super(TimedToggleButtonInitial()) {
+       _ticker = Ticker(),
+       super(TimedToggleButtonInitial()) {
     _initializeFromNecklace();
     on<InitializeTimedToggleButton>(_onInitialize);
     on<StartPeriodicEmission>(_onStartPeriodicEmission);
@@ -145,8 +145,7 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     } else if (_isTimerActive) {
       _isTimerActive = false;
       _isActive = false;
-      await _repository.toggleLight(necklace, false);
-      if (!emit.isDone) emit(LightOffState());
+      if (!emit.isDone) emit(LightOffState()); // Just update the state, don't send command
       _stopTimer(emit);
     }
   }
@@ -193,11 +192,16 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
   Future<void> _stopTimer(Emitter<TimedToggleButtonState> emit) async {
     _tickerSubscription?.cancel();
     _isTimerActive = false;
-    _isActive = false;
-    await _repository.toggleLight(necklace, false).then((_) {
-      if (!emit.isDone) emit(LightOffState());
-    });
-    _logger.logInfo('Timer stopped and light turned off');
+    
+    // Only update the state, don't send a command when timer runs out
+    if (_isActive) {
+      _isActive = false;
+      // We're not sending a command to turn off the light here
+      // This prevents the issue where the timed toggle button sends a command when its emission timer runs out
+    }
+    
+    if (!emit.isDone) emit(LightOffState());
+    _logger.logInfo('Timer stopped');
   }
 
   Future<void> _onStartPeriodicEmission(

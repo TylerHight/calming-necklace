@@ -1,6 +1,7 @@
 import 'package:calming_necklace/core/data/models/necklace.dart';
 import 'package:calming_necklace/core/data/models/ble_device.dart';
 import 'package:calming_necklace/core/services/logging_service.dart';
+import 'package:calming_necklace/core/blocs/ble/ble_bloc.dart';
 import 'package:calming_necklace/core/services/database_service.dart';
 import 'package:calming_necklace/core/services/ble/ble_service.dart';
 import 'dart:async';
@@ -138,8 +139,19 @@ class NecklaceRepositoryImpl implements NecklaceRepository {
   @override
   Future<void> archiveNecklace(String id) async {
     try {
+      // Get the necklace before archiving to access its BLE device
+      final necklace = await getNecklaceById(id);
+      
+      // Disconnect the device if it exists
+      if (necklace?.bleDevice != null) {
+        _logger.logInfo('Disconnecting device before archiving: ${necklace!.bleDevice!.id}');
+        try {
+          await _bleService.disconnectFromDevice(necklace.bleDevice!.id);
+        } catch (e) {
+          _logger.logWarning('Error disconnecting device during archive: $e');
+        }
+      }
       await _dbService.archiveNecklace(id);
-      _logger.logInfo('Successfully archived necklace with id: $id');
     } catch (e) {
       _logger.logError('Error archiving necklace: $e');
       throw Exception('Failed to archive necklace: $e');

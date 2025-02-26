@@ -28,6 +28,7 @@ class BleBloc extends Bloc<BleEvent, BleState> {
        super(BleState.initial()) {
     on<BleConnectRequest>(_onConnectRequest);
     on<BleDisconnectRequest>(_onDisconnectRequest);
+    on<BleDisconnectAllRequest>(_onDisconnectAllRequest);
     on<BleConnectionStatusChanged>((event, emit) => _onConnectionStatusChanged(event.isConnected));
     on<BleRssiUpdated>((event, emit) => _onRssiUpdate(event.rssi));
     on<BleReconnectionAttempt>((event, emit) => _onReconnectionAttempt(event.attempt));
@@ -98,6 +99,35 @@ class BleBloc extends Bloc<BleEvent, BleState> {
         isConnecting: false,
         error: 'Connection and initialization error: ${e.toString()}',
       ));
+    }
+  }
+
+  Future<void> _onDisconnectAllRequest(BleDisconnectAllRequest event, Emitter<BleState> emit) async {
+    try {
+      _logger.logBleInfo('Attempting to disconnect all devices');
+      
+      // Get all connected device IDs
+      final connectedDeviceIds = Map<String, bool>.from(state.deviceConnectionStates)
+          .entries
+          .where((entry) => entry.value == true)
+          .map((entry) => entry.key)
+          .toList();
+      
+      if (connectedDeviceIds.isEmpty) {
+        _logger.logBleInfo('No devices currently connected');
+        return;
+      }
+      
+      // Disconnect each device
+      for (final deviceId in connectedDeviceIds) {
+        await _bleService.disconnectFromDevice(deviceId);
+      }
+      
+      emit(state.copyWith(deviceConnectionStates: {}));
+      _logger.logBleInfo('Successfully disconnected all devices');
+    } catch (e) {
+      _logger.logBleError('Error disconnecting all devices: ${e.toString()}', e);
+      emit(state.copyWith(error: 'Error disconnecting all devices: ${e.toString()}'));
     }
   }
 

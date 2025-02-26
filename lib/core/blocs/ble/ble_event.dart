@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../../../core/data/models/ble_device.dart';
+import '../../services/ble/ble_service.dart';
 
 abstract class BleEvent extends Equatable {
   const BleEvent();
@@ -22,6 +23,13 @@ class BleDisconnectRequest extends BleEvent {
 
   @override
   List<Object?> get props => [deviceId];
+}
+
+class BleDisconnectAllRequest extends BleEvent {
+  const BleDisconnectAllRequest();
+
+  @override
+  List<Object> get props => [];
 }
 
 class BleConnectionStatusChanged extends BleEvent {
