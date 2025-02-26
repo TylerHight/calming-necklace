@@ -1,20 +1,54 @@
-Performing hot restart...
-Syncing files to device Pixel 3a...
-D/[FBP-Android]( 7662): [FBP] onMethodCall: readRssi
-D/BluetoothGatt( 7662): readRssi() - device: 02:00:74:01:0C:A4
-D/[FBP-Android]( 7662): [FBP] onReadRemoteRssi:
-D/[FBP-Android]( 7662): [FBP]   rssi: -54
-D/[FBP-Android]( 7662): [FBP]   status: GATT_SUCCESS (0)
-Restarted application in 1,649ms.
-I/flutter ( 7662): Initializing logging service...
-I/flutter ( 7662): 15:02:34 📘 [logging_service] ℹ️ Logging service initialized successfully
-I/flutter ( 7662): 15:02:34 📘 [main] ℹ️ Application starting...
-I/flutter ( 7662): 15:02:34 🔍 [main] 🔍 Initializing core services...
-I/flutter ( 7662): Initializing BLE Service
-I/flutter ( 7662): 15:02:35 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
-I/flutter ( 7662): 15:02:35 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
-I/flutter ( 7662): 15:02:36 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesInitial(), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
-I/flutter ( 7662): 15:02:36 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesInitial(), nextState: NecklacesLoading() }
-I/flutter ( 7662): 15:02:37 🚨 [database_service] ❌ Error retrieving necklaces: FormatException: Unexpected character (at character 2)
-I/flutter ( 7662): {deviceType=BleDeviceType.heartRateMonitor, rssi=-79, address=02:00:74:01:0...
-I/flutter ( 7662):  ^
+I/flutter (27773): 21:33:37 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, false, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false) }
+I/flutter (27773): 21:33:37 📘 [logging_service] ℹ️ 🔵 Attempting to connect and initialize device: D4:25:CB:B4:D0:52
+I/flutter (27773): 21:33:37 📘 [logging_service] ℹ️ 🔵 Attempting to connect to Calming Necklace
+I/flutter (27773): 21:33:37 📘 [logging_service] ℹ️ 🔵 Starting connection attempt to Calming Necklace
+I/flutter (27773): 21:33:37 🔍 [logging_service] 🔍 🔵 Connection attempt 1 of 5
+I/flutter (27773): 21:33:37 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: BleState({}, {}, {}, {}, null, true, initial, 0, null, false), nextState: BleState({}, {}, {}, {}, null, true, Connecting..., 0, null, false) }
+D/[FBP-Android](27773): [FBP] onMethodCall: connect
+D/BluetoothGatt(27773): connect() - device: D4:25:CB:B4:D0:52, auto: false
+D/BluetoothGatt(27773): registerApp()
+D/BluetoothGatt(27773): registerApp() - UUID=1919a444-7088-41cc-85ac-20c8ab248dea
+D/BluetoothGatt(27773): onClientRegistered() - status=0 clientIf=13
+I/flutter (27773): 21:33:37 🔍 [timed_toggle_button] 🔍 Building TimedToggleButton: isLightOn: false, timeLeft: 
+I/flutter (27773): 21:33:37 🔍 [app_bloc_observer] 🔍 Event: StopScanning()
+D/[FBP-Android](27773): [FBP] onMethodCall: stopScan
+D/BluetoothAdapter(27773): isLeEnabled(): ON
+I/flutter (27773): 21:33:37 🔍 [ble_repository] 🔍 Stopped Bluetooth Low Energy scan
+I/flutter (27773): 21:33:37 🔍 [device_selector_bloc] 🔍 Stopped BLE scan
+I/flutter (27773): 21:33:37 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: DeviceSelectorState([BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), BleDevice(id: A4:C1:38:D0:F3:66, name: Minger_H6001_F366, address: A4:C1:38:D0:F3:66, rssi: -63, type: BleDeviceType.heartRateMonitor), BleDevice(id: DE:2B:04:37:8E:F7, name: H96, address: DE:2B:04:37:8E:F7, rssi: -51, type: BleDeviceType.heartRateMonitor), BleDevice(id: 02:00:74:01:0C:A4, name: M4, address: 02:00:74:01:0C:A4, rssi: -42, type: BleDeviceType.heartRateMonitor)], BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), true, false, null), event: StopScanning(), nextState: DeviceSelectorState([BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), BleDevice(id: A4:C1:38:D0:F3:66, name: Minger_H6001_F366, address: A4:C1:38:D0:F3:66, rs
+I/flutter (27773): 21:33:37 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: DeviceSelectorState([BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), BleDevice(id: A4:C1:38:D0:F3:66, name: Minger_H6001_F366, address: A4:C1:38:D0:F3:66, rssi: -63, type: BleDeviceType.heartRateMonitor), BleDevice(id: DE:2B:04:37:8E:F7, name: H96, address: DE:2B:04:37:8E:F7, rssi: -51, type: BleDeviceType.heartRateMonitor), BleDevice(id: 02:00:74:01:0C:A4, name: M4, address: 02:00:74:01:0C:A4, rssi: -42, type: BleDeviceType.heartRateMonitor)], BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), true, false, null), nextState: DeviceSelectorState([BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), BleDevice(id: A4:C1:38:D0:F3:66, name: Minger_H6001_F366, address: A4:C1:38:D0:F3:66, rssi: -63, type: BleDeviceType.he
+D/[FBP-Android](27773): [FBP] onMethodCall: getAdapterState
+D/BluetoothGatt(27773): onClientConnectionState() - status=0 clientIf=13 device=D4:25:CB:B4:D0:52
+D/[FBP-Android](27773): [FBP] onConnectionStateChange:connected
+D/[FBP-Android](27773): [FBP]   status: SUCCESS
+I/flutter (27773): 21:33:38 🔍 [logging_service] 🔍 🔵 Waiting for connection stabilization
+I/flutter (27773): 21:33:38 🔍 [database_service] 🔍 Services are null.
+I/flutter (27773): *** WARNING ***
+I/flutter (27773): 
+I/flutter (27773): Invalid argument {id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, deviceType: BleDeviceType.necklace, services: null} with type _Map<String, dynamic>.
+I/flutter (27773): Only num, String and Uint8List are supported. See https://github.com/tekartik/sqflite/blob/master/sqflite/doc/supported_types.md for details
+I/flutter (27773): 
+I/flutter (27773): This will throw an exception in the future. For now it is displayed once per type.
+I/flutter (27773): 
+I/flutter (27773):     
+I/flutter (27773): #0      _checkArg (package:sqflite_common/src/value_utils.dart:30:7)
+I/flutter (27773): #1      checkNonNullValue (package:sqflite_common/src/value_utils.dart:51:5)
+I/flutter (27773): #2      new SqlBuilder.update (package:sqflite_common/src/sql_builder.dart:235:9)
+I/flutter (27773): #3      SqfliteDatabaseExecutorMixin.update (package:sqflite_common/src/database_mixin.dart:206:32)
+I/flutter (27773): #4      DatabaseService.updateNecklaceSettings (package:calming_necklace/core/services/database_service.dart:258:16)
+I/flutter (27773): <asynchronous suspension>
+I/flutter (27773): #5      _SettingsContentState._buildHeartRateSection.<anonymous closure>.<anonymous closure> (package:calming_necklace/features/device_settings_screen/presentation/settings_screen.dart:405:25)
+I/flutter (27773): <asynchronous suspension>
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Event: RefreshSettings(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60))
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Event: FetchNecklacesEvent()
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: SettingsState(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60), false, false, null), event: RefreshSettings(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60)), nextState: SettingsState(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDe
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: SettingsState(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60), false, false, null), nextState: SettingsState(Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -59, type: BleDeviceType.necklace), false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60), false, false, null) }
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoaded([Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60)]), event: FetchNecklacesEvent(), nextState: NecklacesLoading() }
+I/flutter (27773): 21:33:38 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoaded([Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60)]), nextState: NecklacesLoading() }
+D/BluetoothGatt(27773): onConnectionUpdated() - Device=D4:25:CB:B4:D0:52 interval=6 latency=0 timeout=500 status=0
+I/flutter (27773): 21:33:39 🚨 [necklace] ❌ Error parsing device data: FormatException: Unexpected character (at character 2)
+I/flutter (27773): {deviceType=BleDeviceType.necklace, rssi=-59, address=D4:25:CB:B4:D0:52, na...
+I/flutter (27773):  ^
+I/flutter (27773): 21:33:39 🔍 [app_bloc_observer] 🔍 Transition: Transition { currentState: NecklacesLoading(), event: FetchNecklacesEvent(), nextState: NecklacesLoaded([Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60)]) }
+I/flutter (27773): 21:33:39 🔍 [app_bloc_observer] 🔍 Change: Change { currentState: NecklacesLoading(), nextState: NecklacesLoaded([Necklace(2025-02-25 20:33:45.659318, vcvv, BleDevice(id: D4:25:CB:B4:D0:52, name: Calming Necklace, address: D4:25:CB:B4:D0:52, rssi: -58, type: BleDeviceType.necklace), null, false, 0:00:08.000000, 0:00:20.000000, false, false, false, false, false, 2025-02-25 20:47:34.086887, false, 120, 60)]) }
+I/flutter (27773): 21:33:39 📘 [logging_service] ℹ️ 🔵 Successfully connected to Calming Necklace

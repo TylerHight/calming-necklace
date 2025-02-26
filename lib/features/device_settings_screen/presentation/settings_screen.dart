@@ -406,7 +406,6 @@ class _SettingsContentState extends State<SettingsContent> {
                           widget.necklace.id,
                           {'heartRateMonitorDevice': device.toMap()},
                         );
-
                         // Refresh settings
                         context.read<SettingsBloc>().add(
                           RefreshSettings(widget.necklace.copyWith(

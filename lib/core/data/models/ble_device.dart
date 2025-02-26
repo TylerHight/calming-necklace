@@ -1,9 +1,61 @@
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:equatable/equatable.dart';
-
 import '../../services/logging_service.dart';
+import '../repositories/ble_repository.dart';
 
 enum BleDeviceType { necklace, heartRateMonitor }
+
+class BleServiceInfo {
+  final String uuid;
+  final List<BleCharacteristicInfo>? characteristics;
+
+  BleServiceInfo({
+    required this.uuid,
+    this.characteristics,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uuid': uuid,
+      'characteristics': characteristics?.map((c) => c.toMap()).toList(),
+    };
+  }
+
+  factory BleServiceInfo.fromMap(Map<String, dynamic> map) {
+    return BleServiceInfo(
+      uuid: map['uuid'],
+      characteristics: map['characteristics'] != null
+          ? (map['characteristics'] as List)
+          .map((c) => BleCharacteristicInfo.fromMap(c))
+          .toList()
+          : null,
+    );
+  }
+}
+
+class BleCharacteristicInfo {
+  final String uuid;
+  final List<String> properties;
+
+  BleCharacteristicInfo({
+    required this.uuid,
+    required this.properties,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uuid': uuid,
+      'properties': properties,
+    };
+  }
+
+  factory BleCharacteristicInfo.fromMap(Map<String, dynamic> map) {
+    return BleCharacteristicInfo(
+      uuid: map['uuid'],
+      properties: List<String>.from(map['properties']),
+    );
+  }
+}
 
 class BleDevice extends Equatable {
   final String id;
@@ -12,7 +64,7 @@ class BleDevice extends Equatable {
   final int rssi;
   final BleDeviceType deviceType;
   final BluetoothDevice? device;
-  final List<BleServiceInfo> services;
+  final List<BleServiceInfo>? services;
 
   const BleDevice({
     required this.id,
@@ -21,8 +73,34 @@ class BleDevice extends Equatable {
     required this.rssi,
     required this.deviceType,
     this.device,
-    this.services = const [],
+    this.services,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'address': address,
+      'rssi': rssi,
+      'deviceType': deviceType.toString(),
+      'services': services?.map((s) => s.toMap()).toList(),
+    };
+  }
+
+  factory BleDevice.fromMap(Map<String, dynamic> map) {
+    return BleDevice(
+      id: map['id'],
+      name: map['name'],
+      address: map['address'],
+      rssi: map['rssi'] ?? 0,
+      deviceType: _parseDeviceType(map['deviceType']),
+      services: map['services'] != null
+          ? (map['services'] as List)
+          .map((s) => BleServiceInfo.fromMap(s))
+          .toList()
+          : null,
+    );
+  }
 
   BleDevice copyWith({
     String? id,
@@ -44,128 +122,19 @@ class BleDevice extends Equatable {
     );
   }
 
-  @override
-  List<Object?> get props => [id, name, address, rssi, deviceType, device, services];
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'address': address,
-      'rssi': rssi,
-      'deviceType': deviceType.toString().split('.').last.toLowerCase(),
-      'services': services.map((service) => service.toMap()).toList(),
-      'device': null, // Ensure device field is explicitly null
-    };
-  }
-
-  factory BleDevice.fromMap(Map<String, dynamic> map) {
-    try {
-      return BleDevice(
-        id: map['id'] ?? '',
-        name: map['name'] ?? 'Unknown Device',
-        address: map['address'] ?? '',
-        rssi: map['rssi'] ?? 0,
-        deviceType: _parseDeviceType(map['deviceType']),
-        services: _parseServices(map['services']),
-      );
-    } catch (e) {
-      LoggingService.instance.logError('Error parsing BLE device data: $e');
-      // Return a default device on error
-      return BleDevice(
-        id: '',
-        name: 'Unknown Device',
-        address: '',
-        rssi: 0,
-        deviceType: BleDeviceType.necklace,
-        services: const [],
-      );
-    }
-  }
-
-  static BleDeviceType _parseDeviceType(dynamic value) {
-    try {
-      if (value == null) return BleDeviceType.necklace;
-      
-      if (value is String) {
-        // Handle both full enum string and just the name
-        final enumString = value.contains('.') ? value.split('.').last : value;
-        return BleDeviceType.values.firstWhere(
-          (e) => e.toString().split('.').last.toLowerCase() == enumString.toLowerCase(),
-          orElse: () => BleDeviceType.necklace
-        );
-      }
-      return BleDeviceType.necklace;
-    } catch (e) {
-      LoggingService.instance.logError('Error parsing device type: $e');
-      return BleDeviceType.necklace;
-    }
-  }
-
-  static List<BleServiceInfo> _parseServices(dynamic services) {
-    if (services == null || services is! List) return [];
-
-    try {
-      return services
-          .map((x) => BleServiceInfo.fromMap(x as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      LoggingService.instance.logError('Error parsing BLE services: $e');
-      return [];
-    }
-  }
-}
-
-class BleServiceInfo extends Equatable {
-  final String uuid;
-  final List<BleCharacteristicInfo> characteristics;
-
-  const BleServiceInfo({
-    required this.uuid,
-    required this.characteristics,
-  });
-
-  @override
-  List<Object?> get props => [uuid, characteristics];
-
-  Map<String, dynamic> toMap() {
-    return {
-      'uuid': uuid,
-      'characteristics': characteristics.map((char) => char.toMap()).toList(),
-    };
-  }
-
-  factory BleServiceInfo.fromMap(Map<String, dynamic> map) {
-    return BleServiceInfo(
-      uuid: map['uuid'],
-      characteristics: List<BleCharacteristicInfo>.from(map['characteristics']?.map((x) => BleCharacteristicInfo.fromMap(x))),
+  static BleDeviceType _parseDeviceType(String? type) {
+    if (type == null) return BleDeviceType.necklace;
+    return BleDeviceType.values.firstWhere(
+          (e) => e.toString() == type,
+      orElse: () => BleDeviceType.necklace,
     );
   }
-}
-
-class BleCharacteristicInfo extends Equatable {
-  final String uuid;
-  final List<String> properties;
-
-  const BleCharacteristicInfo({
-    required this.uuid,
-    required this.properties,
-  });
 
   @override
-  List<Object?> get props => [uuid, properties];
+  List<Object?> get props => [id, name, address, rssi, deviceType, services];
 
-  Map<String, dynamic> toMap() {
-    return {
-      'uuid': uuid,
-      'properties': properties,
-    };
-  }
-
-  factory BleCharacteristicInfo.fromMap(Map<String, dynamic> map) {
-    return BleCharacteristicInfo(
-      uuid: map['uuid'],
-      properties: List<String>.from(map['properties']),
-    );
+  @override
+  String toString() {
+    return 'BleDevice(id: $id, name: $name, address: $address, rssi: $rssi, type: $deviceType)';
   }
 }

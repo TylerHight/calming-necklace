@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../../data/models/ble_device.dart';
+import '../database_service.dart';
 import '../logging_service.dart';
 import 'managers/ble_connection_manager.dart';
 import 'ble_types.dart';
@@ -218,9 +220,67 @@ class BleService {
     }
   }
 
+  Future<List<BleServiceInfo>> discoverServices(BluetoothDevice device) async {
+    try {
+      _logger.logBleInfo('Starting service discovery for device: ${device.id}');
+      final services = await device.discoverServices();
+
+      List<BleServiceInfo> discoveredServices = [];
+
+      for (var service in services) {
+        List<BleCharacteristicInfo> characteristics = [];
+
+        for (var char in service.characteristics) {
+          characteristics.add(BleCharacteristicInfo(
+            uuid: char.uuid.toString(),
+            properties: [
+              if (char.properties.read) 'read',
+              if (char.properties.write) 'write',
+              if (char.properties.notify) 'notify',
+              if (char.properties.indicate) 'indicate',
+            ],
+          ));
+        }
+
+        discoveredServices.add(BleServiceInfo(
+          uuid: service.uuid.toString(),
+          characteristics: characteristics,
+        ));
+      }
+
+      return discoveredServices;
+    } catch (e) {
+      _logger.logBleError('Error discovering services', e);
+      rethrow;
+    }
+  }
+
   Future<void> connectAndInitializeDevice(BluetoothDevice device) async {
     final connected = await connectToDevice(device);
     if (connected) {
+      final services = await discoverServices(device);
+      _connectedDevice = device;
+
+      // Create updated BleDevice with discovered services
+      final bleDevice = BleDevice(
+        id: device.id.id,
+        name: device.name,
+        address: device.id.id,
+        rssi: await device.readRssi(),
+        deviceType: BleDeviceType.necklace,
+        services: services,
+        device: device,
+      );
+
+      // Save the device info to database
+      final databaseService = await DatabaseService().database;
+      await databaseService.update(
+        'necklaces',
+        {'bleDevice': jsonEncode(bleDevice.toMap())},
+        where: 'bleDevice LIKE ?',
+        whereArgs: ['%${device.id.id}%'],
+      );
+
       await _initializeCharacteristics(device);
     }
   }

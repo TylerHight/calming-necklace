@@ -15,7 +15,7 @@ class DatabaseService {
   Stream<void> get onNecklaceUpdate => _necklaceUpdateController.stream;
 
   DatabaseService._internal() {
-    // Logger is now initialized synchronously
+    // Logger is initialized synchronously
   }
 
   Future<Database> get database async {
@@ -159,7 +159,7 @@ class DatabaseService {
         where: 'isArchived = ?',
         whereArgs: [0],
       );
-      return List.generate(maps.length, 
+      return List.generate(maps.length,
         (i) => Necklace.fromMap(Map<String, dynamic>.from(maps[i])));
     } catch (e) {
       _logger.logError('Error retrieving necklaces: $e');
@@ -221,32 +221,51 @@ class DatabaseService {
     final db = await database;
     _logger.logDebug('Archiving necklace with id: $id');
     await db.transaction((txn) async {
-      await txn.update('necklaces', {'isArchived': 1}, 
+      await txn.update('necklaces', {'isArchived': 1},
         where: 'id = ?', whereArgs: [id]);
     });
   }
 
-  Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
+  Future<void> deleteAllNecklaces() async {
     final db = await database;
-    // Ensure proper JSON encoding for device fields
-    if (settings.containsKey('heartRateMonitorDevice')) {
-      if (settings['heartRateMonitorDevice'] is Map) {
-        settings['heartRateMonitorDevice'] = jsonEncode(settings['heartRateMonitorDevice']);
-      }
-    }
-    if (settings.containsKey('bleDevice')) {
-      if (settings['bleDevice'] is Map) {
-        settings['bleDevice'] = jsonEncode(settings['bleDevice']);
-      }
-    }
-    await db.update(
-      'necklaces',
-      settings,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    await db.delete('necklaces');
+    await db.delete('notes');
     _necklaceUpdateController.add(null);
-    _logger.logDebug('Updated necklace settings for id: $id');
+    _logger.logDebug('Deleted all necklace and note data');
+  }
+
+  Future<void> updateNecklaceSettings(String id, Map<String, dynamic> settings) async {
+    try {
+      final db = await database;
+      final services = settings['services'] as List<dynamic>?;
+
+      if (services != null) {
+        for (var service in services) {
+          _logger.logDebug('Service UUID: ${service['uuid']}');
+          final characteristics = service['characteristics'] as List<dynamic>?;
+          if (characteristics != null) {
+            for (var characteristic in characteristics) {
+              _logger.logDebug('Characteristic UUID: ${characteristic['uuid']}');
+              _logger.logDebug('Properties: ${characteristic['properties']}');
+            }
+          }
+        }
+      }
+      else {
+        _logger.logDebug('Services are null.');
+      }
+
+      await db.update(
+        'necklaces',
+        settings,
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+      _necklaceUpdateController.add(null);
+    } catch (e) {
+      _logger.logError('Error updating necklace settings: $e');
+      rethrow;
+    }
   }
 
   Future<Necklace?> getNecklaceById(String id) async {
@@ -277,6 +296,40 @@ class DatabaseService {
       _necklaceUpdateController.add(null);
     } catch (e) {
       _logger.logError('Error updating LED state for necklace $necklaceId: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateHeartRateMonitorDevice(String necklaceId, Map<String, dynamic> deviceData) async {
+    try {
+      final db = await database;
+      await db.update(
+        'necklaces',
+        {'heartRateMonitorDevice': jsonEncode(deviceData)},
+        where: 'id = ?',
+        whereArgs: [necklaceId],
+      );
+      _necklaceUpdateController.add(null);
+      _logger.logDebug('Updated heart rate monitor device for necklace: $necklaceId');
+    } catch (e) {
+      _logger.logError('Error updating heart rate monitor device: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> removeHeartRateMonitor(String necklaceId) async {
+    try {
+      final db = await database;
+      await db.update(
+        'necklaces',
+        {'heartRateMonitorDevice': null},
+        where: 'id = ?',
+        whereArgs: [necklaceId],
+      );
+      _necklaceUpdateController.add(null);
+      _logger.logDebug('Removed heart rate monitor from necklace: $necklaceId');
+    } catch (e) {
+      _logger.logError('Error removing heart rate monitor: $e');
       rethrow;
     }
   }
