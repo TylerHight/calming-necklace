@@ -22,6 +22,7 @@ class BleSettingsSyncService {
   
   /// Synchronizes all settings with the connected BLE device
   Future<void> syncAllSettings(Necklace necklace) async {
+    _logger = await LoggingService.getInstance();
     if (necklace.bleDevice == null) {
       _logger.logWarning('Cannot sync settings: No BLE device connected to necklace');
       return;
@@ -53,36 +54,42 @@ class BleSettingsSyncService {
   
   /// Synchronizes only changed settings with the connected BLE device
   Future<void> syncChangedSettings(Necklace originalNecklace, Necklace updatedNecklace) async {
+    _logger = await LoggingService.getInstance();
     if (updatedNecklace.bleDevice == null) {
       _logger.logWarning('Cannot sync settings: No BLE device connected to necklace');
       return;
     }
-    
+
     try {
       _logger.logInfo('Starting changed settings sync for device: ${updatedNecklace.bleDevice!.name}');
-      
+
+      // Check if device is connected before attempting to sync
+      if (!await _bleService.isDeviceConnected(updatedNecklace.bleDevice!.id)) {
+        await _bleService.connectToDevice(updatedNecklace.bleDevice!.device!);
+      }
+
       // Check and sync emission duration if changed
       if (originalNecklace.emission1Duration != updatedNecklace.emission1Duration) {
         await syncEmissionDuration(updatedNecklace);
       }
-      
+
       // Check and sync release interval if changed
       if (originalNecklace.releaseInterval1 != updatedNecklace.releaseInterval1) {
         await syncReleaseInterval(updatedNecklace);
       }
-      
+
       // Check and sync periodic emission setting if changed
       if (originalNecklace.periodicEmissionEnabled != updatedNecklace.periodicEmissionEnabled) {
         await syncPeriodicEmission(updatedNecklace);
       }
-      
+
       // Check and sync heart rate settings if changed
       if (originalNecklace.isHeartRateBasedReleaseEnabled != updatedNecklace.isHeartRateBasedReleaseEnabled ||
           originalNecklace.highHeartRateThreshold != updatedNecklace.highHeartRateThreshold ||
           originalNecklace.lowHeartRateThreshold != updatedNecklace.lowHeartRateThreshold) {
         await syncHeartRateSettings(updatedNecklace);
       }
-      
+
       _logger.logInfo('Changed settings sync completed successfully');
     } catch (e) {
       _logger.logError('Error syncing changed settings with device: $e');

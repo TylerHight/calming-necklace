@@ -11,6 +11,8 @@ import '../../../core/services/logging_service.dart';
 import '../../../core/services/ble/ble_service.dart';
 import '../../../core/ui/formatters.dart';
 import '../blocs/settings/settings_bloc.dart';
+import '../blocs/settings/settings_event.dart';
+import '../blocs/settings/settings_state.dart';
 import '../widgets/duration_picker_dialog.dart';
 import '../widgets/heart_rate_settings_dialog.dart';
 import '../widgets/settings_help_dialog.dart';
@@ -43,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late LoggingService _logger;
   final BleSettingsSyncService _settingsSyncService = BleSettingsSyncService();
   bool _isLoading = false;
+  bool _isSyncing = false;
 
   @override
   void initState() {
@@ -77,7 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await _syncSettingsWithDevice(context);
+        await _syncSettingsWithDevice(context, showLoadingIndicator: true);
         return true;
       },
       child: BlocProvider(
@@ -105,7 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Manually syncing settings...'))
                   );
-                  await _syncSettingsWithDevice(context);
+                  await _syncSettingsWithDevice(context, showLoadingIndicator: true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Manual sync completed'))
                   );
@@ -125,15 +128,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
             databaseService: widget.databaseService,
             necklace: widget.necklace,
           ),
+          // Add loading overlay when syncing
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: _isSyncing 
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.black54, borderRadius: BorderRadius.circular(8)),
+                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  CircularProgressIndicator(color: Colors.white), SizedBox(width: 16), 
+                  Text('Syncing settings...', style: TextStyle(color: Colors.white))]))
+            : null,
         ),
       ),
     );
   }
 
   /// Synchronizes changed settings with the BLE device when leaving the settings screen
-  Future<void> _syncSettingsWithDevice(BuildContext context) async {
-    bool isLoading = false;
+  Future<void> _syncSettingsWithDevice(BuildContext context, {bool showLoadingIndicator = false}) async {
     final settingsBloc = context.read<SettingsBloc>();
+    if (_isSyncing) return; // Prevent multiple syncs
+    
     final currentState = settingsBloc.state;
     final originalNecklace = settingsBloc.originalNecklace;
 
@@ -145,26 +160,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // Check if any settings have changed
     if (_haveSettingsChanged(originalNecklace, currentState.necklace)) {
       _logger.logInfo('Settings have changed, syncing with device');
-
+      
       try {
-        setState(() => isLoading = true);
-        // Show a loading indicator
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Syncing settings with device...'))
-        );
+        if (showLoadingIndicator) {
+          setState(() => _isSyncing = true);
+          // Show a loading indicator
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Syncing settings with device...'))
+          );
+        }
 
+        // Wait a moment to ensure connection is established
         // Sync the changed settings with the device
         await _settingsSyncService.syncChangedSettings(originalNecklace, currentState.necklace);
+        
+        // Update the original necklace in the settings bloc to reflect the changes
+        settingsBloc.add(SaveSettings());
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Settings synced successfully'))
-        );
-        setState(() => isLoading = false);
+        if (showLoadingIndicator) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Settings synced successfully'))
+          );
+          setState(() => _isSyncing = false);
+        }
       } catch (e) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to sync settings: $e'))
+            SnackBar(content: Text('Failed to sync settings: $e'))
         );
-        setState(() => isLoading = false);
+        setState(() => _isLoading = false);
       }
     }
   }
