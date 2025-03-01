@@ -42,6 +42,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late LoggingService _logger;
   final BleSettingsSyncService _settingsSyncService = BleSettingsSyncService();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -99,6 +100,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             elevation: 0,
             actions: [
               IconButton(
+                icon: const Icon(Icons.sync, color: Colors.black87),
+                onPressed: () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Manually syncing settings...'))
+                  );
+                  await _syncSettingsWithDevice(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Manual sync completed'))
+                  );
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.help_outline, color: Colors.black87),
                 onPressed: () => showDialog(
                   context: context,
@@ -119,6 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   /// Synchronizes changed settings with the BLE device when leaving the settings screen
   Future<void> _syncSettingsWithDevice(BuildContext context) async {
+    bool isLoading = false;
     final settingsBloc = context.read<SettingsBloc>();
     final currentState = settingsBloc.state;
     final originalNecklace = settingsBloc.originalNecklace;
@@ -133,6 +147,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _logger.logInfo('Settings have changed, syncing with device');
 
       try {
+        setState(() => isLoading = true);
         // Show a loading indicator
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Syncing settings with device...'))
@@ -144,10 +159,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Settings synced successfully'))
         );
+        setState(() => isLoading = false);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to sync settings: $e'))
         );
+        setState(() => isLoading = false);
       }
     }
   }
