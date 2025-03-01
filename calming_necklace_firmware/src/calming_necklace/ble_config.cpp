@@ -23,7 +23,7 @@ BLEByteCharacteristic lowHeartRateThresholdCharacteristic("19B10004-E8F2-537E-4F
 
 bool isConnected = false;
 
-bool setupBLE(uint8_t maxAttempts = 3) {
+bool setupBLE(uint8_t maxAttempts) {
     debugPrintln(DEBUG_BLE, "\nInitializing BLE...");
 
     uint8_t attempts = 0;

@@ -40,7 +40,7 @@ extern BLEByteCharacteristic heartRateEnabledCharacteristic;
 extern BLEByteCharacteristic highHeartRateThresholdCharacteristic;
 extern BLEByteCharacteristic lowHeartRateThresholdCharacteristic;
 
-void setupBLE();
+bool setupBLE(uint8_t maxAttempts = 3);
 void setupServices();
 void initializeCharacteristics();
 void onCentralConnected(BLEDevice central);
