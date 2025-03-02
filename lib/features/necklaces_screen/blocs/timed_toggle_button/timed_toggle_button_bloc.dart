@@ -145,7 +145,6 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     } else if (_isTimerActive) {
       _isTimerActive = false;
       _isActive = false;
-      await _repository.toggleLight(necklace, false);
       if (!emit.isDone) emit(LightOffState());
       _stopTimer(emit);
     }
@@ -194,10 +193,8 @@ class TimedToggleButtonBloc extends Bloc<TimedToggleButtonEvent, TimedToggleButt
     _tickerSubscription?.cancel();
     _isTimerActive = false;
     _isActive = false;
-    await _repository.toggleLight(necklace, false).then((_) {
-      if (!emit.isDone) emit(LightOffState());
-    });
-    _logger.logInfo('Timer stopped and light turned off');
+    if (!emit.isDone) emit(LightOffState());
+    _logger.logInfo('Timer stopped');
   }
 
   Future<void> _onStartPeriodicEmission(
