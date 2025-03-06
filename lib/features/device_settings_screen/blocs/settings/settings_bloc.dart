@@ -1,5 +1,3 @@
-// lib/features/device_settings_screen/blocs/settings/settings_bloc.dart
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/data/models/necklace.dart';
 import '../../../../core/data/repositories/necklace_repository.dart';
@@ -12,7 +10,6 @@ import 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final NecklaceRepository _repository;
   final DatabaseService _databaseService;
-  Necklace? _originalNecklace;
   final LoggingService _logger = LoggingService.instance;
 
   SettingsBloc(Necklace necklace, this._repository, this._databaseService)
@@ -27,11 +24,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<UpdateHeartRateBasedRelease>(_onUpdateHeartRateBasedRelease);
     on<UpdateHighHeartRateThreshold>(_onUpdateHighHeartRateThreshold);
     on<UpdateLowHeartRateThreshold>(_onUpdateLowHeartRateThreshold);
-
-    _originalNecklace = necklace.copyWith();
   }
-
-  Necklace? get originalNecklace => _originalNecklace;
 
   Future<void> _onSaveSettings(SaveSettings event, Emitter<SettingsState> emit) async {
     try {
@@ -40,10 +33,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         state.necklace.toMap(),
       );
       emit(state.copyWith(isSaved: true));
-
-      // Call syncChangedSettings after saving settings
-      final BleSettingsSyncService bleSyncService = BleSettingsSyncService();
-      await bleSyncService.syncChangedSettings(_originalNecklace!, state.necklace);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
     }
@@ -126,7 +115,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   void _onRefreshSettings(RefreshSettings event, Emitter<SettingsState> emit) {
-    _originalNecklace = event.necklace.copyWith();
     emit(state.copyWith(necklace: event.necklace));
   }
 

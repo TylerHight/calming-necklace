@@ -128,7 +128,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             databaseService: widget.databaseService,
             necklace: widget.necklace,
           ),
-          // Add loading overlay when syncing
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           floatingActionButton: _isSyncing 
             ? Container(
@@ -147,39 +146,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Synchronizes changed settings with the BLE device when leaving the settings screen
   Future<void> _syncSettingsWithDevice(BuildContext context, {bool showLoadingIndicator = false}) async {
     final settingsBloc = context.read<SettingsBloc>();
-    if (_isSyncing) return; // Prevent multiple syncs
+    if (_isSyncing) return; // Prevent multiple syncs running at once
     
     final currentState = settingsBloc.state;
-    final originalNecklace = settingsBloc.originalNecklace;
-
-    if (originalNecklace == null || currentState.necklace.bleDevice == null) {
-      _logger.logWarning('Cannot sync settings: Missing original necklace or BLE device');
+    final stateNecklace = currentState.necklace;
+    
+    if (stateNecklace.bleDevice == null) {
+      _logger.logWarning('Cannot sync settings: Missing BLE device');
+      return;
+    }
+    
+    // Get the latest necklace from the database to compare with the state's necklace
+    final updatedNecklace = await widget.databaseService.getNecklaceById(stateNecklace.id);
+    if (updatedNecklace == null) {
+      _logger.logWarning('Cannot sync settings: Unable to retrieve necklace from database');
       return;
     }
 
     // Check if any settings have changed
-    if (_haveSettingsChanged(originalNecklace, currentState.necklace)) {
-      _logger.logInfo('Settings have changed, syncing with device');
+    if (_haveSettingsChanged(stateNecklace, updatedNecklace)) {
+      _logger.logInfo('Settings have changed, syncing with device. State necklace vs DB necklace:');
+      _logger.logDebug('State emission duration: ${stateNecklace.emission1Duration}, DB: ${updatedNecklace.emission1Duration}');
+      _logger.logDebug('State release interval: ${stateNecklace.releaseInterval1}, DB: ${updatedNecklace.releaseInterval1}');
+      _logger.logDebug('State periodic emission: ${stateNecklace.periodicEmissionEnabled}, DB: ${updatedNecklace.periodicEmissionEnabled}');
       
       try {
         if (showLoadingIndicator) {
           setState(() => _isSyncing = true);
-          // Show a loading indicator
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Syncing settings with device...'))
           );
         }
 
-        // Wait a moment to ensure connection is established
         // Sync the changed settings with the device
-        await _settingsSyncService.syncChangedSettings(originalNecklace, currentState.necklace);
+        // The state necklace contains the original settings, and the database necklace contains the updated settings
+        await _settingsSyncService.syncChangedSettings(stateNecklace, updatedNecklace);
         
-        // Update the original necklace in the settings bloc to reflect the changes
+        // Save settings to ensure everything is in sync
         settingsBloc.add(SaveSettings());
 
         if (showLoadingIndicator) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Settings synced successfully'))
+            const SnackBar(content: Text('Settings synced successfully with device'))
           );
           setState(() => _isSyncing = false);
         }
@@ -188,19 +196,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to sync settings: $e'))
         );
-        setState(() => _isLoading = false);
+        setState(() => _isSyncing = false);
       }
     }
   }
 
   /// Checks if any settings have changed between the original and current necklace
-  bool _haveSettingsChanged(Necklace original, Necklace current) {
-    return original.emission1Duration != current.emission1Duration ||
-           original.releaseInterval1 != current.releaseInterval1 ||
-           original.periodicEmissionEnabled != current.periodicEmissionEnabled ||
-           original.isHeartRateBasedReleaseEnabled != current.isHeartRateBasedReleaseEnabled ||
-           original.highHeartRateThreshold != current.highHeartRateThreshold ||
-           original.lowHeartRateThreshold != current.lowHeartRateThreshold;
+  bool _haveSettingsChanged(Necklace stateNecklace, Necklace dbNecklace) {
+    return stateNecklace.emission1Duration != dbNecklace.emission1Duration ||
+           stateNecklace.releaseInterval1 != dbNecklace.releaseInterval1 ||
+           stateNecklace.periodicEmissionEnabled != dbNecklace.periodicEmissionEnabled ||
+           stateNecklace.isHeartRateBasedReleaseEnabled != dbNecklace.isHeartRateBasedReleaseEnabled ||
+           stateNecklace.highHeartRateThreshold != dbNecklace.highHeartRateThreshold ||
+           stateNecklace.lowHeartRateThreshold != dbNecklace.lowHeartRateThreshold;
   }
 }
 
