@@ -320,13 +320,27 @@ class BleService {
     }
   }
 
-  Future<void> ensureConnected() async {
-    if (_connectedDevice == null || !await checkDeviceConnected(_connectedDevice!)) {
-      throw BleException('Device not connected');
-    }
-
-    if (!_isInitialized) {
-      await _initializeCharacteristics(_connectedDevice!, forceRediscovery: true);
+  /// Ensures that a device is connected before performing operations
+  /// Returns true if connected successfully, false otherwise
+  Future<bool> ensureConnected() async {
+    try {
+      // If we already have a connected device, check if it's still connected
+      if (_connectedDevice != null) {
+        final isConnected = await isDeviceConnected(_connectedDevice!.id.id);
+        if (isConnected) {
+          return true;
+        }
+        
+        // If not connected, try to reconnect
+        _logger.logBleInfo('Device disconnected. Attempting to reconnect...');
+        return await connectToDevice(_connectedDevice!);
+      }
+      
+      _logger.logBleWarning('No device to connect to');
+      return false;
+    } catch (e) {
+      _logger.logBleError('Error ensuring connection', e);
+      return false;
     }
   }
 
@@ -428,12 +442,15 @@ class BleService {
   Future<void> updateHeartRateSettings(String deviceId, bool enabled, int highThreshold, int lowThreshold) async {
     await ensureConnected();
     
-    // Send heart rate enabled/disabled command
-    await _writeCommand(BleCommand.heartRateEnabled.value, enabled ? 1 : 0);
+    // Create a settings map to use the existing updateDeviceSettings method
+    final settings = {
+      'heartRateEnabled': enabled ? 1 : 0,
+      'highHeartRate': highThreshold,
+      'lowHeartRate': lowThreshold,
+    };
     
-    // Send heart rate thresholds
-    await _writeCommand(BleCommand.highHeartRateThreshold.value, highThreshold);
-    await _writeCommand(BleCommand.lowHeartRateThreshold.value, lowThreshold);
+    await updateDeviceSettings(deviceId, settings);
+    _logger.logBleInfo('Heart rate settings updated: enabled=$enabled, high=$highThreshold, low=$lowThreshold');
   }
 
   Future<void> updateDeviceSettings(String deviceId, Map<String, dynamic> settings) async {
