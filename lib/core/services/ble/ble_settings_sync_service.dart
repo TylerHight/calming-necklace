@@ -57,7 +57,7 @@ class BleSettingsSyncService {
 
   /// Synchronizes only changed settings with the connected BLE device
   Future<void> syncChangedSettings(Necklace originalNecklace, Necklace updatedNecklace) async {
-    await _initLogger(); // Ensure logger is initialized
+    await _initLogger();
 
     if (updatedNecklace.bleDevice == null) {
       _logger.logWarning('Cannot sync settings: No BLE device connected to necklace');

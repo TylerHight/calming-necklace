@@ -82,24 +82,31 @@ void checkPeriodicEmissions() {
 }
 
 void handleSwitchCommand(int command, int value) {
+    debugPrintf(DEBUG_SETTINGS, "Received command: %d with value: %d\n", command, value);
     switch (command) {
-        case 4: // CMD_EMISSION1_DURATION
-            emission1Duration = value;
+        case CMD_EMISSION_DURATION:
+            emission1Duration = value * 1000;  // Convert seconds to milliseconds
+            debugPrintf(DEBUG_SETTINGS, "Switch command: Emission duration updated: %lu ms\n", emission1Duration);
             break;
-        case 6: // CMD_INTERVAL1
-            releaseInterval1 = value;
+        case CMD_INTERVAL:
+            releaseInterval1 = value * 1000;  // Convert seconds to milliseconds
+            debugPrintf(DEBUG_SETTINGS, "Switch command: Release interval updated: %lu ms\n", releaseInterval1);
             break;
-        case 8: // CMD_PERIODIC1
+        case CMD_PERIODIC_ENABLED:
             periodicEmissionEnabled = (value == 1);
+            debugPrintf(DEBUG_SETTINGS, "Switch command: Periodic emission %s\n", periodicEmissionEnabled ? "enabled" : "disabled");
             break;
-        case 10: // CMD_HEART_RATE_ENABLED
+        case CMD_HEART_RATE_ENABLED:
             heartRateBasedReleaseEnabled = (value == 1);
+            debugPrintf(DEBUG_SETTINGS, "Switch command: Heart rate based release %s\n", heartRateBasedReleaseEnabled ? "enabled" : "disabled");
             break;
         case CMD_HIGH_HEART_RATE_THRESHOLD:
             highHeartRateThreshold = value;
+            debugPrintf(DEBUG_SETTINGS, "Switch command: High heart rate threshold updated: %d BPM\n", highHeartRateThreshold);
             break;
         case CMD_LOW_HEART_RATE_THRESHOLD:
             lowHeartRateThreshold = value;
+            debugPrintf(DEBUG_SETTINGS, "Switch command: Low heart rate threshold updated: %d BPM\n", lowHeartRateThreshold);
             break;
     }
 }

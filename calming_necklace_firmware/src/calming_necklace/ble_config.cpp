@@ -45,7 +45,7 @@ bool setupBLE(uint8_t maxAttempts) {
     }
 
     debugPrintln(DEBUG_BLE, "ERROR: BLE initialization failed after max attempts");
-    handleLEDs(CMD_LED_RED);  // Visual error indication
+    handleLEDs(CMD_LED_ON);  // Visual error indication
     return false;
 }
 
@@ -103,7 +103,7 @@ void handlePeripheralLoop(BLEDevice central) {
         resetActivityTimer();
         byte command = switchCharacteristic.value();
         
-        if (command == CMD_LED_RED) {
+        if (command == CMD_LED_ON) {
             triggerEmission(TRIGGER_MANUAL);
         } else {
             handleLEDs(command);

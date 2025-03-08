@@ -19,29 +19,20 @@ void handleLEDs(byte command) {
     debugPrintf(DEBUG_LED, "%d\n", command);
 
     switch (command) {
-        case CMD_LED_RED:
+        case CMD_LED_ON:
             debugPrintln(DEBUG_LED, "Red LED on");
             digitalWrite(LEDR, LOW);
             digitalWrite(LEDG, HIGH);
             digitalWrite(LEDB, HIGH);
             break;
-        case CMD_LED_GREEN:
-            debugPrintln(DEBUG_LED, "Green LED on");
-            digitalWrite(LEDR, HIGH);
-            digitalWrite(LEDG, LOW);
-            digitalWrite(LEDB, HIGH);
-            break;
-        case CMD_LED_BLUE:
-            debugPrintln(DEBUG_LED, "Blue LED on");
-            digitalWrite(LEDR, HIGH);
-            digitalWrite(LEDG, HIGH);
-            digitalWrite(LEDB, LOW);
-            break;
-        default:
+        case CMD_LED_OFF:
             debugPrintln(DEBUG_LED, "LEDs off");
             digitalWrite(LEDR, HIGH);
             digitalWrite(LEDG, HIGH);
             digitalWrite(LEDB, HIGH);
+            break;
+        default:
+            debugPrintln(DEBUG_LED, "Ignoring unsupported LED command");
             break;
     }
 }

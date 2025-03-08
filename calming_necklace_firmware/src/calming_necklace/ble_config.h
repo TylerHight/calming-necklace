@@ -9,12 +9,12 @@
 // Command definitions
 #define CMD_LED_ON 1
 #define CMD_LED_OFF 2
-#define CMD_EMISSION1_DURATION 4
-#define CMD_INTERVAL1 6
-#define CMD_PERIODIC1 8
-#define CMD_HEART_RATE_ENABLED 10
-#define CMD_HIGH_HEART_RATE_THRESHOLD 11
-#define CMD_LOW_HEART_RATE_THRESHOLD 12
+#define CMD_EMISSION_DURATION 3  // emission duration
+#define CMD_INTERVAL 4  // periodic emission interval
+#define CMD_PERIODIC_ENABLED 5
+#define CMD_HEART_RATE_ENABLED 6
+#define CMD_HIGH_HEART_RATE_THRESHOLD 7
+#define CMD_LOW_HEART_RATE_THRESHOLD 8
 
 // Service and characteristic UUIDs
 #define LED_SERVICE_UUID "19B10000-E8F2-537E-4F6C-D104768A1214"
@@ -27,15 +27,9 @@ extern BLEService settingsService;
 extern BLEByteCharacteristic switchCharacteristic;
 extern BLEByteCharacteristic keepAliveCharacteristic;
 extern BLELongCharacteristic emission1Characteristic;
-extern BLELongCharacteristic emission2Characteristic;
 extern BLELongCharacteristic interval1Characteristic;
-extern BLELongCharacteristic interval2Characteristic;
 extern BLEByteCharacteristic periodic1Characteristic;
-extern BLEByteCharacteristic periodic2Characteristic;
 extern BLEByteCharacteristic heartrateCharacteristic;
-extern BLEByteCharacteristic heartRateEnabledCharacteristic;
-extern BLEByteCharacteristic highHeartRateThresholdCharacteristic;
-extern BLEByteCharacteristic lowHeartRateThresholdCharacteristic;
 extern BLEByteCharacteristic heartRateEnabledCharacteristic;
 extern BLEByteCharacteristic highHeartRateThresholdCharacteristic;
 extern BLEByteCharacteristic lowHeartRateThresholdCharacteristic;

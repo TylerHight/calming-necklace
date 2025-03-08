@@ -54,7 +54,7 @@ bool triggerEmission(byte triggerSource) {
     lastTriggerSource = triggerSource;
     
     // Turn on the LED (representing the fan)
-    handleLEDs(CMD_LED_RED);
+    handleLEDs(CMD_LED_ON);
     
     return true;
 }
