@@ -344,7 +344,7 @@ class BleService {
     }
   }
 
-  Future<void> setLedColor(int command) async {
+  Future<void> setLedColor(int command, [int? value]) async {
     await ensureConnected();
     try {
       if (command < 0 || command > BleCommand.periodic1.value) {
@@ -357,9 +357,19 @@ class BleService {
         throw BleException('Device connection lost');
       }
       
-      await _writeCommand(command, 0); // TODO: Provide correct second parameter (currently dummy value)
+      // For LED on/off commands, the value parameter is typically not needed
+      // For setting commands (like durations, intervals), the value is required
+      final cmd = BleCommand.values.firstWhere((c) => c.value == command, 
+                                             orElse: () => throw BleException('Unknown command'));
+      
+      if (cmd.isSettingCommand && value == null) {
+        throw BleException('Value parameter required for setting command');
+      }
+      
+      await _writeCommand(command, value!);
+      _logger.logDebug('Command $command sent with value: $value');
     } catch (e) {
-      _logger.logBleError('Failed to set LED color: $e');
+      _logger.logBleError('Failed to set LED color or setting: $e');
       rethrow;
     }
   }
