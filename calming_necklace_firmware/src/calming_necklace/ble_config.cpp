@@ -102,7 +102,8 @@ void handlePeripheralLoop(BLEDevice central) {
     if (switchCharacteristic.written()) {
         resetActivityTimer();
         byte command = switchCharacteristic.value();
-        
+
+        debugPrintln(DEBUG_BLE, "Received command.");
         if (command == CMD_LED_ON) {
             triggerEmission(TRIGGER_MANUAL);
         } else {

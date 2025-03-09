@@ -162,7 +162,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _logger.logWarning('Cannot sync settings: Unable to retrieve necklace from database');
       return;
     }
-
+  
     // Check if any settings have changed
     if (_haveSettingsChanged(stateNecklace, updatedNecklace)) {
       _logger.logInfo('Settings have changed, syncing with device. State necklace vs DB necklace:');
@@ -177,27 +177,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SnackBar(content: Text('Syncing settings with device...'))
           );
         }
-
+  
         // Sync the changed settings with the device
-        // The state necklace contains the original settings, and the database necklace contains the updated settings
         await _settingsSyncService.syncChangedSettings(stateNecklace, updatedNecklace);
         
-        // Save settings to ensure everything is in sync
-        settingsBloc.add(SaveSettings());
-
-        if (showLoadingIndicator) {
+        // After successful sync, update the UI state with the database values
+        if (mounted) {
+          settingsBloc.add(RefreshSettings(updatedNecklace));
+          _logger.logInfo('Settings synced successfully and UI state updated');
+        }
+        
+        if (showLoadingIndicator && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Settings synced successfully with device'))
+            const SnackBar(content: Text('Settings synced successfully'))
           );
-          setState(() => _isSyncing = false);
         }
       } catch (e) {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to sync settings: $e'))
-        );
-        setState(() => _isSyncing = false);
+        _logger.logError('Error syncing settings with device: $e');
+        if (mounted && showLoadingIndicator) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error syncing settings: $e'))
+          );
+        }
+      } finally {
+        if (mounted && showLoadingIndicator) {
+          setState(() => _isSyncing = false);
+        }
       }
+    } else {
+      _logger.logInfo('No settings changes detected, skipping sync');
     }
   }
 

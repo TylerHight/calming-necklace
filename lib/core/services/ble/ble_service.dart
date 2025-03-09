@@ -437,29 +437,30 @@ class BleService {
   }
 
   // Device Settings Methods
+  // Device Settings Methods
   Future<void> updateEmission1Duration(String deviceId, Duration duration) async {
-    await _writeCommand(BleCommand.emission1Duration.value, duration.inSeconds);
+    await ensureConnected();
+    await setLedColor(BleCommand.emission1Duration.value, duration.inSeconds);
   }
 
   Future<void> updateInterval1(String deviceId, Duration interval) async {
-    await _writeCommand(BleCommand.interval1.value, interval.inSeconds);
+    await ensureConnected();
+    await setLedColor(BleCommand.interval1.value, interval.inSeconds);
   }
 
   Future<void> updatePeriodicEmission1(String deviceId, bool enabled) async {
-    await _writeCommand(BleCommand.periodic1.value, enabled ? 1 : 0);
+    await ensureConnected();
+    await setLedColor(BleCommand.periodic1.value, enabled ? 1 : 0);
   }
 
   Future<void> updateHeartRateSettings(String deviceId, bool enabled, int highThreshold, int lowThreshold) async {
     await ensureConnected();
     
-    // Create a settings map to use the existing updateDeviceSettings method
-    final settings = {
-      'heartRateEnabled': enabled ? 1 : 0,
-      'highHeartRate': highThreshold,
-      'lowHeartRate': lowThreshold,
-    };
+    // Use setLedColor for each heart rate setting
+    await setLedColor(BleCommand.heartRateEnabled.value, enabled ? 1 : 0);
+    await setLedColor(BleCommand.highHeartRateThreshold.value, highThreshold);
+    await setLedColor(BleCommand.lowHeartRateThreshold.value, lowThreshold);
     
-    await updateDeviceSettings(deviceId, settings);
     _logger.logBleInfo('Heart rate settings updated: enabled=$enabled, high=$highThreshold, low=$lowThreshold');
   }
 
@@ -469,22 +470,22 @@ class BleService {
     for (final entry in settings.entries) {
       switch (entry.key) {
         case 'emission1':
-          await updateEmission1Duration(deviceId, Duration(seconds: entry.value));
+          await setLedColor(BleCommand.emission1Duration.value, entry.value);
           break;
         case 'interval1':
-          await updateInterval1(deviceId, Duration(seconds: entry.value));
+          await setLedColor(BleCommand.interval1.value, entry.value);
           break;
         case 'periodic1':
-          await updatePeriodicEmission1(deviceId, entry.value == 1);
+          await setLedColor(BleCommand.periodic1.value, entry.value == 1 ? 1 : 0);
           break;
         case 'heartRateEnabled':
-          await _writeCommand(BleCommand.heartRateEnabled.value, entry.value);
+          await setLedColor(BleCommand.heartRateEnabled.value, entry.value);
           break;
         case 'highHeartRate':
-          await _writeCommand(BleCommand.highHeartRateThreshold.value, entry.value);
+          await setLedColor(BleCommand.highHeartRateThreshold.value, entry.value);
           break;
         case 'lowHeartRate':
-          await _writeCommand(BleCommand.lowHeartRateThreshold.value, entry.value);
+          await setLedColor(BleCommand.lowHeartRateThreshold.value, entry.value);
           break;
       }
     }
