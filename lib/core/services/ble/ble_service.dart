@@ -121,7 +121,7 @@ class BleService {
   }
 
   void _startRssiUpdates() {
-    _rssiTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+    _rssiTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
       if (_connectedDevice != null) {
         try {
           final rssi = await _connectedDevice!.readRssi();

@@ -81,7 +81,7 @@ void initializeCharacteristics() {
 
 void onCentralConnected(BLEDevice central) {
     debugPrint(DEBUG_BLE, "Connected to central: ");
-    debugPrintln(DEBUG_BLE, central.address().c_str());
+    debugPrintln(DEBUG_BLE, central.address().c_str());  // Now using the parameter
     digitalWrite(LED_BUILTIN, HIGH);
     resetActivityTimer();
     resetKeepAliveTimer();
@@ -91,7 +91,7 @@ void onCentralConnected(BLEDevice central) {
 
 void onCentralDisconnected(BLEDevice central) {
     debugPrint(DEBUG_BLE, "Disconnected from central: ");
-    debugPrintln(DEBUG_BLE, central.address().c_str());
+    debugPrintln(DEBUG_BLE, central.address().c_str());  // Now using the parameter
     digitalWrite(LED_BUILTIN, LOW);
     handleLEDs(CMD_LED_OFF);
     BLE.advertise();
@@ -103,9 +103,15 @@ void handlePeripheralLoop(BLEDevice central) {
         resetActivityTimer();
         byte command = switchCharacteristic.value();
 
-        debugPrintln(DEBUG_BLE, "Received command.");
+        debugPrintf(DEBUG_BLE, "Received command: %d\n", command);
+
         if (command == CMD_LED_ON) {
             triggerEmission(TRIGGER_MANUAL);
+        } else if (command >= CMD_EMISSION_DURATION && command <= CMD_LOW_HEART_RATE_THRESHOLD) {
+            // For settings commands, we need a second byte for the value
+            // This would typically be handled in a separate characteristic or protocol
+            // For now, we'll just log that we received a settings command
+            debugPrintf(DEBUG_BLE, "Received settings command: %d (needs value)\n", command);
         } else {
             handleLEDs(command);
         }
@@ -116,9 +122,48 @@ void handlePeripheralLoop(BLEDevice central) {
         onKeepAliveReceived(central, keepAliveCharacteristic);
     }
 
+    // Handle settings characteristics
+    if (emission1Characteristic.written()) {
+        long value = emission1Characteristic.value();
+        emission1Duration = value;
+        debugPrintf(DEBUG_SETTINGS, "Emission duration updated: %lu ms\n", emission1Duration);
+    }
+
+    if (interval1Characteristic.written()) {
+        long value = interval1Characteristic.value();
+        releaseInterval1 = value;
+        debugPrintf(DEBUG_SETTINGS, "Release interval updated: %lu ms\n", releaseInterval1);
+    }
+
+    if (periodic1Characteristic.written()) {
+        byte value = periodic1Characteristic.value();
+        periodicEmissionEnabled = (value == 1);
+        debugPrintf(DEBUG_SETTINGS, "Periodic emission %s\n", periodicEmissionEnabled ? "enabled" : "disabled");
+    }
+
+    if (heartRateEnabledCharacteristic.written()) {
+        byte value = heartRateEnabledCharacteristic.value();
+        heartRateBasedReleaseEnabled = (value == 1);
+        debugPrintf(DEBUG_SETTINGS, "Heart rate based release %s\n", heartRateBasedReleaseEnabled ? "enabled" : "disabled");
+    }
+
+    if (highHeartRateThresholdCharacteristic.written()) {
+        byte value = highHeartRateThresholdCharacteristic.value();
+        highHeartRateThreshold = value;
+        debugPrintf(DEBUG_SETTINGS, "High heart rate threshold updated: %d BPM\n", highHeartRateThreshold);
+    }
+
+    if (lowHeartRateThresholdCharacteristic.written()) {
+        byte value = lowHeartRateThresholdCharacteristic.value();
+        lowHeartRateThreshold = value;
+        debugPrintf(DEBUG_SETTINGS, "Low heart rate threshold updated: %d BPM\n", lowHeartRateThreshold);
+    }
+
+    // Update settings and emission state
     handleSettingsUpdate();
     updateEmissionState();
 
+    // Check for timeouts
     if (isConnectionTimedOut() || isKeepAliveTimedOut()) {
         if (isConnected) {
             debugPrintln(DEBUG_BLE, "Connection or keep-alive timeout");

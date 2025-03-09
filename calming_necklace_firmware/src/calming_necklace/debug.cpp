@@ -4,7 +4,7 @@
 
 // Debug control variables
 bool globalDebugEnabled = true;
-uint8_t debugCategories = DEBUG_GENERAL | DEBUG_BLE;
+uint8_t debugCategories = DEBUG_GENERAL | DEBUG_BLE | DEBUG_SETTINGS;
 
 void debugInit() {
   // Initialize serial if not already done
